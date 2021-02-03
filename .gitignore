@@ -1,0 +1,7 @@
+/.project
+CMakeLists.txt.user
+CMakeLists.config
+out
+.vs
+CMakeLists.txt.user*
+CMakeSettings.json

@@ -1,0 +1,16 @@
+# Configura diretório de instalação (CMAKE_INSTALL_PREFIX).
+IF(CMAKE_BUILD_TYPE MATCHES Debug)
+    set(CMAKE_INSTALL_PREFIX [ROOT_DIR]/externalsUnisinos/win64-msvc2015/ContinentalLandscapeEvolutionModel/install/debug)
+    set(SHP_HOME [ROOT_DIR]/externalsUnisinos/win64-msvc2015/ContinentalDevOps/libraries/shapelib/install/debug)
+    set(ContinentalDataManagement_DIR "[ROOT_DIR]/externalsUnisinos/win64-msvc2015/ContinentalDataManagement/install/debug/lib/cmake/ContinentalDataManagement")
+	set(ContinentalHydroTools_DIR "[ROOT_DIR]/externalsUnisinos/win64-msvc2015/ContinentalHydroTools/install/debug/lib/cmake/ContinentalHydroTools")
+else()
+    set(CMAKE_INSTALL_PREFIX [ROOT_DIR]/externalsUnisinos/win64-msvc2015/ContinentalLandscapeEvolutionModel/install/release)
+    set(SHP_HOME [ROOT_DIR]/externalsUnisinos/win64-msvc2015/ContinentalDevOps/libraries/shapelib/install/release)
+    set(ContinentalDataManagement_DIR "[ROOT_DIR]/externalsUnisinos/win64-msvc2015/ContinentalDataManagement/install/release/lib/cmake/ContinentalDataManagement")
+	set(ContinentalHydroTools_DIR "[ROOT_DIR]/externalsUnisinos/win64-msvc2015/ContinentalHydroTools/install/release/lib/cmake/ContinentalHydroTools")
+endif()
+
+set(HDF5_HOME "[ROOT_DIR]/externalsUnisinos/win64-msvc2015/hdf5-1.8.17")
+set(HDF5_INCLUDE_DIRS "${HDF5_HOME}/include")
+set(HDF5_LIBRARIES optimized ${HDF5_HOME}/lib/hdf5_cpp.lib debug ${HDF5_HOME}/lib/hdf5_cppd.lib optimized ${HDF5_HOME}/lib/hdf5.lib debug ${HDF5_HOME}/lib/hdf5d.lib)
