@@ -5,6 +5,7 @@
 #include <continental/hydrotools/service/HeuristicSinkRemoval.h>
 #include <continental/hydrotools/service/HeuristicSinkRemovalUtil.h>
 #include <continental/hydrotools/service/FlowDirection.h>
+#include "continental/landscapeevolutionmodel/domain/EnumDirection.h"
 #include "continental/landscapeevolutionmodel/service/HydroToolsAlgorithmService.h"
 #include "continental/landscapeevolutionmodel/service/DirectionCalculatorService.h"
 #include <QString>
@@ -12,7 +13,6 @@
 #include <memory>
 #include <cmath>
 #include <vector>
-#include <iostream>
 
 using namespace continental::datamanagement;
 using namespace continental::hydrotools;
@@ -27,15 +27,12 @@ EroderAlgorithmService::EroderAlgorithmService()
 
 }
 
-EroderAlgorithmService::EroderAlgorithmService(std::shared_ptr<Raster<float>> initialGrid, double erodibility, size_t deltaT, double concavityIndex) :
-    m_deltaT(deltaT),
+EroderAlgorithmService::EroderAlgorithmService(std::shared_ptr<Raster<float>> raster, double erodibility, size_t deltaT, double concavityIndex) :
+    m_deltaTime(deltaT),
     m_erodibility(erodibility),
-    m_concavityIndex(concavityIndex),
-    m_initialGrid(initialGrid)
+    m_concavityIndex(concavityIndex)
 {
-	m_numberOfCols = m_initialGrid->getCols();
-	m_numberOfRows = m_initialGrid->getRows();
-	m_cellSize = m_initialGrid->getCellSize();
+    setRaster(raster);
 }
 
 
@@ -61,9 +58,208 @@ void EroderAlgorithmService::setStreamSegmentation(const std::shared_ptr<Raster<
 
 void EroderAlgorithmService::setCatchment(const std::shared_ptr<Raster<short>> catchment)
 {
-	m_catchment = catchment;
+    m_catchment = catchment;
 }
 
+size_t EroderAlgorithmService::getNumberOfIterations() const
+{
+    return m_numberOfIterations;
+}
+
+void EroderAlgorithmService::setNumberOfIterations(const size_t &numberOfIterations)
+{
+    m_numberOfIterations = numberOfIterations;
+}
+
+double EroderAlgorithmService::getPrecipitationRate() const
+{
+    return m_precipitationRate;
+}
+
+void EroderAlgorithmService::setPrecipitationRate(double precipitationRate)
+{
+    m_precipitationRate = precipitationRate;
+}
+
+std::shared_ptr<datamanagement::Raster<float> > EroderAlgorithmService::getRaster() const
+{
+    return m_raster;
+}
+
+void EroderAlgorithmService::setRaster(const std::shared_ptr<datamanagement::Raster<float>> &raster)
+{
+    m_raster = raster;
+    m_numberOfCols = m_raster->getCols();
+    m_numberOfRows = m_raster->getRows();
+    m_cellSize = m_raster->getCellSize();
+}
+
+double EroderAlgorithmService::getErodibility() const
+{
+    return m_erodibility;
+}
+
+void EroderAlgorithmService::setErodibility(double erodibility)
+{
+    m_erodibility = erodibility;
+}
+
+double EroderAlgorithmService::getConcavityIndex() const
+{
+    return m_concavityIndex;
+}
+
+void EroderAlgorithmService::setConcavityIndex(double concavityIndex)
+{
+    m_concavityIndex = concavityIndex;
+}
+
+double EroderAlgorithmService::getDepositionCoeficient() const
+{
+    return m_depositionCoeficient;
+}
+
+void EroderAlgorithmService::setDepositionCoeficient(double depositionCoeficient)
+{
+    m_depositionCoeficient = depositionCoeficient;
+}
+
+size_t EroderAlgorithmService::getDeltaTime() const
+{
+    return m_deltaTime;
+}
+
+void EroderAlgorithmService::setDeltaTime(const size_t &deltaT)
+{
+    m_deltaTime = deltaT;
+}
+
+void EroderAlgorithmService::useOnlyMainDrainageNetwork()
+{
+    m_drainageNetworkTypeLimit = OnlyMain;
+}
+
+void EroderAlgorithmService::useDrainageNetworkAmountLimit(size_t amountLimit)
+{
+    m_drainageNetworkTypeLimit = Amount;
+    m_drainageNetworkAmountLimit = amountLimit;
+}
+
+void EroderAlgorithmService::useDrainageNetworkPercentLimit(double percentLimit)
+{
+    m_drainageNetworkTypeLimit = Percent;
+    m_drainageNetworkAmountLimit = percentLimit;
+}
+
+short EroderAlgorithmService::getFlowAccumulationLimit() const
+{
+    return m_flowAccumulationLimit;
+}
+
+void EroderAlgorithmService::setFlowAccumulationLimit(short flowAccumulationLimit)
+{
+    m_flowAccumulationLimit = flowAccumulationLimit;
+}
+
+std::shared_ptr<datamanagement::Raster<double> > EroderAlgorithmService::getUplift() const
+{
+    return m_uplift;
+}
+
+void EroderAlgorithmService::setUplift(const std::shared_ptr<datamanagement::Raster<double> > &uplift)
+{
+    m_uplift = uplift;
+}
+
+std::vector<std::vector<double>> EroderAlgorithmService::donorsSummation(std::vector<PositionMatrix> &positions, bool addUplift)
+{
+    std::vector<std::vector<double>> donorsSummation(m_numberOfRows, std::vector<double>(m_numberOfCols));
+
+    const short fdrNoDataValue = m_flowDirection->getNoDataValue();
+
+    for (size_t iAux = positions.size(); iAux >= 1; iAux--)
+    {
+        size_t i = iAux - 1;
+
+        const PositionMatrix &position = positions[i];
+        const size_t row = position.row;
+        const size_t col = position.col;
+
+        const short fdrValue = m_flowDirection->getData(row, col);
+
+        std::vector<std::tuple<size_t, size_t, short>> directions = {
+            {row - 1, col + 1, static_cast<short>(EnumDirection::UpRight)},
+            {row - 1, col    , static_cast<short>(EnumDirection::Up)},
+            {row - 1, col - 1, static_cast<short>(EnumDirection::UpLeft)},
+            {row    , col - 1, static_cast<short>(EnumDirection::Left)},
+            {row + 1, col - 1, static_cast<short>(EnumDirection::DownLeft)},
+            {row + 1, col    , static_cast<short>(EnumDirection::Down)},
+            {row + 1, col + 1, static_cast<short>(EnumDirection::DownRight)},
+            {row    , col + 1, static_cast<short>(EnumDirection::Right)}
+        };
+
+        if (fdrValue != fdrNoDataValue)
+        {
+            for (const std::tuple<size_t, size_t, short> &direction : directions)
+            {
+                const size_t directionFdrRow = std::get<0>(direction);
+                const size_t directionFdrCol = std::get<1>(direction);
+                const short directionFdrValue = std::get<2>(direction);
+
+                if (fdrValue == directionFdrValue && m_flowDirection->getData(directionFdrRow, directionFdrCol) != fdrNoDataValue)
+                {
+                    donorsSummation[directionFdrRow][directionFdrCol] += m_raster->getData(row, col);
+                }
+            }
+        }
+    }
+
+    for (size_t iAux = positions.size(); iAux > 0; iAux--)
+    {
+        const size_t i = iAux - 1;
+
+        const PositionMatrix &position = positions[i];
+        const size_t row = position.row;
+        const size_t col = position.col;
+
+        const short fdrValue = m_flowDirection->getData(row, col);
+
+        std::vector<std::tuple<size_t, size_t, short >> directions = {
+            {row - 1, col + 1, static_cast<short>(EnumDirection::UpRight)},
+            {row - 1, col    , static_cast<short>(EnumDirection::Up)},
+            {row - 1, col - 1, static_cast<short>(EnumDirection::UpLeft)},
+            {row    , col - 1, static_cast<short>(EnumDirection::Left)},
+            {row + 1, col - 1, static_cast<short>(EnumDirection::DownLeft)},
+            {row + 1, col    , static_cast<short>(EnumDirection::Down)},
+            {row + 1, col + 1, static_cast<short>(EnumDirection::DownRight)},
+            {row    , col + 1, static_cast<short>(EnumDirection::Right)}
+        };
+
+        if (fdrValue != fdrNoDataValue)
+        {
+            for (const std::tuple<size_t, size_t, short> &direction : directions)
+            {
+                const size_t directionFdrRow = std::get<0>(direction);
+                const size_t directionFdrCol = std::get<1>(direction);
+                const short directionFdrValue = std::get<2>(direction);
+
+                if (fdrValue == directionFdrValue && m_flowDirection->getData(directionFdrRow, directionFdrCol) != fdrNoDataValue)
+                {
+                    if (addUplift && m_uplift != nullptr)
+                    {
+                        donorsSummation[directionFdrRow][directionFdrCol] += donorsSummation[row][col] + m_uplift->getData(row, col) * m_deltaTime;
+                    }
+                    else
+                    {
+                        donorsSummation[directionFdrRow][directionFdrCol] += donorsSummation[row][col];
+                    }
+                }
+            }
+        }
+    }
+
+    return donorsSummation;
+}
 
 void EroderAlgorithmService::execute()
 {
@@ -71,10 +267,10 @@ void EroderAlgorithmService::execute()
 	double horizontalDeltaL = m_cellSize;
 	
 	// se os pontos estão em diaginal, deltaL recebe este valor
-	double diagonalDeltaL = sqrt(2 * m_initialGrid->getCellSize() * m_initialGrid->getCellSize()); 
+    double diagonalDeltaL = sqrt(2 * m_raster->getCellSize() * m_raster->getCellSize());
 	
 	// vlores do Modelo de Elevação de Topografia 
-    Raster<float> dem = *m_initialGrid;
+    Raster<float> dem = *m_raster;
 
 	// valor de celula e canal de rio no stream definition
     short channelMarkerValue = 1;
@@ -93,8 +289,6 @@ void EroderAlgorithmService::execute()
 				// ao detectar que a celula é de canal, detecta para qual celula está esta sendo passado o fluxo
 				size_t rowReceiver = i; 
 				size_t colReceiver = j;
-
-				
 
 				bool result = moveToFlowDirection(m_flowDirection->getData(i, j), rowReceiver, colReceiver, m_numberOfRows, m_numberOfCols);
 
@@ -125,13 +319,13 @@ void EroderAlgorithmService::execute()
 				// se o valor topografico for inferior a zero, recebe 0
 				if (dem.getData(i, j) < 0.0 || qFuzzyCompare(dem.getData(i, j), 0.0f))
 				{
-					m_initialGrid->setData(i, j, 0);
+                    m_raster->setData(i, j, 0);
 				}
 				else
 				{
 					// calculo da erosão  E = -k * A^m * S de uma celula para outra
-                    auto value = ((-m_erodibility * pow((m_flowAccumulation->getData(i, j) * m_cellSize * m_cellSize), m_concavityIndex) * (dem.getData(i, j) - receiverElevation) / deltaL) * m_deltaT) + dem.getData(i, j);
-					m_initialGrid->setData(i, j, value);
+                    auto value = ((-m_erodibility * pow((m_flowAccumulation->getData(i, j) * m_cellSize * m_cellSize), m_concavityIndex) * (dem.getData(i, j) - receiverElevation) / deltaL) * m_deltaTime) + dem.getData(i, j);
+                    m_raster->setData(i, j, value);
 
 				}
 			}
@@ -139,26 +333,37 @@ void EroderAlgorithmService::execute()
     }
 }
 
-void EroderAlgorithmService::executeWithImplicitErosion(bool onlyMainDrainageNetwork, double drainageNetworksLenghtPercent, short facLimit)
+void EroderAlgorithmService::executeWithImplicitErosion()
 {
     // se os pontos estão lado a lado deltaL recebe este valor
     double horizontalDeltaL = m_cellSize;
     // se os pontos estão em diaginal, deltaL recebe este valor
-    double diagonalDeltaL = sqrt(2 * m_initialGrid->getCellSize() * m_initialGrid->getCellSize());
+    double diagonalDeltaL = sqrt(2 * m_raster->getCellSize() * m_raster->getCellSize());
     
 	// vlores do Modelo de Elevação de Topografia
-	Raster<float> &dem = *m_initialGrid;
+    Raster<float> &dem = *m_raster;
 
 	// Executa o algoritmo de arvore para captação das diferentes redes de drenagem. true pega só a principal.
     DirectionCalculatorService directionCalculator(m_flowDirection, m_flowAccumulation);
-    directionCalculator.setFacLimit(facLimit);
-	directionCalculator.execute(onlyMainDrainageNetwork);
+    directionCalculator.setFlowAccumulationLimit(m_flowAccumulationLimit);
+    directionCalculator.execute(m_drainageNetworkTypeLimit == EnumDrainageNetworkLimit::OnlyMain);
 
     std::vector<std::shared_ptr<DrainageNetwork>> &drainageNetworks = *directionCalculator.getDrainageNetworks();
 
-    size_t totalPercent = (drainageNetworksLenghtPercent * drainageNetworks.size())/100;
+    size_t limit = 0;
+    switch (m_drainageNetworkTypeLimit)
+    {
+        case EnumDrainageNetworkLimit::Amount:
+            limit = std::max(m_drainageNetworkAmountLimit, drainageNetworks.size());
+            break;
+        case EnumDrainageNetworkLimit::Percent:
+            limit = m_drainageNetworkPercentLimit * drainageNetworks.size();
+            break;
+        default:
+            limit = 1;
+    }
 
-    for (size_t auxi = 0; auxi < totalPercent; auxi++)
+    for (size_t auxi = 0; auxi < limit; auxi++)
     {
         const std::shared_ptr<DrainageNetwork> &drainageNetwork = drainageNetworks[auxi];
 		bool isFirst = true;
@@ -168,14 +373,14 @@ void EroderAlgorithmService::executeWithImplicitErosion(bool onlyMainDrainageNet
             double value = 0.0;
             double flowDirectionValue = m_flowDirection->getData(position.row, position.col);
 
-            if (flowDirectionValue == DirectionCalculatorService::DIRECTION_DOWN || flowDirectionValue == DirectionCalculatorService::DIRECTION_LEFT
-                    || flowDirectionValue == DirectionCalculatorService::DIRECTION_RIGHT || flowDirectionValue == DirectionCalculatorService::DIRECTION_UP)
+            if (flowDirectionValue == EnumDirection::Down || flowDirectionValue == EnumDirection::Left
+                    || flowDirectionValue == EnumDirection::Right || flowDirectionValue == EnumDirection::Up)
             {
-                value = (m_erodibility * std::pow(m_flowAccumulation->getData(position.row, position.col) * (m_cellSize * m_cellSize), m_concavityIndex) * m_deltaT) / horizontalDeltaL;
+                value = (m_erodibility * std::pow(m_flowAccumulation->getData(position.row, position.col) * (m_cellSize * m_cellSize), m_concavityIndex) * m_deltaTime) / horizontalDeltaL;
             }
             else
             {
-                value = (m_erodibility * std::pow(m_flowAccumulation->getData(position.row, position.col) * (m_cellSize * m_cellSize), m_concavityIndex) * m_deltaT) / diagonalDeltaL;
+                value = (m_erodibility * std::pow(m_flowAccumulation->getData(position.row, position.col) * (m_cellSize * m_cellSize), m_concavityIndex) * m_deltaTime) / diagonalDeltaL;
             }
 
 			if (!isFirst)
@@ -189,6 +394,81 @@ void EroderAlgorithmService::executeWithImplicitErosion(bool onlyMainDrainageNet
 			}
 			
 			isFirst = false;
+        }
+    }
+}
+
+void EroderAlgorithmService::executeWithErosionDeposition()
+{
+    // Executa o algoritmo de arvore para captação das diferentes redes de drenagem. true pega só a principal.
+    DirectionCalculatorService directionCalculator(m_flowDirection, m_flowAccumulation);
+    directionCalculator.setFlowAccumulationLimit(m_flowAccumulationLimit);
+    directionCalculator.execute(m_drainageNetworkTypeLimit == EnumDrainageNetworkLimit::OnlyMain);
+
+    std::shared_ptr<std::vector<std::shared_ptr<DrainageNetwork>>> drainageNetworks = directionCalculator.getDrainageNetworks();
+
+    size_t limit = 0;
+    switch (m_drainageNetworkTypeLimit)
+    {
+        case EnumDrainageNetworkLimit::Amount:
+            limit = m_drainageNetworkAmountLimit;
+            break;
+        case EnumDrainageNetworkLimit::Percent:
+            limit = m_drainageNetworkPercentLimit * drainageNetworks->size();
+            break;
+        default:
+            limit = 1;
+    }
+
+    for (size_t indexDrainage = 0; indexDrainage < limit; indexDrainage++)
+    {
+        const std::shared_ptr<DrainageNetwork> &drainageNetwork = drainageNetworks->at(indexDrainage);
+        const size_t positionsSize = drainageNetwork->positions.size();
+
+        std::vector<std::vector<double>> initialRaster(m_numberOfRows, std::vector<double>(m_numberOfCols));
+        for (size_t row = 0; row < m_numberOfRows; ++row)
+        {
+            for (size_t col = 0; col < m_numberOfCols; ++col)
+            {
+                initialRaster[row][col] = m_raster->getData(row, col);
+            }
+        }
+
+        const std::vector<std::vector<double>> pastSummation = donorsSummation(drainageNetwork->positions, true);
+
+        for (size_t indexIteration = 1; indexIteration < m_numberOfIterations; ++indexIteration)
+        {
+            const std::vector<std::vector<double>> futureSummation = donorsSummation(drainageNetwork->positions, false);
+
+            for (size_t pos = 1; pos < positionsSize; ++pos)
+            {
+                const PositionMatrix &position = drainageNetwork->positions[pos];
+
+                const size_t row = position.row;
+                const size_t col = position.col;
+
+                // Para garantir que a topografia do ponto 0 nunca se altere aolongo das iterações
+                // A topogrfia do ponto 0 é constante
+                m_raster->setData(drainageNetwork->positions[0].row, drainageNetwork->positions[0].col, initialRaster[drainageNetwork->positions[0].row][drainageNetwork->positions[0].col]);
+
+                size_t fdrRow = position.row;
+                size_t fdrCol = position.col;
+
+                double facValue = m_flowAccumulation->getData(row, col);
+
+                moveToFlowDirection(m_flowDirection->getData(fdrRow, fdrCol), fdrRow, fdrCol, m_numberOfRows, m_numberOfCols);
+
+                double bi = initialRaster[row][col] + (m_depositionCoeficient / (m_precipitationRate * facValue)) * pastSummation[row][col];
+
+                if (m_uplift != nullptr)
+                {
+                    bi += m_uplift->getData(row, col) * m_deltaTime;
+                }
+
+                const double f = (m_erodibility * std::pow(m_precipitationRate, m_concavityIndex) * std::pow(facValue * m_cellSize * m_cellSize, m_concavityIndex) * m_deltaTime) / m_cellSize;
+
+                m_raster->setData(row, col, (bi - (m_depositionCoeficient / (m_precipitationRate * facValue)) * futureSummation[row][col] + f * m_raster->getData(fdrRow, fdrCol)) / (1 + f));
+            }
         }
     }
 }

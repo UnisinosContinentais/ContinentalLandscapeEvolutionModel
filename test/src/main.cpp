@@ -1,13 +1,13 @@
 #include <continental/datamanagement/RasterFile.h>
-#include <continental/landscapeevolutionmodel/service/SlopeCalculator.h>
-#include <continental/landscapeevolutionmodel/service/LithologyDefinionCalculator.h>
+#include <continental/landscapeevolutionmodel/constant/LandscapeEvolutionModelConstant.h>
 #include <continental/landscapeevolutionmodel/domain/DrainageNetwork.h>
 #include <continental/landscapeevolutionmodel/domain/definition/SlopeTypes.h>
 #include <continental/landscapeevolutionmodel/domain/definition/SlopeUnits.h>
-#include <continental/landscapeevolutionmodel/constant/LandscapeEvolutionModelConstant.h>
-#include <gtest/gtest.h>
-#include <continental/landscapeevolutionmodel/service/EroderAlgorithmService.h>
 #include <continental/landscapeevolutionmodel/service/DirectionCalculatorService.h>
+#include <continental/landscapeevolutionmodel/service/EroderAlgorithmService.h>
+#include <continental/landscapeevolutionmodel/service/LithologyDefinionCalculator.h>
+#include <continental/landscapeevolutionmodel/service/SlopeCalculator.h>
+#include <gtest/gtest.h>
 
 using namespace continental::datamanagement;
 using namespace continental::landscapeevolutionmodel::service;
@@ -71,7 +71,6 @@ TEST(ContinentalFuzzyTest, TestSlopeSmallArcGisPercent)
         }
     }
 }
-
 
 TEST(ContinentalFuzzyTest, TestSlopeSmallPythonFlowDirDegree)
 {
@@ -349,13 +348,15 @@ TEST(ContinentalLandscapeEvolutionModelTest, TestPythonD50)
 
 TEST(ContinentalLandscapeEvolutionModelTest, DirectionCalculator)
 {
+    QString basePath = "C:/Git/ContinentalLandscapeEvolutionModelMock";
+
     std::vector<std::pair<QString, float>> compares = {
-        {"C:/Git/ContinentalLandscapeEvolutionModelMock/bacia_piratini_90m_directions.csv", 0},
-        {"C:/Git/ContinentalLandscapeEvolutionModelMock/bacia_piratini_90m_directionsOneNegative.csv", -1}
+        {basePath + "/bacia_piratini_90m_directions.csv", 0},
+        {basePath + "/bacia_piratini_90m_directionsOneNegative.csv", -1}
     };
 
-    auto flowDir = std::make_shared<continental::datamanagement::Raster<short>>(RasterFile<short>::loadRasterByFile("C:/Git/ContinentalLandscapeEvolutionModelMock/bacia_piratini_90m_flowDir.asc"));
-    auto flowAcc = std::make_shared<continental::datamanagement::Raster<float>>(RasterFile<float>::loadRasterByFile("C:/Git/ContinentalLandscapeEvolutionModelMock/bacia_piratini_90m_flowAcc.asc"));
+    auto flowDir = std::make_shared<Raster<short>>(RasterFile<short>::loadRasterByFile(basePath + "/bacia_piratini_90m_flowDir.asc"));
+    auto flowAcc = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(basePath + "/bacia_piratini_90m_flowAcc.asc"));
 
     for (const auto &compare : compares)
     {
@@ -374,11 +375,10 @@ TEST(ContinentalLandscapeEvolutionModelTest, DirectionCalculator)
             }
 
             DirectionCalculatorService directionCalculator(flowDir, flowAcc);
-            directionCalculator.setFacLimit(compare.second);
+            directionCalculator.setFlowAccumulationLimit(compare.second);
             directionCalculator.execute(true);
 
-            std::vector<std::shared_ptr<DrainageNetwork>> &drainageNetworks = *directionCalculator.getDrainageNetworks();
-            std::shared_ptr<DrainageNetwork> &drainageNetwork = drainageNetworks[0];
+            std::shared_ptr<DrainageNetwork> &drainageNetwork = directionCalculator.getDrainageNetworks()->at(0);
 
             EXPECT_EQ(positionsCompare.size(), drainageNetwork->positions.size()) << "Número de posições total diferente do arquivo de facLimit " << compare.second << ".";
 
@@ -392,10 +392,109 @@ TEST(ContinentalLandscapeEvolutionModelTest, DirectionCalculator)
     }
 }
 
+TEST(ContinentalLandscapeEvolutionModelTest, FutureDonorsSummation)
+{
+    const QString basePath = "C:/Git/ContinentalLandscapeEvolutionModelMock/";
+
+    auto initialRaster = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(basePath + "/micro_regiao_Piratini.asc"));
+    auto flowDir = std::make_shared<Raster<short>>(RasterFile<short>::loadRasterByFile(basePath + "/micro_regiao_Piratini_flowDir.asc"));
+    auto flowAcc = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(basePath + "/micro_regiao_Piratini_flowAcc.asc"));
+    auto donorsSummationPastCompare = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(basePath + "/micro_regiao_Piratini_donors_summation_past.asc"));
+    auto donorsSummationFutureCompare = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(basePath + "/micro_regiao_Piratini_donors_summation_future.asc"));
+    int flowAccumulationLimit = 2;
+
+    EroderAlgorithmService eroderService;
+    eroderService.setRaster(initialRaster);
+    eroderService.setFlowDirection(flowDir);
+    eroderService.setFlowAccumulation(flowAcc);
+    
+    DirectionCalculatorService directionCalculator(flowDir, flowAcc);
+    directionCalculator.setFlowAccumulationLimit(flowAccumulationLimit);
+    directionCalculator.execute(true);
+
+    std::shared_ptr<std::vector<std::shared_ptr<DrainageNetwork>>> drainageNetworks = directionCalculator.getDrainageNetworks();
+
+    double epsilon = std::pow(10, -10);
+
+    std::vector<std::vector<double>> futureDonorsSummation = eroderService.donorsSummation(drainageNetworks->at(0)->positions, false);
+
+    for (size_t row = 0; row < futureDonorsSummation.size(); ++row)
+    {
+        for (size_t col = 0; col < futureDonorsSummation[0].size(); ++col)
+        {
+            EXPECT_LT(std::abs(futureDonorsSummation[row][col] - donorsSummationFutureCompare->getData(row, col)), epsilon);
+        }
+    }
+}
+
+TEST(ContinentalLandscapeEvolutionModelTest, PastDonorsSummation)
+{
+    const QString basePath = "C:/Git/ContinentalLandscapeEvolutionModelMock/";
+
+    auto initialRaster = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(basePath + "/micro_regiao_Piratini.asc"));
+    auto flowDir = std::make_shared<Raster<short>>(RasterFile<short>::loadRasterByFile(basePath + "/micro_regiao_Piratini_flowDir.asc"));
+    auto flowAcc = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(basePath + "/micro_regiao_Piratini_flowAcc.asc"));
+    auto donorsSummationPastCompare = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(basePath + "/micro_regiao_Piratini_donors_summation_past.asc"));
+    auto upliftRaster = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(basePath + "/micro_regiao_Piratini_uplift.asc"));
+    int flowAccumulationLimit = 2;
+
+    EroderAlgorithmService eroderService;
+    eroderService.setRaster(initialRaster);
+    eroderService.setFlowDirection(flowDir);
+    eroderService.setFlowAccumulation(flowAcc);
+    eroderService.setUplift(upliftRaster);
+    eroderService.setDeltaTime(1000);
+
+    DirectionCalculatorService directionCalculator(flowDir, flowAcc);
+    directionCalculator.setFlowAccumulationLimit(flowAccumulationLimit);
+    directionCalculator.execute(true);
+
+    std::shared_ptr<std::vector<std::shared_ptr<DrainageNetwork>>> drainageNetworks = directionCalculator.getDrainageNetworks();
+
+    double epsilon = std::pow(10, -5);
+
+    std::vector<std::vector<double>> donorsSummationPast = eroderService.donorsSummation(drainageNetworks->at(0)->positions, true);
+
+    for (size_t row = 0; row < donorsSummationPast.size(); ++row)
+    {
+        for (size_t col = 0; col < donorsSummationPast[0].size(); ++col)
+        {            
+            EXPECT_LT(std::abs(donorsSummationPast[row][col] - donorsSummationPastCompare->getData(row, col)), epsilon) << "row: " << row << " col: " << col << "value: " << donorsSummationPast[row][col] << " compare: " << donorsSummationPastCompare->getData(row, col);
+        }
+    }
+}
+
+TEST(ContinentalLandscapeEvolutionModelTest, ErosionDeposition)
+{
+    const QString basePath = "C:/Git/ContinentalLandscapeEvolutionModelMock/";
+
+    auto initialRaster = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(basePath + "/micro_regiao_Piratini.asc"));
+    auto flowDir = std::make_shared<Raster<short>>(RasterFile<short>::loadRasterByFile(basePath + "/micro_regiao_Piratini_flowDir.asc"));
+    auto flowAcc = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(basePath + "/micro_regiao_Piratini_flowAcc.asc"));
+    auto result = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(basePath + "/micro_regiao_Piratini_result.asc"));
+    auto upliftRaster = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(basePath + "/micro_regiao_Piratini_uplift.asc"));
+
+    EroderAlgorithmService eroderService;
+    eroderService.setRaster(initialRaster);
+    eroderService.setFlowDirection(flowDir);
+    eroderService.setFlowAccumulation(flowAcc);
+    eroderService.setErodibility(0.00001);
+    eroderService.setConcavityIndex(0.4);
+    eroderService.setDepositionCoeficient(1);
+    eroderService.setPrecipitationRate(0.2);
+    eroderService.setDeltaTime(1000);
+    eroderService.setFlowAccumulationLimit(2);
+    eroderService.useDrainageNetworkAmountLimit(5);
+    eroderService.setUplift(upliftRaster);
+    eroderService.executeWithErosionDeposition();
+    
+    RasterFile<float>::writeData(*eroderService.getRaster(), basePath + "/micro_regiao_Piratini_result_cpp.asc");
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    //::testing::GTEST_FLAG(filter) = "*ImplicitErosion*";
+    ::testing::GTEST_FLAG(filter) = "*ErosionDeposition*";
     return RUN_ALL_TESTS();
 }
 

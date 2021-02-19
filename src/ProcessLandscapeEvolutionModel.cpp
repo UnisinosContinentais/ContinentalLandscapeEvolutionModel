@@ -77,7 +77,7 @@ void ProcessLandscapeEvolutionModel::preprare(
             out << "concavityIndex: " << QString::number(m_concavityIndex, 'f', 10) << "\n";
             out << "drainagesLength: " << QString::number(m_drainagesLength) << "\n";
             out << "simulateUntilTime: " << QString::number(m_simulateUntilTime) << "\n";
-            out << "facLimit: " << QString::number(m_facLimit) << "\n";
+            out << "facLimit: " << QString::number(m_flowAccumulationLimit) << "\n";
         }
 
         QString path = basePath + "_lem_02_initialGrid.asc";
@@ -101,17 +101,17 @@ void continental::landscapeevolutionmodel::ProcessLandscapeEvolutionModel::prepa
             throw;
         }
         auto aux = (value == 100) ? 0.01 : (100 - value);
-        m_facLimit = (static_cast<size_t>(calculateMaxValue * aux)) / static_cast<size_t>(calculateMaxValue);
+        m_flowAccumulationLimit = (static_cast<size_t>(calculateMaxValue * aux)) / static_cast<size_t>(calculateMaxValue);
     }
     else if (streamDefinitionConfig->getThresoldType() == StreamDefinitionThresholdType::NumberOfCells)
     {
         // Retorna o próprio valor
-        m_facLimit = static_cast<size_t>(value);
+        m_flowAccumulationLimit = static_cast<size_t>(value);
     }
     else if (streamDefinitionConfig->getThresoldType() == StreamDefinitionThresholdType::Area)
     {
         auto aux = static_cast<double>(value) * pow(10, 6);
-        m_facLimit = static_cast<size_t>(aux / (std::pow(m_surface->getCellSize(), 2)));
+        m_flowAccumulationLimit = static_cast<size_t>(aux / (std::pow(m_surface->getCellSize(), 2)));
     }
 }
 
@@ -125,6 +125,15 @@ bool ProcessLandscapeEvolutionModel::iterate()
     m_eroderAlgorithm.setFlowAccumulation(m_hydroToolsAlgorithm.getFlowAccumulation());
     m_eroderAlgorithm.setStreamDefinition(m_hydroToolsAlgorithm.getStreamDefinition());
     m_eroderAlgorithm.setFlowDirection(m_hydroToolsAlgorithm.getFlowDirection());
+    if (m_drainagesLength == 0)
+    {
+        m_eroderAlgorithm.useOnlyMainDrainageNetwork();
+    }
+    else if (m_drainagesLength)
+    {
+        m_eroderAlgorithm.useDrainageNetworkPercentLimit(m_drainagesLength / 10.0);
+    }
+    m_eroderAlgorithm.setFlowAccumulationLimit(m_flowAccumulationLimit);
 
     std::shared_ptr<Raster<short>> streams = m_hydroToolsAlgorithm.getStreamDefinition();
     std::shared_ptr<Raster<float>> flowAccumalation = m_hydroToolsAlgorithm.getFlowAccumulation();
@@ -133,10 +142,7 @@ bool ProcessLandscapeEvolutionModel::iterate()
 
     for (size_t erosionTimeStepCount = 0; erosionTimeStepCount < (m_difusionDeltaT / m_erosionDeltaT); ++erosionTimeStepCount)
     {
-        bool onlyMainDrainageNetwork = (m_drainagesLength == 0); // 0 = Principal
-        double drainageNetworksLenghtPercent = (m_drainagesLength == 0) ? 100 : (m_drainagesLength * 10);
-
-        m_eroderAlgorithm.executeWithImplicitErosion(onlyMainDrainageNetwork, drainageNetworksLenghtPercent, static_cast<short>(m_facLimit));
+        m_eroderAlgorithm.executeWithImplicitErosion();
     }
     qDebug() << "7º Executa o processo de Difusividade \n";
 
