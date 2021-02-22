@@ -1,6 +1,7 @@
 #include "continental/landscapeevolutionmodel/constant/LandscapeEvolutionModelConstant.h"
 #include "continental/landscapeevolutionmodel/service/DirectionCalculatorService.h"
 #include "continental/landscapeevolutionmodel/domain/Direction.h"
+#include "continental/landscapeevolutionmodel/domain/EnumDirection.h"
 #include "continental/landscapeevolutionmodel/domain/DrainageNetwork.h"
 #include <iostream>
 
@@ -70,7 +71,7 @@ void DirectionCalculatorService::execute(bool onlyMainDrainageNetwork)
             {
                 double value = flowAccumulation.getData(row, col);
 
-                if (exuterValue < value && !qFuzzyCompare(value, m_noDataValue))
+                if (exuterValue < value && value != m_noDataValue)
                 {
                     exuterRow = row;
                     exuterColumn = col;
@@ -94,14 +95,14 @@ void DirectionCalculatorService::execute(bool onlyMainDrainageNetwork)
     }
 }
 
-double DirectionCalculatorService::getFacLimit() const
+float DirectionCalculatorService::getFlowAccumulationLimit() const
 {
-    return m_facLimit;
+    return m_flowAccumulationLimit;
 }
 
-void DirectionCalculatorService::setFacLimit(double facLimit)
+void DirectionCalculatorService::setFlowAccumulationLimit(float flowAccumulationLimit)
 {
-    m_facLimit = facLimit;
+    m_flowAccumulationLimit = flowAccumulationLimit;
 }
 
 bool DirectionCalculatorService::getProcessMapsPositionsAndBranches() const
@@ -125,87 +126,76 @@ size_t DirectionCalculatorService::makeTree(
         size_t numberOfCellsOfIndentified
     )
 {
-	
     const size_t row = direction.getRow();
     const size_t col = direction.getCol();
 	flowAccumulation.setData(row, col, m_noDataValue);
 	
-	++numberOfCellsOfIndentified;
-    // std::cout << "TREE " << row << " " << col << std::endl;
+    ++numberOfCellsOfIndentified;
 
     // RIGHT
-    if (col - 1 >= 0 && m_flowDirection->getData(row, col - 1) == DIRECTION_RIGHT && flowAccumulation.getData(row, col - 1) > m_facLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row, col - 1)))
+    if (col - 1 >= 0 && m_flowDirection->getData(row, col - 1) == EnumDirection::Right && flowAccumulation.getData(row, col - 1) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row, col - 1)))
     {
         direction.donors.emplace_back(Direction(row, col - 1));
         Direction &directionRight = direction.donors.back();
-        // std::cout << "RIGHT " << directionRight.getRow() << " " << directionRight.getCol() << std::endl;
         numberOfCellsOfIndentified = makeTree(directionRight, flowAccumulation, numberOfCellsOfIndentified);
     }
 
     // DOWN and RIGHT
-    if (row - 1 >= 0 && col - 1 >= 0 && m_flowDirection->getData(row - 1, col - 1) == DIRECTION_DOWN_RIGHT && flowAccumulation.getData(row - 1, col - 1) > m_facLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row - 1, col - 1)))
+    if (row - 1 >= 0 && col - 1 >= 0 && m_flowDirection->getData(row - 1, col - 1) == EnumDirection::DownRight && flowAccumulation.getData(row - 1, col - 1) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row - 1, col - 1)))
     {
         direction.donors.emplace_back(Direction(row - 1, col - 1));
         Direction &directionDownRight = direction.donors.back();
-        // std::cout << "DOWN and RIGHT " << directionDownRight.getRow() << " " << directionDownRight.getCol() << std::endl;
         numberOfCellsOfIndentified = makeTree(directionDownRight, flowAccumulation, numberOfCellsOfIndentified);
     }
 
     // DOWN
-    if (row - 1 >= 0 && m_flowDirection->getData(row - 1, col) == DIRECTION_DOWN && flowAccumulation.getData(row - 1, col) > m_facLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row - 1, col)))
+    if (row - 1 >= 0 && m_flowDirection->getData(row - 1, col) == EnumDirection::Down && flowAccumulation.getData(row - 1, col) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row - 1, col)))
     {
         direction.donors.emplace_back(Direction(row - 1, col));
         Direction &directionDown = direction.donors.back();
-        // std::cout << "DOWN " << directionDown.getRow() << " " << directionDown.getCol() << std::endl;
         numberOfCellsOfIndentified = makeTree(directionDown, flowAccumulation, numberOfCellsOfIndentified);
     }
 
     // DOWN and LEFT
-    if (row - 1 >= 0 && col + 1 < m_cols && m_flowDirection->getData(row - 1, col + 1) == DIRECTION_DOWN_LEFT && flowAccumulation.getData(row - 1, col + 1) > m_facLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row - 1, col + 1)))
+    if (row - 1 >= 0 && col + 1 < m_cols && m_flowDirection->getData(row - 1, col + 1) == EnumDirection::DownLeft && flowAccumulation.getData(row - 1, col + 1) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row - 1, col + 1)))
     {
         direction.donors.emplace_back(Direction(row - 1, col + 1));
         Direction &directionDownLeft = direction.donors.back();
-        // std::cout << "DOWN and LEFT " << directionDownLeft.getRow() << " " << directionDownLeft.getCol() << std::endl;
         numberOfCellsOfIndentified = makeTree(directionDownLeft, flowAccumulation, numberOfCellsOfIndentified);
     }
 
     // LEFT
-    if (col + 1 < m_cols && m_flowDirection->getData(row, col + 1) == DIRECTION_LEFT && flowAccumulation.getData(row, col + 1) > m_facLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row, col + 1)))
+    if (col + 1 < m_cols && m_flowDirection->getData(row, col + 1) == EnumDirection::Left && flowAccumulation.getData(row, col + 1) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row, col + 1)))
     {
         direction.donors.emplace_back(Direction(row, col + 1));
         Direction &directionLeft = direction.donors.back();
-        // std::cout << "LEFT " << directionLeft.getRow() << " " << directionLeft.getCol() << std::endl;
         numberOfCellsOfIndentified = makeTree(directionLeft, flowAccumulation, numberOfCellsOfIndentified);
     }
 
     // UP and LEFT
-    if (row + 1 < m_rows && col + 1 < m_cols && m_flowDirection->getData(row + 1, col + 1) == DIRECTION_UP_LEFT && flowAccumulation.getData(row + 1, col + 1) > m_facLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row + 1, col + 1)))
+    if (row + 1 < m_rows && col + 1 < m_cols && m_flowDirection->getData(row + 1, col + 1) == EnumDirection::UpLeft && flowAccumulation.getData(row + 1, col + 1) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row + 1, col + 1)))
     {
         direction.donors.emplace_back(Direction(row + 1, col + 1));
         Direction &directionUpLeft = direction.donors.back();
-        // std::cout << "UP and LEFT " << directionUpLeft.getRow() << " " << directionUpLeft.getCol() << std::endl;
         numberOfCellsOfIndentified = makeTree(directionUpLeft, flowAccumulation, numberOfCellsOfIndentified);
     }
 
     // UP
-    if (row + 1 < m_rows && m_flowDirection->getData(row + 1, col) == DIRECTION_UP && flowAccumulation.getData(row + 1, col) > m_facLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row + 1, col)))
+    if (row + 1 < m_rows && m_flowDirection->getData(row + 1, col) == EnumDirection::Up && flowAccumulation.getData(row + 1, col) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row + 1, col)))
     {
         direction.donors.emplace_back(Direction(row + 1, col));
         Direction &directionUp = direction.donors.back();
-        // std::cout << "UP " << directionUp.getRow() << " " << directionUp.getCol() << std::endl;
         numberOfCellsOfIndentified = makeTree(directionUp, flowAccumulation, numberOfCellsOfIndentified);
     }
 
     // UP and RIGHT
-    if (row + 1 < m_rows && col - 1 >= 0 && m_flowDirection->getData(row + 1, col - 1) == DIRECTION_UP_RIGHT && flowAccumulation.getData(row + 1, col - 1) > m_facLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row + 1, col - 1)))
+    if (row + 1 < m_rows && col - 1 >= 0 && m_flowDirection->getData(row + 1, col - 1) == EnumDirection::UpRight && flowAccumulation.getData(row + 1, col - 1) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row + 1, col - 1)))
     {
         direction.donors.emplace_back(Direction(row + 1, col - 1));
         Direction &directionUpRight = direction.donors.back();
-        // std::cout << "UP and RIGHT " << directionUpRight.getRow() << " " << directionUpRight.getCol() << std::endl;
         numberOfCellsOfIndentified = makeTree(directionUpRight, flowAccumulation, numberOfCellsOfIndentified);
     }
 
-    // std::cout << "NUMBER " << numberOfCellsOfIndentified << std::endl;
     return numberOfCellsOfIndentified;
 }
 

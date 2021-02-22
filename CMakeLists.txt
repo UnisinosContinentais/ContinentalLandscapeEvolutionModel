@@ -44,6 +44,8 @@ add_library(ContinentalLandscapeEvolutionModel
     src/constant/LandscapeEvolutionModelConstant.cpp
     src/domain/Direction.cpp
     src/domain/DrainageNetwork.cpp
+    src/domain/EnumDirection.cpp
+    src/domain/EnumDrainageNetworkLimit.cpp
     src/domain/HeuristicSinkRemovalProcessingMode.cpp
     src/domain/PositionMatrix.cpp
     src/domain/Raster.cpp

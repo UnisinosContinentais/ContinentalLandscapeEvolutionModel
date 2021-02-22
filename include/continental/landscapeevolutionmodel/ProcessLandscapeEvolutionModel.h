@@ -79,7 +79,7 @@ private :
     service::EroderAlgorithmService m_eroderAlgorithm;
     service::LithologyDefinionCalculator m_grainDispersionService;
 
-    size_t m_facLimit = 0;
+    size_t m_flowAccumulationLimit = 0;
 
     /// Função que valida se a interação é valida.
     void validateInterate();
