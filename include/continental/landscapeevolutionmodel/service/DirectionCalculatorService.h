@@ -24,19 +24,19 @@ public:
     static const short DIRECTION_UP = 64;
     static const short DIRECTION_UP_RIGHT = 128;
 
-    DirectionCalculatorService(std::shared_ptr<datamanagement::Raster<short>> flowDirection, std::shared_ptr<datamanagement::Raster<float>> flowAccumulation);
+    DirectionCalculatorService(std::shared_ptr<datamanagement::Raster<short>> flowDirection, std::shared_ptr<datamanagement::Raster<int>> flowAccumulation);
 
     void setFlowDirection(const std::shared_ptr<datamanagement::Raster<short>> flowDirection);
     std::shared_ptr<datamanagement::Raster<short>> getFlowDirection() const;
 
-    std::shared_ptr<datamanagement::Raster<float>> getFlowAccumulation() const;
-    void setFlowAccumulation(const std::shared_ptr<datamanagement::Raster<float>> flowAccumulation);
+    std::shared_ptr<datamanagement::Raster<int>> getFlowAccumulation() const;
+    void setFlowAccumulation(const std::shared_ptr<datamanagement::Raster<int>> flowAccumulation);
 
     bool getProcessMapsPositionsAndBranches() const;
     void setProcessMapsPositionsAndBranches(bool processMapsPositionsAndBranches);
 
-    float getFacLimit() const;
-    void setFacLimit(float facLimit);
+    double getFacLimit() const;
+    void setFacLimit(double facLimit);
 
     std::shared_ptr<std::vector<std::shared_ptr<domain::DrainageNetwork>>> getDrainageNetworks() const;
 
@@ -45,21 +45,21 @@ private:
     const int LimitMapPositions = 1;
 
     std::shared_ptr<datamanagement::Raster<short>> m_flowDirection;
-    std::shared_ptr<datamanagement::Raster<float>> m_flowAccumulation;
+    std::shared_ptr<datamanagement::Raster<int>> m_flowAccumulation;
 
     bool m_processMapsPositionsAndBranches = false;
-    float m_facLimit = -1;
+    double m_facLimit = -1;
     size_t m_rows = 0;
     size_t m_cols = 0;
 	
-	float m_noDataValue = 0.0f;
+    double m_noDataValue = 0.0f;
     std::shared_ptr<std::vector<std::shared_ptr<domain::DrainageNetwork>>> m_drainageNetworks;
 
-    void makeTree(domain::DrainageNetwork &drainageNetwork, datamanagement::Raster<float> &flowAccumulation, size_t exuterRow, size_t exuterColumn);
+    void makeTree(domain::DrainageNetwork &drainageNetwork, datamanagement::Raster<int> &flowAccumulation, size_t exuterRow, size_t exuterColumn);
 
     size_t makeTree(
             domain::Direction &direction,
-            datamanagement::Raster<float> &flowAccumulation,
+            datamanagement::Raster<int> &flowAccumulation,
             size_t numberOfCellsOfIndentified = 0
         );
 

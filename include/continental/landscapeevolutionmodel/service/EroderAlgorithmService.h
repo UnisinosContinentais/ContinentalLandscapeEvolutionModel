@@ -34,7 +34,7 @@ public:
     /// @param erodibility Valor do tipo double com o parametro de erodibilidade.
     /// @param deltaT Valor tipo size_t com a o passo de tempo em anos.
     /// @param concavityIndex Valor do tipo double com o valor indice de concavidade da bacia.
-    EroderAlgorithmService(std::shared_ptr<continental::datamanagement::Raster<float>> initialGrid, double erodibility, size_t deltaT, double concavityIndex);
+    EroderAlgorithmService(std::shared_ptr<continental::datamanagement::Raster<double>> initialGrid, double erodibility, size_t deltaT, double concavityIndex);
 
     /// Função que retorna a proxima posição dado um ponto do grid de acordo com o grid de fluxo.
     /// @param value Valor do ponto.
@@ -55,7 +55,7 @@ public:
 
     /// Função de definição dos valores de Acumulação do Fluxo.
     /// @param flowAccumulation Objeto do tipo Raster<float>.
-	void setFlowAccumulation(const std::shared_ptr<continental::datamanagement::Raster<float>> flowAccumulation);
+    void setFlowAccumulation(const std::shared_ptr<continental::datamanagement::Raster<int>> flowAccumulation);
 
     /// Função de definição dos valores de Definição dos Rios.
     /// @param streamDefinition Objeto do tipo Raster<short>.
@@ -77,9 +77,9 @@ private:
     double m_erodibility = 0.0;
     double m_cellSize = 0.0;
     double m_concavityIndex = 0.0;
-    std::shared_ptr<continental::datamanagement::Raster<float>> m_initialGrid;
+    std::shared_ptr<continental::datamanagement::Raster<double>> m_initialGrid;
 	std::shared_ptr<continental::datamanagement::Raster<short>> m_flowDirection;
-	std::shared_ptr<continental::datamanagement::Raster<float>> m_flowAccumulation;
+    std::shared_ptr<continental::datamanagement::Raster<int>> m_flowAccumulation;
 	std::shared_ptr<continental::datamanagement::Raster<short>> m_streamDefinition;
 	std::shared_ptr<continental::datamanagement::Raster<short>> m_streamSegmentation;
 	std::shared_ptr<continental::datamanagement::Raster<short>> m_catchment;

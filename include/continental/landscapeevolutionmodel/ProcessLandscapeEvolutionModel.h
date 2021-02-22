@@ -36,7 +36,7 @@ public:
     /// Função que prepara os dados de entrada para execução das interações.
     /// @param initialGrid Objeto do tipo Raster<float> com os valores de elevação topografica da simulação atual.
     /// @param inputParameters Objeto do tipo LandscapeEvolutionModelInput com os valores de parâmetros para execução do algoritimo do LEM.
-    void preprare(std::shared_ptr<continental::datamanagement::Raster<float>> initialGrid,
+    void preprare(std::shared_ptr<continental::datamanagement::Raster<double>> initialGrid,
                   std::shared_ptr<dto::LandscapeEvolutionModelInput> inputParameters
                 );
 
@@ -46,7 +46,7 @@ public:
 
     /// Função de retorno do resultado da Simulação.
     /// @return Objeto do tipo Raster<float> com resultado final da simulação.
-    std::shared_ptr<continental::datamanagement::Raster<float>> getResultSimulation();
+    std::shared_ptr<continental::datamanagement::Raster<double>> getResultSimulation();
 
     std::shared_ptr<continental::datamanagement::Raster<short>> getResultDispersionSimulation();
 
@@ -71,7 +71,7 @@ private :
     QString m_logSurfacePath;
     double m_age = 0.0;
 
-    std::shared_ptr<datamanagement::Raster<float>> m_surface;
+    std::shared_ptr<datamanagement::Raster<double>> m_surface;
     std::shared_ptr<datamanagement::Raster<short>> m_grainDispersion;
     std::shared_ptr<dto::LandscapeEvolutionModelInput> m_inputParameters;
     service::HydroToolsAlgorithmService m_hydroToolsAlgorithm;

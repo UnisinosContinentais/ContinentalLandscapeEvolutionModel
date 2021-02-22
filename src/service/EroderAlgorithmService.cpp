@@ -27,7 +27,7 @@ EroderAlgorithmService::EroderAlgorithmService()
 
 }
 
-EroderAlgorithmService::EroderAlgorithmService(std::shared_ptr<Raster<float>> initialGrid, double erodibility, size_t deltaT, double concavityIndex) :
+EroderAlgorithmService::EroderAlgorithmService(std::shared_ptr<Raster<double>> initialGrid, double erodibility, size_t deltaT, double concavityIndex) :
     m_deltaT(deltaT),
     m_erodibility(erodibility),
     m_concavityIndex(concavityIndex),
@@ -44,7 +44,7 @@ void EroderAlgorithmService::setFlowDirection(const std::shared_ptr<Raster<short
 	m_flowDirection = flowDirection;
 }
 
-void EroderAlgorithmService::setFlowAccumulation(const std::shared_ptr<Raster<float>> flowAccumulation)
+void EroderAlgorithmService::setFlowAccumulation(const std::shared_ptr<Raster<int>> flowAccumulation)
 {
 	m_flowAccumulation = flowAccumulation;
 }
@@ -74,7 +74,7 @@ void EroderAlgorithmService::execute()
 	double diagonalDeltaL = sqrt(2 * m_initialGrid->getCellSize() * m_initialGrid->getCellSize()); 
 	
 	// vlores do Modelo de Elevação de Topografia 
-    Raster<float> dem = *m_initialGrid;
+    Raster<double> dem = *m_initialGrid;
 
 	// valor de celula e canal de rio no stream definition
     short channelMarkerValue = 1;
@@ -123,7 +123,8 @@ void EroderAlgorithmService::execute()
 					deltaL = diagonalDeltaL;
 				}
 				// se o valor topografico for inferior a zero, recebe 0
-				if (dem.getData(i, j) < 0.0 || qFuzzyCompare(dem.getData(i, j), 0.0f))
+                double  auxCompareZero = 0.0f;
+                if (dem.getData(i, j) < 0.0 || qFuzzyCompare(dem.getData(i, j), auxCompareZero))
 				{
 					m_initialGrid->setData(i, j, 0);
 				}
@@ -147,7 +148,7 @@ void EroderAlgorithmService::executeWithImplicitErosion(bool onlyMainDrainageNet
     double diagonalDeltaL = sqrt(2 * m_initialGrid->getCellSize() * m_initialGrid->getCellSize());
     
 	// vlores do Modelo de Elevação de Topografia
-	Raster<float> &dem = *m_initialGrid;
+    Raster<double> &dem = *m_initialGrid;
 
 	// Executa o algoritmo de arvore para captação das diferentes redes de drenagem. true pega só a principal.
     DirectionCalculatorService directionCalculator(m_flowDirection, m_flowAccumulation);

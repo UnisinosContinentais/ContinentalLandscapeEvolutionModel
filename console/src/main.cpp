@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     QCoreApplication app(argc, argv);
     QStringList args = app.arguments();
     std::shared_ptr<Raster<short>> flowDirection = std::make_shared<Raster<short>>(RasterFile<short>::loadRasterByFile("C:/Git/ContinentalLandscapeEvolutionModelMock/bacia_piratini_90m_flowDir.asc"));
-    std::shared_ptr<Raster<float>> flowAccumulation = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile("C:/Git/ContinentalLandscapeEvolutionModelMock/bacia_piratini_90m_flowAcc.asc"));
+    std::shared_ptr<Raster<int>> flowAccumulation = std::make_shared<Raster<int>>(RasterFile<int>::loadRasterByFile("C:/Git/ContinentalLandscapeEvolutionModelMock/bacia_piratini_90m_flowAcc.asc"));
 
     DirectionCalculatorService directionCalculator(flowDirection, flowAccumulation);
     //directionCalculator.setProcessMapsPositionsAndBranches(true);
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
     //Dados de Entrada da superficie inicial
     QString inputDemFile = "C:/Users/ADM_LOCAL/Desktop/bacia_piratini_90m.asc";
-    std::shared_ptr<Raster<float>> initialGrid = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(inputDemFile));
+    std::shared_ptr<Raster<double>> initialGrid = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(inputDemFile));
 
 
     std::shared_ptr<continental::landscapeevolutionmodel::domain::SinkDestroyConfig> sinkDestroyConfig = std::make_shared<continental::landscapeevolutionmodel::domain::SinkDestroyConfig>();

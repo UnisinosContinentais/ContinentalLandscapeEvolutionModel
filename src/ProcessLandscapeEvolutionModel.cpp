@@ -30,7 +30,7 @@ ProcessLandscapeEvolutionModel::ProcessLandscapeEvolutionModel()
 }
 
 void ProcessLandscapeEvolutionModel::preprare(
-        std::shared_ptr<datamanagement::Raster<float>> surface,
+        std::shared_ptr<datamanagement::Raster<double>> surface,
         std::shared_ptr<LandscapeEvolutionModelInput> inputParameters
     )
 {
@@ -82,14 +82,14 @@ void ProcessLandscapeEvolutionModel::preprare(
 
         QString path = basePath + "_lem_02_initialGrid.asc";
         qDebug() << "lem_02_initialGrid: " << path;
-        RasterFile<float>::writeData(*m_surface, path);
+        RasterFile<double>::writeData(*m_surface, path);
     }
 }
 
 void continental::landscapeevolutionmodel::ProcessLandscapeEvolutionModel::prepareFacLimit()
 {
     auto streamDefinitionConfig = m_inputParameters->getStreamDefinitionConfig();
-    float value = streamDefinitionConfig->getThresoldValue();
+    double value = streamDefinitionConfig->getThresoldValue();
 
     if (streamDefinitionConfig->getThresoldType() == StreamDefinitionThresholdType::PercentualOfMaximumCells)
     {
@@ -127,7 +127,7 @@ bool ProcessLandscapeEvolutionModel::iterate()
     m_eroderAlgorithm.setFlowDirection(m_hydroToolsAlgorithm.getFlowDirection());
 
     std::shared_ptr<Raster<short>> streams = m_hydroToolsAlgorithm.getStreamDefinition();
-    std::shared_ptr<Raster<float>> flowAccumalation = m_hydroToolsAlgorithm.getFlowAccumulation();
+    std::shared_ptr<Raster<int>> flowAccumalation = m_hydroToolsAlgorithm.getFlowAccumulation();
 
     qDebug() << "6º Executa o processo de Erosão para cada sub-passo.";
 
@@ -192,19 +192,19 @@ bool ProcessLandscapeEvolutionModel::iterate()
 
             QString pathNewGrid = basePath + "_lem_03_newGrid.asc";
             qDebug() << "lem_03_newGrid: " << pathNewGrid;
-            RasterFile<float>::writeData(*m_surface, pathNewGrid);
+            RasterFile<double>::writeData(*m_surface, pathNewGrid);
 
             QString pathFlowAccumulation = basePath + "_lem_03_flowAccumulation.asc";
             qDebug() << "lem_03_flowAccumulation: " << pathNewGrid;
-            RasterFile<float>::writeData(*m_grainDispersionService.getFlowAccumulationRaster(), pathFlowAccumulation);
+            RasterFile<int>::writeData(*m_grainDispersionService.getFlowAccumulationRaster(), pathFlowAccumulation);
 
             QString pathSlope = basePath + "_lem_03_slope.asc";
             qDebug() << "lem_03_slope: " << pathNewGrid;
-            RasterFile<float>::writeData(*m_grainDispersionService.getSlope(), pathSlope);
+            RasterFile<double>::writeData(*m_grainDispersionService.getSlope(), pathSlope);
 
             QString pathD50 = basePath + "_lem_03_d50.asc";
             qDebug() << "lem_03_d50: " << pathNewGrid;
-            RasterFile<float>::writeData(*m_grainDispersionService.getD50(), pathD50);
+            RasterFile<double>::writeData(*m_grainDispersionService.getD50(), pathD50);
 
             QString pathGrainDispersion = basePath + "_lem_04_grainDispersion.asc";
             qDebug() << "lem_04_grainDispersion: " << pathGrainDispersion;
@@ -215,7 +215,7 @@ bool ProcessLandscapeEvolutionModel::iterate()
     return !isLast;
 }
 
-std::shared_ptr<continental::datamanagement::Raster<float>> ProcessLandscapeEvolutionModel::getResultSimulation()
+std::shared_ptr<continental::datamanagement::Raster<double>> ProcessLandscapeEvolutionModel::getResultSimulation()
 {
     return m_surface;
 }

@@ -13,7 +13,7 @@ namespace service {
 double LithologyDefinionCalculator::calculateFlowAccumulationSquareMeters(const double pixelsFlowAccumulation) const
 {
     // Calcula o valor da acumulação em metros quadrados, caso a acumulação tenha sido calcula em número de pixels.
-    const Raster<float> &rasterInput = *getFlowAccumulationRaster();
+    const Raster<int> &rasterInput = *getFlowAccumulationRaster();
 
     // Informações do Raster do DEM
     double inputCellSize = rasterInput.getCellSize();
@@ -84,8 +84,8 @@ short LithologyDefinionCalculator::calculateGrainDiscretizationValue(const doubl
 
 void LithologyDefinionCalculator::calculateGrainDiscretizationRaster()
 {
-    const Raster<float> &flowAccumulation = *getFlowAccumulationRaster();
-    const Raster<float> &dem = *getDemRaster();
+    const Raster<int> &flowAccumulation = *getFlowAccumulationRaster();
+    const Raster<double> &dem = *getDemRaster();
 
     // Informações do Raster do DEM
     size_t inputRows = dem.getRows();
@@ -105,13 +105,13 @@ void LithologyDefinionCalculator::calculateGrainDiscretizationRaster()
     setSlope(slope.getOutputRaster());
 
     // Cria o Raster do D50.
-    setD50(std::make_shared<Raster<float>>(inputRows,
+    setD50(std::make_shared<Raster<double>>(inputRows,
                                            inputCols,
                                            inputXOrigin,
                                            inputYOrigin,
                                            inputCellSize,
                                            inputNoData));
-    Raster<float> &rasterD50 = *getD50();
+    Raster<double> &rasterD50 = *getD50();
 
     // Cria o Raster com os resultados.
     setLithologyDefinitionRaster(std::make_shared<Raster<short>>(inputRows,
@@ -156,12 +156,12 @@ double LithologyDefinionCalculator::convertAdimensionalDegrees(const double adim
     return degree;
 }
 
-std::shared_ptr<Raster<float> > LithologyDefinionCalculator::getFlowAccumulationRaster() const
+std::shared_ptr<Raster<int> > LithologyDefinionCalculator::getFlowAccumulationRaster() const
 {
     return m_flowAccumulationRaster;
 }
 
-void LithologyDefinionCalculator::setFlowAccumulationRaster(const std::shared_ptr<Raster<float> > flowAccumulationRaster)
+void LithologyDefinionCalculator::setFlowAccumulationRaster(const std::shared_ptr<Raster<int> > flowAccumulationRaster)
 {
     m_flowAccumulationRaster = flowAccumulationRaster;
 }
@@ -216,12 +216,12 @@ void LithologyDefinionCalculator::setChannelDepthFParameter(const double channel
     m_channelDepthFParameter = channelDepthFParameter;
 }
 
-std::shared_ptr<continental::datamanagement::Raster<float>> LithologyDefinionCalculator::getDemRaster() const
+std::shared_ptr<continental::datamanagement::Raster<double>> LithologyDefinionCalculator::getDemRaster() const
 {
     return m_demRaster;
 }
 
-void LithologyDefinionCalculator::setDemRaster(const std::shared_ptr<continental::datamanagement::Raster<float>> demRaster)
+void LithologyDefinionCalculator::setDemRaster(const std::shared_ptr<continental::datamanagement::Raster<double>> demRaster)
 {
     m_demRaster = demRaster;
 }
@@ -256,22 +256,22 @@ void LithologyDefinionCalculator::setGrainSizeShieldsNumber(const double grainSi
     m_grainSizeShieldsNumber = grainSizeShieldsNumber;
 }
 
-std::shared_ptr<continental::datamanagement::Raster<float> > LithologyDefinionCalculator::getSlope() const
+std::shared_ptr<continental::datamanagement::Raster<double> > LithologyDefinionCalculator::getSlope() const
 {
     return m_slope;
 }
 
-void LithologyDefinionCalculator::setSlope(const std::shared_ptr<continental::datamanagement::Raster<float> > slope)
+void LithologyDefinionCalculator::setSlope(const std::shared_ptr<continental::datamanagement::Raster<double> > slope)
 {
     m_slope = slope;
 }
 
-std::shared_ptr<continental::datamanagement::Raster<float> > LithologyDefinionCalculator::getD50() const
+std::shared_ptr<continental::datamanagement::Raster<double> > LithologyDefinionCalculator::getD50() const
 {
     return m_d50;
 }
 
-void LithologyDefinionCalculator::setD50(const std::shared_ptr<continental::datamanagement::Raster<float> > d50)
+void LithologyDefinionCalculator::setD50(const std::shared_ptr<continental::datamanagement::Raster<double> > d50)
 {
     m_d50 = d50;
 }

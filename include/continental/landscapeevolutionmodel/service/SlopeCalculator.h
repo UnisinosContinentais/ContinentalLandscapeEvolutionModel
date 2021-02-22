@@ -24,11 +24,11 @@ class CONTINENTALLANDSCAPEEVOLUTIONMODELPLUGIN_EXPORT_DECL SlopeCalculator
 {
 
 public:
-    std::shared_ptr<continental::datamanagement::Raster<float> > getInputRaster() const;
-    void setInputRaster(const std::shared_ptr<continental::datamanagement::Raster<float> > inputRaster);
+    std::shared_ptr<continental::datamanagement::Raster<double> > getInputRaster() const;
+    void setInputRaster(const std::shared_ptr<continental::datamanagement::Raster<double> > inputRaster);
 
-    std::shared_ptr<continental::datamanagement::Raster<float> > getOutputRaster() const;
-    void setOutputRaster(const std::shared_ptr<continental::datamanagement::Raster<float> > outputRaster);
+    std::shared_ptr<continental::datamanagement::Raster<double> > getOutputRaster() const;
+    void setOutputRaster(const std::shared_ptr<continental::datamanagement::Raster<double> > outputRaster);
 
     continental::landscapeevolutionmodel::domain::definition::SlopeUnits getSlopeUnit() const;
     void setSlopeUnit(const continental::landscapeevolutionmodel::domain::definition::SlopeUnits unit);
@@ -40,8 +40,8 @@ public:
 
 private:
     /// Membros.
-    std::shared_ptr<continental::datamanagement::Raster<float>> m_inputRaster;
-    std::shared_ptr<continental::datamanagement::Raster<float>> m_outputRaster;
+    std::shared_ptr<continental::datamanagement::Raster<double>> m_inputRaster;
+    std::shared_ptr<continental::datamanagement::Raster<double>> m_outputRaster;
     continental::landscapeevolutionmodel::domain::definition::SlopeUnits m_slopeUnit = continental::landscapeevolutionmodel::domain::definition::SlopeUnits::tangent;
     continental::landscapeevolutionmodel::domain::definition::SlopeType m_slopeType = continental::landscapeevolutionmodel::domain::definition::SlopeType::slopeHorn1981;
 

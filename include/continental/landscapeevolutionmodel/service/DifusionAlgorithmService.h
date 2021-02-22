@@ -32,7 +32,7 @@ public:
     /// @param simulateUtilTime Valor do tipo size_t com o tempo de simulacao em anos.
     /// @param diffusivity Valor do tipo double com o parametro de difusividade.
     /// @param deltaT Valor do tipo size_t com o passo de tempo de anos.
-    DifusionAlgorithmService(std::shared_ptr<continental::datamanagement::Raster<float>> initialGrid, size_t simulateUtilTime, double diffusivity, size_t deltaT);
+    DifusionAlgorithmService(std::shared_ptr<continental::datamanagement::Raster<double>> initialGrid, size_t simulateUtilTime, double diffusivity, size_t deltaT);
 	
     /// Função que executa o algoritmo de alocação da topográfia.
     void allocateTopography();
@@ -45,7 +45,7 @@ public:
 
 private:
     /// Membros.
-    std::shared_ptr<continental::datamanagement::Raster<float>> m_initialGrid;
+    std::shared_ptr<continental::datamanagement::Raster<double>> m_initialGrid;
     size_t m_numberOfCols = 0;
     size_t m_numberOfRows = 0;
     size_t m_deltaT = 0; // ano

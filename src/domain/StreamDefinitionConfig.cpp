@@ -5,12 +5,12 @@ namespace continental {
 namespace landscapeevolutionmodel {
 namespace domain {
 
-float StreamDefinitionConfig::getThresoldValue() const
+double StreamDefinitionConfig::getThresoldValue() const
 {
     return m_thresoldValue;
 }
 
-void StreamDefinitionConfig::setThresoldValue(float ThresoldValue)
+void StreamDefinitionConfig::setThresoldValue(double ThresoldValue)
 {
     m_thresoldValue = ThresoldValue;
 }

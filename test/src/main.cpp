@@ -19,17 +19,17 @@ using namespace continental::landscapeevolutionmodel::constant;
 TEST(ContinentalLandscapeEvolutionModelTest, TestSlopeSmallArcGisDegree)
 {
     QString filenameDem = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Small/SmallDem.asc";
-    std::shared_ptr<Raster<float>> rasterDem = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameDem));
+    std::shared_ptr<Raster<double>> rasterDem = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameDem));
 
     QString filenameSlope = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Small/SlopeSmallArcGisDegree.asc";
-    std::shared_ptr<Raster<float>> rasterSlope = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameSlope));
+    std::shared_ptr<Raster<double>> rasterSlope = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameSlope));
 
     SlopeCalculator slope;
     slope.setSlopeUnit(SlopeUnits::degree);
     slope.setSlopeType(SlopeType::slopeHorn1981);
     slope.setInputRaster(rasterDem);
     slope.calculateSlopeRaster();
-    std::shared_ptr<Raster<float>> resultSlope = slope.getOutputRaster();
+    std::shared_ptr<Raster<double>> resultSlope = slope.getOutputRaster();
 
     // Informações do Raster
     const size_t rasterRows = rasterDem->getRows();
@@ -47,17 +47,17 @@ TEST(ContinentalLandscapeEvolutionModelTest, TestSlopeSmallArcGisDegree)
 TEST(ContinentalFuzzyTest, TestSlopeSmallArcGisPercent)
 {
     QString filenameDem = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Small/SmallDem.asc";
-    std::shared_ptr<Raster<float>> rasterDem = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameDem));
+    std::shared_ptr<Raster<double>> rasterDem = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameDem));
 
     QString filenameSlope = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Small/SlopeSmallArcGisPercent.asc";
-    std::shared_ptr<Raster<float>> rasterSlope = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameSlope));
+    std::shared_ptr<Raster<double>> rasterSlope = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameSlope));
 
     SlopeCalculator slope;
     slope.setSlopeUnit(SlopeUnits::percent);
     slope.setSlopeType(SlopeType::slopeHorn1981);
     slope.setInputRaster(rasterDem);
     slope.calculateSlopeRaster();
-    std::shared_ptr<Raster<float>> resultSlope = slope.getOutputRaster();
+    std::shared_ptr<Raster<double>> resultSlope = slope.getOutputRaster();
 
     // Informações do Raster
     const size_t rasterRows = rasterDem->getRows();
@@ -76,17 +76,17 @@ TEST(ContinentalFuzzyTest, TestSlopeSmallArcGisPercent)
 TEST(ContinentalFuzzyTest, TestSlopeSmallPythonFlowDirDegree)
 {
     QString filenameDem = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Small/SmallDem.asc";
-    std::shared_ptr<Raster<float>> rasterDem = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameDem));
+    std::shared_ptr<Raster<double>> rasterDem = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameDem));
 
     QString filenameSlope = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Small/SlopeSmallPythonFlowDirDegree.asc";
-    std::shared_ptr<Raster<float>> rasterSlope = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameSlope));
+    std::shared_ptr<Raster<double>> rasterSlope = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameSlope));
 
     SlopeCalculator slope;
     slope.setSlopeUnit(SlopeUnits::degree);
     slope.setSlopeType(SlopeType::maxSlope);
     slope.setInputRaster(rasterDem);
     slope.calculateSlopeRaster();
-    std::shared_ptr<Raster<float>> resultSlope = slope.getOutputRaster();
+    std::shared_ptr<Raster<double>> resultSlope = slope.getOutputRaster();
 
     // Informações do Raster
     const size_t rasterRows = rasterDem->getRows();
@@ -104,17 +104,17 @@ TEST(ContinentalFuzzyTest, TestSlopeSmallPythonFlowDirDegree)
 TEST(ContinentalFuzzyTest, TestSlopePiratiniArcGisDegree)
 {
     QString filenameDem = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Piratini/PiratiniDem.asc";
-    std::shared_ptr<Raster<float>> rasterDem = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameDem));
+    std::shared_ptr<Raster<double>> rasterDem = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameDem));
 
     QString filenameSlope = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Piratini/SlopePiratiniArcGisDegree.asc";
-    std::shared_ptr<Raster<float>> rasterSlope = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameSlope));
+    std::shared_ptr<Raster<double>> rasterSlope = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameSlope));
 
     SlopeCalculator slope;
     slope.setSlopeUnit(SlopeUnits::degree);
     slope.setSlopeType(SlopeType::slopeHorn1981);
     slope.setInputRaster(rasterDem);
     slope.calculateSlopeRaster();
-    std::shared_ptr<Raster<float>> resultSlope = slope.getOutputRaster();
+    std::shared_ptr<Raster<double>> resultSlope = slope.getOutputRaster();
 
     // Informações do Raster
     const size_t rasterRows = rasterDem->getRows();
@@ -132,17 +132,17 @@ TEST(ContinentalFuzzyTest, TestSlopePiratiniArcGisDegree)
 TEST(ContinentalFuzzyTest, TestSlopePiratiniArcGisPercent)
 {
     QString filenameDem = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Piratini/PiratiniDem.asc";
-    std::shared_ptr<Raster<float>> rasterDem = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameDem));
+    std::shared_ptr<Raster<double>> rasterDem = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameDem));
 
     QString filenameSlope = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Piratini/SlopePiratiniArcGisPercent.asc";
-    std::shared_ptr<Raster<float>> rasterSlope = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameSlope));
+    std::shared_ptr<Raster<double>> rasterSlope = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameSlope));
 
     SlopeCalculator slope;
     slope.setSlopeUnit(SlopeUnits::percent);
     slope.setSlopeType(SlopeType::slopeHorn1981);
     slope.setInputRaster(rasterDem);
     slope.calculateSlopeRaster();
-    std::shared_ptr<Raster<float>> resultSlope = slope.getOutputRaster();
+    std::shared_ptr<Raster<double>> resultSlope = slope.getOutputRaster();
 
     // Informações do Raster
     const size_t rasterRows = rasterDem->getRows();
@@ -160,16 +160,16 @@ TEST(ContinentalFuzzyTest, TestSlopePiratiniArcGisPercent)
 TEST(ContinentalFuzzyTest, TestSlopePiratiniPythonFlowDirDegree)
 {
     QString filenameDem = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Piratini/PiratiniDem.asc";
-    std::shared_ptr<Raster<float>> rasterDem = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameDem));
+    std::shared_ptr<Raster<double>> rasterDem = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameDem));
     QString filenameSlope = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Piratini/SlopePiratiniPythonFlowDirDegree.asc";
-    std::shared_ptr<Raster<float>> rasterSlope = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameSlope));
+    std::shared_ptr<Raster<double>> rasterSlope = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameSlope));
 
     SlopeCalculator slope;
     slope.setSlopeUnit(SlopeUnits::degree);
     slope.setSlopeType(SlopeType::maxSlope);
     slope.setInputRaster(rasterDem);
     slope.calculateSlopeRaster();
-    std::shared_ptr<Raster<float>> resultSlope = slope.getOutputRaster();
+    std::shared_ptr<Raster<double>> resultSlope = slope.getOutputRaster();
 
     // Informações do Raster
     const size_t rasterRows = rasterDem->getRows();
@@ -187,13 +187,13 @@ TEST(ContinentalFuzzyTest, TestSlopePiratiniPythonFlowDirDegree)
 TEST(ContinentalLandscapeEvolutionModelTest, TestSmallGrainDiscretization)
 {
     QString filenameDem = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Small/SmallDem.asc";
-    std::shared_ptr<Raster<float>> rasterDem = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameDem));
+    std::shared_ptr<Raster<double>> rasterDem = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameDem));
 
     QString filenameAccumulationPixels = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Small/AccumulationPixelsSmallArcGis.asc";
-    std::shared_ptr<Raster<float>> rasterAccumulationPixels = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameAccumulationPixels));
+    std::shared_ptr<Raster<int>> rasterAccumulationPixels = std::make_shared<Raster<int>>(RasterFile<int>::loadRasterByFile(filenameAccumulationPixels));
 
     QString filenameGrainName = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Small/GrainD50SmallPython.asc";
-    std::shared_ptr<Raster<float>> rasterGrainName = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameGrainName));
+    std::shared_ptr<Raster<double>> rasterGrainName = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameGrainName));
 
     // Calcular a declividade
     SlopeCalculator slope;
@@ -201,7 +201,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, TestSmallGrainDiscretization)
     slope.setSlopeType(SlopeType::slopeHorn1981);
     slope.setInputRaster(rasterDem);
     slope.calculateSlopeRaster();
-    std::shared_ptr<Raster<float>> resultSlope = slope.getOutputRaster();
+    std::shared_ptr<Raster<double>> resultSlope = slope.getOutputRaster();
 
     LithologyDefinionCalculator lithologyDefinition;
     lithologyDefinition.setFlowAccumulationRaster(rasterAccumulationPixels);
@@ -225,13 +225,13 @@ TEST(ContinentalLandscapeEvolutionModelTest, TestSmallGrainDiscretization)
 TEST(ContinentalLandscapeEvolutionModelTest, TestPiratiniGrainDiscretization)
 {
     QString filenameDem = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Piratini/PiratiniDem.asc";
-    std::shared_ptr<Raster<float>> rasterDem = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameDem));
+    std::shared_ptr<Raster<double>> rasterDem = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameDem));
 
     QString filenameAccumulationPixels = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Piratini/AccumulationPixelsPiratiniArcGis.asc";
-    std::shared_ptr<Raster<float>> rasterAccumulationPixels = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameAccumulationPixels));
+    std::shared_ptr<Raster<int>> rasterAccumulationPixels = std::make_shared<Raster<int>>(RasterFile<int>::loadRasterByFile(filenameAccumulationPixels));
 
     QString filenameGrainName = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Piratini/GrainD50PiratiniPython.asc";
-    std::shared_ptr<Raster<float>> rasterGrainName = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameGrainName));
+    std::shared_ptr<Raster<double>> rasterGrainName = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameGrainName));
 
     // Calcular a declividade
     SlopeCalculator slope;
@@ -239,7 +239,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, TestPiratiniGrainDiscretization)
     slope.setSlopeType(SlopeType::slopeHorn1981);
     slope.setInputRaster(rasterDem);
     slope.calculateSlopeRaster();
-    std::shared_ptr<Raster<float>> resultSlope = slope.getOutputRaster();
+    std::shared_ptr<Raster<double>> resultSlope = slope.getOutputRaster();
 
     LithologyDefinionCalculator lithologyDefinition;
     lithologyDefinition.setFlowAccumulationRaster(rasterAccumulationPixels);
@@ -263,13 +263,13 @@ TEST(ContinentalLandscapeEvolutionModelTest, TestPiratiniGrainDiscretization)
 TEST(ContinentalLandscapeEvolutionModelTest, TestPythonSlope)
 {
     QString filenameDem = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Python/python_dem_piratini_1000m.asc";
-    std::shared_ptr<Raster<float>> rasterDem = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameDem));
+    std::shared_ptr<Raster<double>> rasterDem = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameDem));
 
     QString filenameMaxSlope = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Python/python_maxSlope_piratini_1000m.asc";
-    std::shared_ptr<Raster<float>> rasterMaxSlope = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameMaxSlope));
+    std::shared_ptr<Raster<double>> rasterMaxSlope = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameMaxSlope));
 
     QString filenameHornSlope = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Python/python_horn_piratini_1000m.asc";
-    std::shared_ptr<Raster<float>> rasterHornSlope = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameHornSlope));
+    std::shared_ptr<Raster<double>> rasterHornSlope = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameHornSlope));
 
 
     // Calcular a declividade Horn1981
@@ -278,7 +278,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, TestPythonSlope)
     slope.setSlopeType(SlopeType::slopeHorn1981);
     slope.setInputRaster(rasterDem);
     slope.calculateSlopeRaster();
-    std::shared_ptr<Raster<float>> resultSlope = slope.getOutputRaster();
+    std::shared_ptr<Raster<double>> resultSlope = slope.getOutputRaster();
 
     // Informações do Raster
     const size_t rasterRows = rasterDem->getRows();
@@ -312,13 +312,13 @@ TEST(ContinentalLandscapeEvolutionModelTest, TestPythonSlope)
 TEST(ContinentalLandscapeEvolutionModelTest, TestPythonD50)
 {
     QString filenameDem = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Python/python_dem_piratini_1000m.asc";
-    std::shared_ptr<Raster<float>> rasterDem = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameDem));
+    std::shared_ptr<Raster<double>> rasterDem = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameDem));
 
     QString filenameAccumulationPixels = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Python/python_flow_accumulation_piratini_1000m.asc";
-    std::shared_ptr<Raster<float>> rasterAccumulationPixels = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameAccumulationPixels));
+    std::shared_ptr<Raster<int>> rasterAccumulationPixels = std::make_shared<Raster<int>>(RasterFile<int>::loadRasterByFile(filenameAccumulationPixels));
 
     QString filenameD50Name = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Python/python_d50_piratini_1000m.asc";
-    std::shared_ptr<Raster<float>> rasterD50Name = std::make_shared<Raster<float>>(RasterFile<float>::loadRasterByFile(filenameD50Name));
+    std::shared_ptr<Raster<double>> rasterD50Name = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameD50Name));
 
     // Calcular a declividade
     SlopeCalculator slope;
@@ -326,13 +326,13 @@ TEST(ContinentalLandscapeEvolutionModelTest, TestPythonD50)
     slope.setSlopeType(SlopeType::slopeHorn1981);
     slope.setInputRaster(rasterDem);
     slope.calculateSlopeRaster();
-    std::shared_ptr<Raster<float>> resultSlope = slope.getOutputRaster();
+    std::shared_ptr<Raster<double>> resultSlope = slope.getOutputRaster();
 
     LithologyDefinionCalculator lithologyDefinition;
     lithologyDefinition.setFlowAccumulationRaster(rasterAccumulationPixels);
     lithologyDefinition.setDemRaster(rasterDem);
     lithologyDefinition.calculateGrainDiscretizationRaster();
-    std::shared_ptr<Raster<float>> resultD50 = lithologyDefinition.getD50();
+    std::shared_ptr<Raster<double>> resultD50 = lithologyDefinition.getD50();
 
     // Informações do Raster
     const size_t rasterRows = rasterDem->getRows();
@@ -349,13 +349,13 @@ TEST(ContinentalLandscapeEvolutionModelTest, TestPythonD50)
 
 TEST(ContinentalLandscapeEvolutionModelTest, DirectionCalculator)
 {
-    std::vector<std::pair<QString, float>> compares = {
+    std::vector<std::pair<QString, double>> compares = {
         {"C:/Git/ContinentalLandscapeEvolutionModelMock/bacia_piratini_90m_directions.csv", 0},
         {"C:/Git/ContinentalLandscapeEvolutionModelMock/bacia_piratini_90m_directionsOneNegative.csv", -1}
     };
 
     auto flowDir = std::make_shared<continental::datamanagement::Raster<short>>(RasterFile<short>::loadRasterByFile("C:/Git/ContinentalLandscapeEvolutionModelMock/bacia_piratini_90m_flowDir.asc"));
-    auto flowAcc = std::make_shared<continental::datamanagement::Raster<float>>(RasterFile<float>::loadRasterByFile("C:/Git/ContinentalLandscapeEvolutionModelMock/bacia_piratini_90m_flowAcc.asc"));
+    auto flowAcc = std::make_shared<continental::datamanagement::Raster<int>>(RasterFile<int>::loadRasterByFile("C:/Git/ContinentalLandscapeEvolutionModelMock/bacia_piratini_90m_flowAcc.asc"));
 
     for (const auto &compare : compares)
     {

@@ -21,7 +21,7 @@ DifusionAlgorithmService::DifusionAlgorithmService()
 
 }
 
-DifusionAlgorithmService::DifusionAlgorithmService(std::shared_ptr<Raster<float>> initialGrid, size_t simulateUltilTime, double diffusivity, size_t deltaT) :
+DifusionAlgorithmService::DifusionAlgorithmService(std::shared_ptr<Raster<double>> initialGrid, size_t simulateUltilTime, double diffusivity, size_t deltaT) :
     m_initialGrid(initialGrid),
     //m_saveEachDeltaT(saveEachDeltaT),
     m_simulateUltilTime(simulateUltilTime),

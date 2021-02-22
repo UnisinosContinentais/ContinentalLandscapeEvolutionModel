@@ -31,7 +31,7 @@ public:
     constexpr static const size_t ParametersSinkDestroyConfigMaxClosedList = 500000;
     constexpr static const size_t ParametersSinkDestroyConfigWeightFunctionCost = 2.00;
 
-    constexpr static const float ParametersStreamDefinitionConfigAreaThreshold = 50.0f;
+    constexpr static const double ParametersStreamDefinitionConfigAreaThreshold = 50.0f;
     static const bool ParametersStreamDefinitionConfigApproximateArea = false;
     static const bool ParametersStreamDefinitionConfigPercentualOfNumberOfCells = true;
 

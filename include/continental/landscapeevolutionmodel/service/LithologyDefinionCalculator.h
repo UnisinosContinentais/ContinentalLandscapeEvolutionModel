@@ -26,8 +26,8 @@ class CONTINENTALLANDSCAPEEVOLUTIONMODELPLUGIN_EXPORT_DECL LithologyDefinionCalc
 public:
     void calculateGrainDiscretizationRaster();
 
-    std::shared_ptr<continental::datamanagement::Raster<float> > getFlowAccumulationRaster() const;
-    void setFlowAccumulationRaster(const std::shared_ptr<continental::datamanagement::Raster<float> > flowAccumulationRaster);
+    std::shared_ptr<continental::datamanagement::Raster<int> > getFlowAccumulationRaster() const;
+    void setFlowAccumulationRaster(const std::shared_ptr<continental::datamanagement::Raster<int> > flowAccumulationRaster);
 
     std::shared_ptr<continental::datamanagement::Raster<short> > getLithologyDefinitionRaster() const;
     void setLithologyDefinitionRaster(const std::shared_ptr<continental::datamanagement::Raster<short> > lithologyDefinitionRaster);
@@ -44,8 +44,8 @@ public:
     double getChannelDepthFParameter() const;
     void setChannelDepthFParameter(const double channelDepthFParameter);
 
-    std::shared_ptr<continental::datamanagement::Raster<float> > getDemRaster() const;
-    void setDemRaster(const std::shared_ptr<continental::datamanagement::Raster<float> > demRaster);
+    std::shared_ptr<continental::datamanagement::Raster<double> > getDemRaster() const;
+    void setDemRaster(const std::shared_ptr<continental::datamanagement::Raster<double> > demRaster);
 
     double getGrainSizeWaterDensity() const;
     void setGrainSizeWaterDensity(const double grainSizeWaterDensity);
@@ -56,11 +56,11 @@ public:
     double getGrainSizeShieldsNumber() const;
     void setGrainSizeShieldsNumber(const double grainSizeShieldsNumber);
 
-    std::shared_ptr<continental::datamanagement::Raster<float> > getSlope() const;
-    void setSlope(const std::shared_ptr<continental::datamanagement::Raster<float> > slope);
+    std::shared_ptr<continental::datamanagement::Raster<double> > getSlope() const;
+    void setSlope(const std::shared_ptr<continental::datamanagement::Raster<double> > slope);
 
-    std::shared_ptr<continental::datamanagement::Raster<float> > getD50() const;
-    void setD50(const std::shared_ptr<continental::datamanagement::Raster<float> > d50);
+    std::shared_ptr<continental::datamanagement::Raster<double> > getD50() const;
+    void setD50(const std::shared_ptr<continental::datamanagement::Raster<double> > d50);
 
 private:
     /// Membros.
@@ -71,10 +71,10 @@ private:
     double m_grainSizeWaterDensity = continental::landscapeevolutionmodel::constant::LandscapeEvolutionModelConstant::GrainSizeWaterDensity;
     double m_grainSizeSedimentDensity = continental::landscapeevolutionmodel::constant::LandscapeEvolutionModelConstant::GrainSizeSedimentDensity;
     double m_grainSizeShieldsNumber = continental::landscapeevolutionmodel::constant::LandscapeEvolutionModelConstant::GrainSizeShieldsNumber;
-    std::shared_ptr<continental::datamanagement::Raster<float>> m_flowAccumulationRaster;
-    std::shared_ptr<continental::datamanagement::Raster<float>> m_demRaster;
-    std::shared_ptr<continental::datamanagement::Raster<float>> m_slope;
-    std::shared_ptr<continental::datamanagement::Raster<float>> m_d50;
+    std::shared_ptr<continental::datamanagement::Raster<int>> m_flowAccumulationRaster;
+    std::shared_ptr<continental::datamanagement::Raster<double>> m_demRaster;
+    std::shared_ptr<continental::datamanagement::Raster<double>> m_slope;
+    std::shared_ptr<continental::datamanagement::Raster<double>> m_d50;
     std::shared_ptr<continental::datamanagement::Raster<short>> m_lithologyDefinitionRaster;
 
     double calculateFlowAccumulationSquareMeters(const double pixelsFlowAccumulation) const;

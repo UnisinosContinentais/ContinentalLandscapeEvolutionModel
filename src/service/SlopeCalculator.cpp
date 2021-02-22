@@ -7,12 +7,12 @@ namespace continental {
 namespace landscapeevolutionmodel {
 namespace service {
 
-std::shared_ptr<Raster<float> > SlopeCalculator::getOutputRaster() const
+std::shared_ptr<Raster<double> > SlopeCalculator::getOutputRaster() const
 {
     return m_outputRaster;
 }
 
-void SlopeCalculator::setOutputRaster(const std::shared_ptr<Raster<float> > outputRaster)
+void SlopeCalculator::setOutputRaster(const std::shared_ptr<Raster<double> > outputRaster)
 {
     m_outputRaster = outputRaster;
 }
@@ -39,7 +39,7 @@ void SlopeCalculator::setSlopeType(const SlopeType slopeType)
 
 void SlopeCalculator::calculateSlopeRaster()
 {
-    const Raster<float> &rasterInput = *getInputRaster();
+    const Raster<double> &rasterInput = *getInputRaster();
 
     // Informações do Raster do DEM
     size_t inputRows = rasterInput.getRows();
@@ -50,13 +50,13 @@ void SlopeCalculator::calculateSlopeRaster()
     int inputNoData = rasterInput.getNoDataValue();
 
     // Cria o Raster com os resultados.
-    setOutputRaster(std::make_shared<Raster<float>>(inputRows,
+    setOutputRaster(std::make_shared<Raster<double>>(inputRows,
                                                     inputCols,
                                                     inputXOrigin,
                                                     inputYOrigin,
                                                     inputCellSize,
                                                     inputNoData));
-    Raster<float> &rasterOutput = *getOutputRaster();
+    Raster<double> &rasterOutput = *getOutputRaster();
 
     int auxInputCols = static_cast<int>(inputCols);
     #pragma omp parallel for
@@ -87,7 +87,7 @@ std::shared_ptr<std::vector<std::vector<float> >> SlopeCalculator::generateMovin
 
     std::vector<std::vector<float>> movingWindow(sizeWindow, std::vector<float>(sizeWindow, 0.0f));
 
-    const Raster<float> &rasterInput = *getInputRaster();
+    const Raster<double> &rasterInput = *getInputRaster();
 
     size_t maxRows = rasterInput.getRows();
     size_t maxCols = rasterInput.getCols();
@@ -123,7 +123,7 @@ std::shared_ptr<std::vector<std::vector<float> >> SlopeCalculator::generateMovin
 
 float SlopeCalculator::calculateSlopeHorn1981Value(const std::shared_ptr<std::vector<std::vector<float> >> movingWindow) const
 {
-    const Raster<float> &rasterInput = *getInputRaster();
+    const Raster<double> &rasterInput = *getInputRaster();
     float cellSize = static_cast<float>(rasterInput.getCellSize());
 
     std::vector<std::vector<float>> &movingWindowVector = *movingWindow;
@@ -146,7 +146,7 @@ float SlopeCalculator::calculateSlopeHorn1981Value(const std::shared_ptr<std::ve
 
 float SlopeCalculator::calculateMaxSlope(const std::shared_ptr<std::vector<std::vector<float> > > movingWindow) const
 {
-    const Raster<float> &rasterInput = *getInputRaster();
+    const Raster<double> &rasterInput = *getInputRaster();
     float cellSize = static_cast<float>(rasterInput.getCellSize());
 
     std::vector<std::vector<float>> &movingWindowVector = *movingWindow;
@@ -217,12 +217,12 @@ float SlopeCalculator::convertUnit(const float slopeTangent) const
     return result;
 }
 
-std::shared_ptr<Raster<float> > SlopeCalculator::getInputRaster() const
+std::shared_ptr<Raster<double> > SlopeCalculator::getInputRaster() const
 {
     return m_inputRaster;
 }
 
-void SlopeCalculator::setInputRaster(const std::shared_ptr<Raster<float> > inputRaster)
+void SlopeCalculator::setInputRaster(const std::shared_ptr<Raster<double> > inputRaster)
 {
     m_inputRaster = inputRaster;
 }

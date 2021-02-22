@@ -33,7 +33,7 @@ HydroToolsAlgorithmService::HydroToolsAlgorithmService()
 
 }
 
-HydroToolsAlgorithmService::HydroToolsAlgorithmService(std::shared_ptr<Raster<float>> initialGrid,
+HydroToolsAlgorithmService::HydroToolsAlgorithmService(std::shared_ptr<Raster<double>> initialGrid,
                                          std::shared_ptr<LandscapeEvolutionModelInput> inputParameters) :
 m_initialGrid(initialGrid),
 m_inputParameters(inputParameters)
@@ -45,7 +45,7 @@ const std::shared_ptr<Raster<short>> HydroToolsAlgorithmService::getFlowDirectio
 	return m_flowDirection;
 }
 
-const std::shared_ptr<Raster<float>> HydroToolsAlgorithmService::getFlowAccumulation() const
+const std::shared_ptr<Raster<int>> HydroToolsAlgorithmService::getFlowAccumulation() const
 {
 	return m_flowAccumulation;
 }
@@ -69,10 +69,10 @@ void HydroToolsAlgorithmService::prepareDem()
 {
     size_t maxOpenList = m_inputParameters->getSinkDestroyConfig()->getMaxOpenList();
     size_t maxClosedList = m_inputParameters->getSinkDestroyConfig()->getMaxClosedList();
-    float weightFunctionG = m_inputParameters->getSinkDestroyConfig()->getCostFunctionWeight();
+    double weightFunctionG = m_inputParameters->getSinkDestroyConfig()->getCostFunctionWeight();
     HeuristicSinkRemovalProcessingMode processingAlgorithm = m_inputParameters->getSinkDestroyConfig()->getProcessingAlgorithm();
 
-    auto sinkDestroy = std::make_shared<HeuristicSinkRemoval<float>>(maxOpenList, maxClosedList, weightFunctionG, static_cast<HeuristicSinkRemoval<float>::ProcessingMode>(processingAlgorithm));
+    auto sinkDestroy = std::make_shared<HeuristicSinkRemoval<double>>(maxOpenList, maxClosedList, weightFunctionG, static_cast<HeuristicSinkRemoval<double>::ProcessingMode>(processingAlgorithm));
     sinkDestroy->setDem(m_initialGrid);
 	sinkDestroy->removeSinks();
 }
@@ -86,10 +86,10 @@ void HydroToolsAlgorithmService::execute()
     float weightFunctionG = m_inputParameters->getSinkDestroyConfig()->getCostFunctionWeight();
     HeuristicSinkRemovalProcessingMode processingAlgorithm = m_inputParameters->getSinkDestroyConfig()->getProcessingAlgorithm();
 
-    std::shared_ptr<HeuristicSinkRemoval<float>> sinkDestroy = std::make_shared<HeuristicSinkRemoval<float>>(maxOpenList, maxClosedList, weightFunctionG, static_cast<HeuristicSinkRemoval<float>::ProcessingMode>(processingAlgorithm));
+    std::shared_ptr<HeuristicSinkRemoval<double>> sinkDestroy = std::make_shared<HeuristicSinkRemoval<double>>(maxOpenList, maxClosedList, weightFunctionG, static_cast<HeuristicSinkRemoval<double>::ProcessingMode>(processingAlgorithm));
 
-    continental::datamanagement::Raster<float> dem = *m_initialGrid;
-    std::shared_ptr<Raster<float>> demShared = std::make_shared<Raster<float>>(dem);
+    continental::datamanagement::Raster<double> dem = *m_initialGrid;
+    std::shared_ptr<Raster<double>> demShared = std::make_shared<Raster<double>>(dem);
     qDebug() << "1º Executa o Sink Destroy com uma copia da superficie inicial atual";
     //1º Executa o Sink Destroy com uma copia da superficie inicial atual
     sinkDestroy->setDem(demShared);
@@ -108,7 +108,7 @@ void HydroToolsAlgorithmService::execute()
 
     qDebug() << "4º Desenha os rios";
     // 4º Desenha os rios
-    float thresoldValue = m_inputParameters->getStreamDefinitionConfig()->getThresoldValue();
+    double thresoldValue = m_inputParameters->getStreamDefinitionConfig()->getThresoldValue();
     StreamDefinitionThresholdType thresoldType = m_inputParameters->getStreamDefinitionConfig()->getThresoldType();
     StreamDefinition streamDefinitionCalculator;
     streamDefinitionCalculator.setFlowAccumulation(m_flowAccumulation, thresoldValue, static_cast<StreamDefinition::ThresholdType>(thresoldType));

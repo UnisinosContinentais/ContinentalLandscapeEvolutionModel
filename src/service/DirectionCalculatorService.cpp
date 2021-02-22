@@ -12,7 +12,7 @@ namespace continental {
 namespace landscapeevolutionmodel {
 namespace service {
 
-DirectionCalculatorService::DirectionCalculatorService(std::shared_ptr<Raster<short>> flowDirection, std::shared_ptr<Raster<float>> flowAccumulation)
+DirectionCalculatorService::DirectionCalculatorService(std::shared_ptr<Raster<short>> flowDirection, std::shared_ptr<Raster<int>> flowAccumulation)
     : m_flowDirection(flowDirection)
     , m_flowAccumulation(flowAccumulation)
     , m_drainageNetworks(std::make_shared<std::vector<std::shared_ptr<domain::DrainageNetwork>>>())
@@ -30,17 +30,17 @@ std::shared_ptr<Raster<short>> DirectionCalculatorService::getFlowDirection() co
     return m_flowDirection;
 }
 
-std::shared_ptr<Raster<float>> DirectionCalculatorService::getFlowAccumulation() const
+std::shared_ptr<Raster<int>> DirectionCalculatorService::getFlowAccumulation() const
 {
     return m_flowAccumulation;
 }
 
-void DirectionCalculatorService::setFlowAccumulation(const std::shared_ptr<Raster<float>> flowAccumulation)
+void DirectionCalculatorService::setFlowAccumulation(const std::shared_ptr<Raster<int>> flowAccumulation)
 {
     m_flowAccumulation = flowAccumulation;
 }
 
-void DirectionCalculatorService::makeTree(DrainageNetwork &drainageNetwork, Raster<float> &flowAccumulation, size_t exuterRow, size_t exuterColumn)
+void DirectionCalculatorService::makeTree(DrainageNetwork &drainageNetwork, Raster<int> &flowAccumulation, size_t exuterRow, size_t exuterColumn)
 {
     drainageNetwork.mainDirection = std::make_shared<Direction>(exuterRow, exuterColumn);
 
@@ -50,7 +50,7 @@ void DirectionCalculatorService::makeTree(DrainageNetwork &drainageNetwork, Rast
 
 void DirectionCalculatorService::execute(bool onlyMainDrainageNetwork)
 {
-	Raster<float> flowAccumulation = *m_flowAccumulation;
+    Raster<int> flowAccumulation = *m_flowAccumulation;
     m_rows = flowAccumulation.getRows();
     m_cols = flowAccumulation.getCols();
 	m_noDataValue = flowAccumulation.getNoDataValue();
@@ -68,7 +68,7 @@ void DirectionCalculatorService::execute(bool onlyMainDrainageNetwork)
         {
             for (size_t col = 0; col < m_cols; ++col)
             {
-                float value = flowAccumulation.getData(row, col);
+                double value = flowAccumulation.getData(row, col);
 
                 if (exuterValue < value && !qFuzzyCompare(value, m_noDataValue))
                 {
@@ -94,12 +94,12 @@ void DirectionCalculatorService::execute(bool onlyMainDrainageNetwork)
     }
 }
 
-float DirectionCalculatorService::getFacLimit() const
+double DirectionCalculatorService::getFacLimit() const
 {
     return m_facLimit;
 }
 
-void DirectionCalculatorService::setFacLimit(float facLimit)
+void DirectionCalculatorService::setFacLimit(double facLimit)
 {
     m_facLimit = facLimit;
 }
@@ -121,7 +121,7 @@ std::shared_ptr<std::vector<std::shared_ptr<DrainageNetwork>>> DirectionCalculat
 
 size_t DirectionCalculatorService::makeTree(
         Direction &direction,
-        Raster<float> &flowAccumulation,
+        Raster<int> &flowAccumulation,
         size_t numberOfCellsOfIndentified
     )
 {

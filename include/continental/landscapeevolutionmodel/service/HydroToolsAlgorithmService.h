@@ -29,7 +29,7 @@ public:
     /// Construtor.
     /// @param initialGrid Objeto do tipo Raster<float> com a Superfície Inicial.
     /// @param inputParameters Objeto do tipo LandscapeEvolutionModelInput com os parametros de entrada para realização do processamento.
-    HydroToolsAlgorithmService(std::shared_ptr<continental::datamanagement::Raster<float>> initialGrid, std::shared_ptr<continental::landscapeevolutionmodel::dto::LandscapeEvolutionModelInput> inputParameters);
+    HydroToolsAlgorithmService(std::shared_ptr<continental::datamanagement::Raster<double>> initialGrid, std::shared_ptr<continental::landscapeevolutionmodel::dto::LandscapeEvolutionModelInput> inputParameters);
 
     /// Função que executa a preparação da topografia para execução do processo principal.
     void prepareDem();
@@ -43,7 +43,7 @@ public:
 
     /// Função de retorno dos valores de Acumulação do Fluxo.
     /// @return Objeto do tipo Raster<short>.
-	const std::shared_ptr<continental::datamanagement::Raster<float>> getFlowAccumulation() const;
+    const std::shared_ptr<continental::datamanagement::Raster<int>> getFlowAccumulation() const;
 
     /// Função de retorno dos valores de Definição dos Rios.
     /// @return Objeto do tipo Raster<short>.
@@ -59,9 +59,9 @@ public:
 
 private:
     /// Membros.
-	std::shared_ptr<continental::datamanagement::Raster<float>> m_initialGrid;
+    std::shared_ptr<continental::datamanagement::Raster<double>> m_initialGrid;
 	std::shared_ptr<continental::datamanagement::Raster<short>> m_flowDirection;
-	std::shared_ptr<continental::datamanagement::Raster<float>> m_flowAccumulation;
+    std::shared_ptr<continental::datamanagement::Raster<int>> m_flowAccumulation;
 	std::shared_ptr<continental::datamanagement::Raster<short>> m_streamDefinition;
 	std::shared_ptr<continental::datamanagement::Raster<short>> m_streamSegmentation;
 	std::shared_ptr<continental::datamanagement::Raster<short>> m_catchment;
