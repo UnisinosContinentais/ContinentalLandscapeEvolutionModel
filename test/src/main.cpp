@@ -44,7 +44,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, TestSlopeSmallArcGisDegree)
     }
 }
 
-TEST(ContinentalFuzzyTest, TestSlopeSmallArcGisPercent)
+TEST(ContinentalLandscapeEvolutionModelTest, TestSlopeSmallArcGisPercent)
 {
     QString filenameDem = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Small/SmallDem.asc";
     std::shared_ptr<Raster<double>> rasterDem = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameDem));
@@ -72,7 +72,7 @@ TEST(ContinentalFuzzyTest, TestSlopeSmallArcGisPercent)
     }
 }
 
-TEST(ContinentalFuzzyTest, TestSlopeSmallPythonFlowDirDegree)
+TEST(ContinentalLandscapeEvolutionModelTest, TestSlopeSmallPythonFlowDirDegree)
 {
     QString filenameDem = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Small/SmallDem.asc";
     std::shared_ptr<Raster<double>> rasterDem = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameDem));
@@ -100,7 +100,7 @@ TEST(ContinentalFuzzyTest, TestSlopeSmallPythonFlowDirDegree)
     }
 }
 
-TEST(ContinentalFuzzyTest, TestSlopePiratiniArcGisDegree)
+TEST(ContinentalLandscapeEvolutionModelTest, TestSlopePiratiniArcGisDegree)
 {
     QString filenameDem = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Piratini/PiratiniDem.asc";
     std::shared_ptr<Raster<double>> rasterDem = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameDem));
@@ -128,7 +128,7 @@ TEST(ContinentalFuzzyTest, TestSlopePiratiniArcGisDegree)
     }
 }
 
-TEST(ContinentalFuzzyTest, TestSlopePiratiniArcGisPercent)
+TEST(ContinentalLandscapeEvolutionModelTest, TestSlopePiratiniArcGisPercent)
 {
     QString filenameDem = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Piratini/PiratiniDem.asc";
     std::shared_ptr<Raster<double>> rasterDem = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameDem));
@@ -156,7 +156,7 @@ TEST(ContinentalFuzzyTest, TestSlopePiratiniArcGisPercent)
     }
 }
 
-TEST(ContinentalFuzzyTest, TestSlopePiratiniPythonFlowDirDegree)
+TEST(ContinentalLandscapeEvolutionModelTest, TestSlopePiratiniPythonFlowDirDegree)
 {
     QString filenameDem = "C:/Git/ContinentalLandscapeEvolutionModelMock/Dispersion/Piratini/PiratiniDem.asc";
     std::shared_ptr<Raster<double>> rasterDem = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(filenameDem));
@@ -350,7 +350,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, DirectionCalculator)
 {
     QString basePath = "C:/Git/ContinentalLandscapeEvolutionModelMock";
 
-    std::vector<std::pair<QString, float>> compares = {
+    std::vector<std::pair<QString, double>> compares = {
         {basePath + "/bacia_piratini_90m_directions.csv", 0},
         {basePath + "/bacia_piratini_90m_directionsOneNegative.csv", -1}
     };
@@ -451,14 +451,14 @@ TEST(ContinentalLandscapeEvolutionModelTest, PastDonorsSummation)
 
     std::shared_ptr<std::vector<std::shared_ptr<DrainageNetwork>>> drainageNetworks = directionCalculator.getDrainageNetworks();
 
-    double epsilon = std::pow(10, -5);
+    double epsilon = std::pow(10, -10);
 
     std::vector<std::vector<double>> donorsSummationPast = eroderService.donorsSummation(drainageNetworks->at(0)->positions, true);
 
     for (size_t row = 0; row < donorsSummationPast.size(); ++row)
     {
         for (size_t col = 0; col < donorsSummationPast[0].size(); ++col)
-        {            
+        {
             EXPECT_LT(std::abs(donorsSummationPast[row][col] - donorsSummationPastCompare->getData(row, col)), epsilon) << "row: " << row << " col: " << col << "value: " << donorsSummationPast[row][col] << " compare: " << donorsSummationPastCompare->getData(row, col);
         }
     }
@@ -488,13 +488,22 @@ TEST(ContinentalLandscapeEvolutionModelTest, ErosionDeposition)
     eroderService.setUplift(upliftRaster);
     eroderService.executeWithErosionDeposition();
     
-    RasterFile<double>::writeData(*eroderService.getRaster(), basePath + "/micro_regiao_Piratini_result_cpp.asc");
+    double epsilon = std::pow(10, -10);
+    for (size_t row = 0; row < eroderService.getRaster()->getRows(); ++row)
+    {
+        for (size_t col = 0; col < eroderService.getRaster()->getCols(); ++col)
+        {
+            EXPECT_LT(std::abs(eroderService.getRaster()->getData(row, col) - result->getData(row, col)), epsilon) 
+                << "row: " << row << " col: " << col << "value: " 
+                << eroderService.getRaster()->getData(row, col) << " compare: " << result->getData(row, col);
+        }
+    }
 }
 
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    //::testing::GTEST_FLAG(filter) = "*ErosionDeposition*";
+    // ::testing::GTEST_FLAG(filter) = "*PastDonorsSummation*";
     return RUN_ALL_TESTS();
 }
 
