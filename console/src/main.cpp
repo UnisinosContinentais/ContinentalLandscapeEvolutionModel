@@ -72,7 +72,7 @@ int main(int argc, char **argv)
     streamDefinitionConfig->setThresoldType("NumberOfCells");
     streamDefinitionConfig->setThresoldValue(LandscapeEvolutionModelConstant::ParametersStreamDefinitionConfigAreaThreshold);
 
-    
+
     std::shared_ptr<continental::landscapeevolutionmodel::domain::SimulationLandscapeEvolutionModelConfig> simulationLandscapeEvolutionModelConfig = std::make_shared<continental::landscapeevolutionmodel::domain::SimulationLandscapeEvolutionModelConfig>();
     simulationLandscapeEvolutionModelConfig->setErodibility(LandscapeEvolutionModelConstant::ParametersSimulationErodibility);
     simulationLandscapeEvolutionModelConfig->setDiffusion(LandscapeEvolutionModelConstant::ParametersSimulationDiffusion);
@@ -99,12 +99,12 @@ int main(int argc, char **argv)
     lemInput->setSimulationLandscapeEvolutionModelConfig(simulationLandscapeEvolutionModelConfig);
     lemInput->setSimulateUntilTime(LandscapeEvolutionModelConstant::SimulateUntilTime);
     lemInput->setGrainDispersionConfig(grainDispersionConfig);
-    
+
     //Executa o lEM com iteração
     continental::landscapeevolutionmodel::ProcessLandscapeEvolutionModel processLem = ProcessLandscapeEvolutionModel();
     processLem.preprare(initialGrid, lemInput);
 
-    
+
     bool result = true;
     do {
         std::cout << "\n PROCESSANDOO PASSO DE TEMPO " << processLem.getSimulationTimeStep() << " ANOS \n" << std::endl;

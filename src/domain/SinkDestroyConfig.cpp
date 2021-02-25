@@ -25,12 +25,12 @@ void SinkDestroyConfig::setMaxClosedList(size_t value)
     m_maxClosedList = value;
 }
 
-float SinkDestroyConfig::getCostFunctionWeight() const
+double SinkDestroyConfig::getCostFunctionWeight() const
 {
     return m_costFunctionWeight;
 }
 
-void SinkDestroyConfig::setCostFunctionWeight(float value)
+void SinkDestroyConfig::setCostFunctionWeight(double value)
 {
     m_costFunctionWeight = value;
 }

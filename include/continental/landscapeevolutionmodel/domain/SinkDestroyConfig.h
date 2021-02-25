@@ -39,11 +39,11 @@ public:
 
     /// Função de retorno do valor do peso da função.
     /// @return Retorna o valor do peso da função.
-    float getCostFunctionWeight() const;
+    double getCostFunctionWeight() const;
 
     /// Função de definição do valor do peso da função.
     /// @param value Valor do peso da função.
-    void setCostFunctionWeight(float value);
+    void setCostFunctionWeight(double value);
 
     /// Função de retorno do enum do algoritmo de processo.
     /// @return Retorna o enum do algoritmo de processo.
@@ -69,7 +69,7 @@ private:
     /// Membros.
     size_t m_maxOpenList = 0;
     size_t m_maxClosedList = 0;
-    float m_costFunctionWeight = 0;
+    double m_costFunctionWeight = 0;
     HeuristicSinkRemovalProcessingMode m_processingAlgorithm;
     unsigned short m_version = 0;
 };

@@ -83,7 +83,7 @@ void HydroToolsAlgorithmService::execute()
     //Parametros de entrada do Sink And Destroy
     size_t maxOpenList = m_inputParameters->getSinkDestroyConfig()->getMaxOpenList();
     size_t maxClosedList = m_inputParameters->getSinkDestroyConfig()->getMaxClosedList();
-    float weightFunctionG = m_inputParameters->getSinkDestroyConfig()->getCostFunctionWeight();
+    double weightFunctionG = m_inputParameters->getSinkDestroyConfig()->getCostFunctionWeight();
     HeuristicSinkRemovalProcessingMode processingAlgorithm = m_inputParameters->getSinkDestroyConfig()->getProcessingAlgorithm();
 
     std::shared_ptr<HeuristicSinkRemoval<double>> sinkDestroy = std::make_shared<HeuristicSinkRemoval<double>>(maxOpenList, maxClosedList, weightFunctionG, static_cast<HeuristicSinkRemoval<double>::ProcessingMode>(processingAlgorithm));
