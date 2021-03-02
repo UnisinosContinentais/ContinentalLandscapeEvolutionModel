@@ -15,7 +15,6 @@
 #include <memory>
 #include <cmath>
 #include <vector>
-#include <iostream>
 
 namespace continental {
 namespace landscapeevolutionmodel {
@@ -29,14 +28,6 @@ class CONTINENTALLANDSCAPEEVOLUTIONMODELPLUGIN_EXPORT_DECL EroderAlgorithmServic
 public:
     /// Construtor.
     EroderAlgorithmService();
-
-    /// Construtor.
-    /// @param initialGrid Objeto do tipo Raster<double> com a Superfície Inicial.
-    /// @param simulateUtilTime Valor tipo size_t com o tempo total de simulação em anos .
-    /// @param erodibility Valor do tipo double com o parametro de erodibilidade.
-    /// @param deltaT Valor tipo size_t com a o passo de tempo em anos.
-    /// @param concavityIndex Valor do tipo double com o valor indice de concavidade da bacia.
-    EroderAlgorithmService(std::shared_ptr<datamanagement::Raster<double>> raster, double erodibility, size_t deltaT, double concavityIndex);
 
     /// Função que retorna a proxima posição dado um ponto do grid de acordo com o grid de fluxo.
     /// @param value Valor do ponto.
@@ -77,9 +68,9 @@ public:
 
     void setNumberOfIterations(const size_t &numberOfIterations);
 
-    double getPrecipitationRate() const;
+    double getDimensionLessPrecipitationRate() const;
 
-    void setPrecipitationRate(double precipitationRate);
+    void setDimensionLessPrecipitationRate(double dimensionLessPrecipitationRate);
 
     std::shared_ptr<datamanagement::Raster<double> > getRaster() const;
 
@@ -93,9 +84,9 @@ public:
 
     void setConcavityIndex(double concavityIndex);
 
-    double getDepositionCoeficient() const;
+    double getDimensionLessDepositionCoeficient() const;
 
-    void setDepositionCoeficient(double depositionCoeficient);
+    void setDimensionLessDepositionCoeficient(double depositionCoeficient);
 
     size_t getDeltaTime() const;
 
@@ -107,9 +98,9 @@ public:
 
     void useDrainageNetworkPercentLimit(double percentLimit);
 
-    short getFlowAccumulationLimit() const;
+    int getFlowAccumulationLimit() const;
 
-    void setFlowAccumulationLimit(short flowAccumulationLimit);
+    void setFlowAccumulationLimit(int flowAccumulationLimit);
 
     std::shared_ptr<datamanagement::Raster<double>> getUplift() const;
 
@@ -125,13 +116,16 @@ private:
     size_t m_deltaTime = 0;
     double m_erodibility = 0.0;
     double m_concavityIndex = 0.0;
-    double m_precipitationRate = 0.2;
-    double m_depositionCoeficient = 1.0;
+    // dimensionLessPrecipitationRate representa qualquer variação na taxa de precipitação p.
+    // Pode ser descrito por p/p0, sendo p a taxa de precipitação e p0 a taxa de precipitação média.
+    // Referência: Yuan, 2019 - https://doi.org/10.1029/2018JF004867
+    double m_dimensionLessPrecipitationRate = 0.2;
+    double m_dimensionLessDepositionCoeficient = 1.0;
     size_t m_numberOfIterations = 20;
     domain::EnumDrainageNetworkLimit m_drainageNetworkTypeLimit = domain::EnumDrainageNetworkLimit::OnlyMain;
     size_t m_drainageNetworkAmountLimit = 0;
     double m_drainageNetworkPercentLimit = 0.0;
-    short m_flowAccumulationLimit = 0;
+    int m_flowAccumulationLimit = 0;
     std::shared_ptr<datamanagement::Raster<double>> m_raster;
     std::shared_ptr<datamanagement::Raster<short>> m_flowDirection;
     std::shared_ptr<datamanagement::Raster<int>> m_flowAccumulation;

@@ -27,12 +27,18 @@ public:
     bool getProcessMapsPositionsAndBranches() const;
     void setProcessMapsPositionsAndBranches(bool processMapsPositionsAndBranches);
 
-    float getFlowAccumulationLimit() const;
-    void setFlowAccumulationLimit(float flowAccumulationLimit);
+    int getFlowAccumulationLimit() const;
+    void setFlowAccumulationLimit(int flowAccumulationLimit);
 
     std::shared_ptr<std::vector<std::shared_ptr<domain::DrainageNetwork>>> getDrainageNetworks() const;
 
-    void execute(bool onlyMainDrainageNetwork = true);
+    void execute();
+
+    void useOnlyMainDrainageNetwork();
+
+    void useDrainageNetworkAmountLimit(size_t amountLimit);
+
+    void useDrainageNetworkPercentLimit(double percentLimit);
 private:
     const int LimitMapPositions = std::numeric_limits<int>::max();
 
@@ -40,11 +46,15 @@ private:
     std::shared_ptr<datamanagement::Raster<int>> m_flowAccumulation;
 
     bool m_processMapsPositionsAndBranches = false;
-    float m_flowAccumulationLimit = -1;
+    int m_flowAccumulationLimit = -1;
     size_t m_rows = 0;
     size_t m_cols = 0;
 	float m_noDataValue = 0.0f;
     std::shared_ptr<std::vector<std::shared_ptr<domain::DrainageNetwork>>> m_drainageNetworks;
+
+    domain::EnumDrainageNetworkLimit m_drainageNetworkTypeLimit = domain::EnumDrainageNetworkLimit::Undefined;
+    size_t m_drainageNetworkAmountLimit = 0;
+    double m_drainageNetworkPercentLimit = 0.0;
 
     void makeTree(domain::DrainageNetwork &drainageNetwork, datamanagement::Raster<int> &flowAccumulation, size_t exuterRow, size_t exuterColumn);
 

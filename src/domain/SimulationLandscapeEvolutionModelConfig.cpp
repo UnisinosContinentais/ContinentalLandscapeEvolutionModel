@@ -25,24 +25,24 @@ void SimulationLandscapeEvolutionModelConfig::setErodibility(const double &erodi
     m_erodibility = erodibility;
 }
 
-double SimulationLandscapeEvolutionModelConfig::getDiffusion() const
+double SimulationLandscapeEvolutionModelConfig::getDiffusivity() const
 {
-    return m_diffusion;
+    return m_diffusivity;
 }
 
-void SimulationLandscapeEvolutionModelConfig::setDiffusion(const double &diffusion)
+void SimulationLandscapeEvolutionModelConfig::setDiffusivity(const double &diffusivity)
 {
-    m_diffusion = diffusion;
+    m_diffusivity = diffusivity;
 }
 
-double SimulationLandscapeEvolutionModelConfig::getValueM() const
+double SimulationLandscapeEvolutionModelConfig::getConcavityIndex() const
 {
-    return m_valueM;
+    return m_concavityIndex;
 }
 
-void SimulationLandscapeEvolutionModelConfig::setValueM(const double &valueM)
+void SimulationLandscapeEvolutionModelConfig::setConcavityIndex(const double &concavityIndex)
 {
-    m_valueM = valueM;
+    m_concavityIndex = concavityIndex;
 }
 
 double SimulationLandscapeEvolutionModelConfig::getValueN() const
@@ -95,16 +95,58 @@ void SimulationLandscapeEvolutionModelConfig::setNorthBoundaryFactor(const size_
     m_northBoundaryFactor = northBoundaryFactor;
 }
 
-size_t SimulationLandscapeEvolutionModelConfig::getDrainagesLength() const
+double SimulationLandscapeEvolutionModelConfig::getDimensionLessPrecipitationRate() const
 {
-    return m_drainagesLength;
+    return m_dimensionLessPrecipitationRate;
 }
 
-void SimulationLandscapeEvolutionModelConfig::setDrainagesLength(const size_t &drainagesLength)
+void SimulationLandscapeEvolutionModelConfig::setDimensionLessPrecipitationRate(double dimensionLessPrecipitationRate)
 {
-    m_drainagesLength = drainagesLength;
+    m_dimensionLessPrecipitationRate = dimensionLessPrecipitationRate;
 }
 
+double SimulationLandscapeEvolutionModelConfig::getDimensionLessDepositionCoeficient() const
+{
+    return m_dimensionLessDepositionCoeficient;
 }
+
+void SimulationLandscapeEvolutionModelConfig::setDimensionLessDepositionCoeficient(double dimensionLessDepositionCoeficient)
+{
+    m_dimensionLessDepositionCoeficient = dimensionLessDepositionCoeficient;
 }
+
+void SimulationLandscapeEvolutionModelConfig::useOnlyMainDrainageNetwork()
+{
+    m_drainageNetworkTypeLimit = OnlyMain;
 }
+
+void SimulationLandscapeEvolutionModelConfig::useDrainageNetworkAmountLimit(size_t amountLimit)
+{
+    m_drainageNetworkTypeLimit = Amount;
+    m_drainageNetworkAmountLimit = amountLimit;
+}
+
+void SimulationLandscapeEvolutionModelConfig::useDrainageNetworkPercentLimit(double percentLimit)
+{
+    m_drainageNetworkTypeLimit = Percent;
+    m_drainageNetworkPercentLimit = percentLimit;
+}
+
+domain::EnumDrainageNetworkLimit SimulationLandscapeEvolutionModelConfig::getDrainageNetworkTypeLimit() const
+{
+    return m_drainageNetworkTypeLimit;
+}
+
+size_t SimulationLandscapeEvolutionModelConfig::getDrainageNetworkAmountLimit() const
+{
+    return m_drainageNetworkAmountLimit;
+}
+
+double SimulationLandscapeEvolutionModelConfig::getDrainageNetworkPercentLimit() const
+{
+    return m_drainageNetworkPercentLimit;
+}
+
+} // namespace domain
+} // namespace landscapeevolutionmodel
+} // namespace continental

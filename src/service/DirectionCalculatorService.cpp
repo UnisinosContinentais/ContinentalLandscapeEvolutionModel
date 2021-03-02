@@ -41,66 +41,12 @@ void DirectionCalculatorService::setFlowAccumulation(const std::shared_ptr<Raste
     m_flowAccumulation = flowAccumulation;
 }
 
-void DirectionCalculatorService::makeTree(DrainageNetwork &drainageNetwork, Raster<int> &flowAccumulation, size_t exuterRow, size_t exuterColumn)
-{
-    drainageNetwork.mainDirection = std::make_shared<Direction>(exuterRow, exuterColumn);
-
-
-    drainageNetwork.numberOfCellsOfIndentified = makeTree(*drainageNetwork.mainDirection, flowAccumulation, 0);
-}
-
-void DirectionCalculatorService::execute(bool onlyMainDrainageNetwork)
-{
-    Raster<int> flowAccumulation = *m_flowAccumulation;
-    m_rows = flowAccumulation.getRows();
-    m_cols = flowAccumulation.getCols();
-	m_noDataValue = flowAccumulation.getNoDataValue();
-
-    int limitDrainageNetwork = onlyMainDrainageNetwork ? 1 : LimitMapPositions;
-
-    for (int indexDrainageNetwork = 0; indexDrainageNetwork < limitDrainageNetwork; ++indexDrainageNetwork)
-    {
-        size_t exuterRow = 0;
-        size_t exuterColumn = 0;
-		float exuterValue = 0.0f;
-        bool found = false;
-
-        for (size_t row = 0; row < m_rows; ++row)
-        {
-            for (size_t col = 0; col < m_cols; ++col)
-            {
-                double value = flowAccumulation.getData(row, col);
-
-                if (exuterValue < value && value != m_noDataValue)
-                {
-                    exuterRow = row;
-                    exuterColumn = col;
-                    exuterValue = value;
-                    found = true;
-                }
-            }
-        }
-
-		
-        if (!found)
-        {
-            break;
-        }
-
-        auto drainageNetwork = std::make_shared<DrainageNetwork>();
-        m_drainageNetworks->push_back(drainageNetwork);
-
-        makeTree(*drainageNetwork, flowAccumulation, exuterRow, exuterColumn);
-        makeTreeDonors(*drainageNetwork);
-    }
-}
-
-float DirectionCalculatorService::getFlowAccumulationLimit() const
+int DirectionCalculatorService::getFlowAccumulationLimit() const
 {
     return m_flowAccumulationLimit;
 }
 
-void DirectionCalculatorService::setFlowAccumulationLimit(float flowAccumulationLimit)
+void DirectionCalculatorService::setFlowAccumulationLimit(int flowAccumulationLimit)
 {
     m_flowAccumulationLimit = flowAccumulationLimit;
 }
@@ -120,6 +66,97 @@ std::shared_ptr<std::vector<std::shared_ptr<DrainageNetwork>>> DirectionCalculat
     return m_drainageNetworks;
 }
 
+void DirectionCalculatorService::useOnlyMainDrainageNetwork()
+{
+    m_drainageNetworkTypeLimit = OnlyMain;
+}
+
+void DirectionCalculatorService::useDrainageNetworkAmountLimit(size_t amountLimit)
+{
+    m_drainageNetworkTypeLimit = Amount;
+    m_drainageNetworkAmountLimit = amountLimit;
+}
+
+void DirectionCalculatorService::useDrainageNetworkPercentLimit(double percentLimit)
+{
+    m_drainageNetworkTypeLimit = Percent;
+    m_drainageNetworkPercentLimit = percentLimit;
+}
+
+void DirectionCalculatorService::makeTree(DrainageNetwork &drainageNetwork, Raster<int> &flowAccumulation, size_t exuterRow, size_t exuterColumn)
+{
+    drainageNetwork.mainDirection = std::make_shared<Direction>(exuterRow, exuterColumn);
+
+
+    drainageNetwork.numberOfCellsOfIndentified = makeTree(*drainageNetwork.mainDirection, flowAccumulation, 0);
+}
+
+void DirectionCalculatorService::execute()
+{
+    Raster<int> flowAccumulation = *m_flowAccumulation;
+    m_rows = flowAccumulation.getRows();
+    m_cols = flowAccumulation.getCols();
+    m_noDataValue = flowAccumulation.getNoDataValue();
+
+    size_t limitDrainageNetwork = 0;
+    switch (m_drainageNetworkTypeLimit)
+    {
+        case Amount:
+            limitDrainageNetwork = m_drainageNetworkAmountLimit;
+            break;
+        case Percent:
+            limitDrainageNetwork = std::numeric_limits<size_t>::max();
+            break;
+        case OnlyMain:
+            limitDrainageNetwork = 1;
+            break;
+        default:
+            throw std::runtime_error("The limit of the drainage networks has not been defined.");
+    }
+
+    for (size_t indexDrainageNetwork = 0; indexDrainageNetwork < limitDrainageNetwork; ++indexDrainageNetwork)
+    {
+        size_t exuterRow = 0;
+        size_t exuterColumn = 0;
+        float exuterValue = 0.0f;
+        bool found = false;
+
+        for (size_t row = 0; row < m_rows; ++row)
+        {
+            for (size_t col = 0; col < m_cols; ++col)
+            {
+                double value = flowAccumulation.getData(row, col);
+
+                if (exuterValue < value && value != m_noDataValue)
+                {
+                    exuterRow = row;
+                    exuterColumn = col;
+                    exuterValue = value;
+                    found = true;
+                }
+            }
+        }
+
+
+        if (!found)
+        {
+            break;
+        }
+
+        auto drainageNetwork = std::make_shared<DrainageNetwork>();
+        m_drainageNetworks->push_back(drainageNetwork);
+
+        makeTree(*drainageNetwork, flowAccumulation, exuterRow, exuterColumn);
+        makeTreeDonors(*drainageNetwork);
+    }
+
+    if (m_drainageNetworkTypeLimit == EnumDrainageNetworkLimit::Percent)
+    {
+        size_t startPosition = static_cast<size_t>(m_drainageNetworks->size() * m_drainageNetworkPercentLimit);
+        m_drainageNetworks->erase(m_drainageNetworks->begin() + startPosition, m_drainageNetworks->end());
+    }
+}
+
 size_t DirectionCalculatorService::makeTree(
         Direction &direction,
         Raster<int> &flowAccumulation,
@@ -133,7 +170,7 @@ size_t DirectionCalculatorService::makeTree(
     ++numberOfCellsOfIndentified;
 
     // RIGHT
-    if (col - 1 >= 0 && m_flowDirection->getData(row, col - 1) == EnumDirection::Right && flowAccumulation.getData(row, col - 1) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row, col - 1)))
+    if (col - 1 >= 0 && m_flowDirection->getData(row, col - 1) == EnumDirection::Right && flowAccumulation.getData(row, col - 1) > m_flowAccumulationLimit && m_noDataValue != flowAccumulation.getData(row, col - 1))
     {
         direction.donors.emplace_back(Direction(row, col - 1));
         Direction &directionRight = direction.donors.back();
@@ -141,7 +178,7 @@ size_t DirectionCalculatorService::makeTree(
     }
 
     // DOWN and RIGHT
-    if (row - 1 >= 0 && col - 1 >= 0 && m_flowDirection->getData(row - 1, col - 1) == EnumDirection::DownRight && flowAccumulation.getData(row - 1, col - 1) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row - 1, col - 1)))
+    if (row - 1 >= 0 && col - 1 >= 0 && m_flowDirection->getData(row - 1, col - 1) == EnumDirection::DownRight && flowAccumulation.getData(row - 1, col - 1) > m_flowAccumulationLimit && m_noDataValue != flowAccumulation.getData(row - 1, col - 1))
     {
         direction.donors.emplace_back(Direction(row - 1, col - 1));
         Direction &directionDownRight = direction.donors.back();
@@ -149,7 +186,7 @@ size_t DirectionCalculatorService::makeTree(
     }
 
     // DOWN
-    if (row - 1 >= 0 && m_flowDirection->getData(row - 1, col) == EnumDirection::Down && flowAccumulation.getData(row - 1, col) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row - 1, col)))
+    if (row - 1 >= 0 && m_flowDirection->getData(row - 1, col) == EnumDirection::Down && flowAccumulation.getData(row - 1, col) > m_flowAccumulationLimit && m_noDataValue != flowAccumulation.getData(row - 1, col))
     {
         direction.donors.emplace_back(Direction(row - 1, col));
         Direction &directionDown = direction.donors.back();
@@ -157,7 +194,7 @@ size_t DirectionCalculatorService::makeTree(
     }
 
     // DOWN and LEFT
-    if (row - 1 >= 0 && col + 1 < m_cols && m_flowDirection->getData(row - 1, col + 1) == EnumDirection::DownLeft && flowAccumulation.getData(row - 1, col + 1) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row - 1, col + 1)))
+    if (row - 1 >= 0 && col + 1 < m_cols && m_flowDirection->getData(row - 1, col + 1) == EnumDirection::DownLeft && flowAccumulation.getData(row - 1, col + 1) > m_flowAccumulationLimit && m_noDataValue != flowAccumulation.getData(row - 1, col + 1))
     {
         direction.donors.emplace_back(Direction(row - 1, col + 1));
         Direction &directionDownLeft = direction.donors.back();
@@ -165,7 +202,7 @@ size_t DirectionCalculatorService::makeTree(
     }
 
     // LEFT
-    if (col + 1 < m_cols && m_flowDirection->getData(row, col + 1) == EnumDirection::Left && flowAccumulation.getData(row, col + 1) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row, col + 1)))
+    if (col + 1 < m_cols && m_flowDirection->getData(row, col + 1) == EnumDirection::Left && flowAccumulation.getData(row, col + 1) > m_flowAccumulationLimit && m_noDataValue != flowAccumulation.getData(row, col + 1))
     {
         direction.donors.emplace_back(Direction(row, col + 1));
         Direction &directionLeft = direction.donors.back();
@@ -173,7 +210,7 @@ size_t DirectionCalculatorService::makeTree(
     }
 
     // UP and LEFT
-    if (row + 1 < m_rows && col + 1 < m_cols && m_flowDirection->getData(row + 1, col + 1) == EnumDirection::UpLeft && flowAccumulation.getData(row + 1, col + 1) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row + 1, col + 1)))
+    if (row + 1 < m_rows && col + 1 < m_cols && m_flowDirection->getData(row + 1, col + 1) == EnumDirection::UpLeft && flowAccumulation.getData(row + 1, col + 1) > m_flowAccumulationLimit && m_noDataValue != flowAccumulation.getData(row + 1, col + 1))
     {
         direction.donors.emplace_back(Direction(row + 1, col + 1));
         Direction &directionUpLeft = direction.donors.back();
@@ -181,7 +218,7 @@ size_t DirectionCalculatorService::makeTree(
     }
 
     // UP
-    if (row + 1 < m_rows && m_flowDirection->getData(row + 1, col) == EnumDirection::Up && flowAccumulation.getData(row + 1, col) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row + 1, col)))
+    if (row + 1 < m_rows && m_flowDirection->getData(row + 1, col) == EnumDirection::Up && flowAccumulation.getData(row + 1, col) > m_flowAccumulationLimit && m_noDataValue != flowAccumulation.getData(row + 1, col))
     {
         direction.donors.emplace_back(Direction(row + 1, col));
         Direction &directionUp = direction.donors.back();
@@ -189,7 +226,7 @@ size_t DirectionCalculatorService::makeTree(
     }
 
     // UP and RIGHT
-    if (row + 1 < m_rows && col - 1 >= 0 && m_flowDirection->getData(row + 1, col - 1) == EnumDirection::UpRight && flowAccumulation.getData(row + 1, col - 1) > m_flowAccumulationLimit && !qFuzzyCompare(m_noDataValue, flowAccumulation.getData(row + 1, col - 1)))
+    if (row + 1 < m_rows && col - 1 >= 0 && m_flowDirection->getData(row + 1, col - 1) == EnumDirection::UpRight && flowAccumulation.getData(row + 1, col - 1) > m_flowAccumulationLimit && m_noDataValue != flowAccumulation.getData(row + 1, col - 1))
     {
         direction.donors.emplace_back(Direction(row + 1, col - 1));
         Direction &directionUpRight = direction.donors.back();

@@ -27,15 +27,6 @@ EroderAlgorithmService::EroderAlgorithmService()
 
 }
 
-EroderAlgorithmService::EroderAlgorithmService(std::shared_ptr<Raster<double>> raster, double erodibility, size_t deltaT, double concavityIndex) :
-    m_deltaTime(deltaT),
-    m_erodibility(erodibility),
-    m_concavityIndex(concavityIndex)
-{
-    setRaster(raster);
-}
-
-
 void EroderAlgorithmService::setFlowDirection(const std::shared_ptr<Raster<short>> flowDirection)
 {
 	m_flowDirection = flowDirection;
@@ -71,14 +62,14 @@ void EroderAlgorithmService::setNumberOfIterations(const size_t &numberOfIterati
     m_numberOfIterations = numberOfIterations;
 }
 
-double EroderAlgorithmService::getPrecipitationRate() const
+double EroderAlgorithmService::getDimensionLessPrecipitationRate() const
 {
-    return m_precipitationRate;
+    return m_dimensionLessPrecipitationRate;
 }
 
-void EroderAlgorithmService::setPrecipitationRate(double precipitationRate)
+void EroderAlgorithmService::setDimensionLessPrecipitationRate(double precipitationRate)
 {
-    m_precipitationRate = precipitationRate;
+    m_dimensionLessPrecipitationRate = precipitationRate;
 }
 
 std::shared_ptr<datamanagement::Raster<double> > EroderAlgorithmService::getRaster() const
@@ -114,14 +105,14 @@ void EroderAlgorithmService::setConcavityIndex(double concavityIndex)
     m_concavityIndex = concavityIndex;
 }
 
-double EroderAlgorithmService::getDepositionCoeficient() const
+double EroderAlgorithmService::getDimensionLessDepositionCoeficient() const
 {
-    return m_depositionCoeficient;
+    return m_dimensionLessDepositionCoeficient;
 }
 
-void EroderAlgorithmService::setDepositionCoeficient(double depositionCoeficient)
+void EroderAlgorithmService::setDimensionLessDepositionCoeficient(double dimensionLessDepositionCoeficient)
 {
-    m_depositionCoeficient = depositionCoeficient;
+    m_dimensionLessDepositionCoeficient = dimensionLessDepositionCoeficient;
 }
 
 size_t EroderAlgorithmService::getDeltaTime() const
@@ -148,15 +139,15 @@ void EroderAlgorithmService::useDrainageNetworkAmountLimit(size_t amountLimit)
 void EroderAlgorithmService::useDrainageNetworkPercentLimit(double percentLimit)
 {
     m_drainageNetworkTypeLimit = Percent;
-    m_drainageNetworkAmountLimit = percentLimit;
+    m_drainageNetworkPercentLimit = percentLimit;
 }
 
-short EroderAlgorithmService::getFlowAccumulationLimit() const
+int EroderAlgorithmService::getFlowAccumulationLimit() const
 {
     return m_flowAccumulationLimit;
 }
 
-void EroderAlgorithmService::setFlowAccumulationLimit(short flowAccumulationLimit)
+void EroderAlgorithmService::setFlowAccumulationLimit(int flowAccumulationLimit)
 {
     m_flowAccumulationLimit = flowAccumulationLimit;
 }
@@ -302,7 +293,7 @@ void EroderAlgorithmService::execute()
 				}
 				else
 				{
-					throw std::exception("Sem receiver.");
+                    throw std::exception("Without receiver.");
 				}
 				
                 // deltaL é a distancia entre dois pontos consecutivos no domínio do canal
@@ -347,26 +338,26 @@ void EroderAlgorithmService::executeWithImplicitErosion()
 	// Executa o algoritmo de arvore para captação das diferentes redes de drenagem. true pega só a principal.
     DirectionCalculatorService directionCalculator(m_flowDirection, m_flowAccumulation);
     directionCalculator.setFlowAccumulationLimit(m_flowAccumulationLimit);
-    directionCalculator.execute(m_drainageNetworkTypeLimit == EnumDrainageNetworkLimit::OnlyMain);
-
-    std::vector<std::shared_ptr<DrainageNetwork>> &drainageNetworks = *directionCalculator.getDrainageNetworks();
-
-    size_t limit = 0;
     switch (m_drainageNetworkTypeLimit)
     {
-        case EnumDrainageNetworkLimit::Amount:
-            limit = std::max(m_drainageNetworkAmountLimit, drainageNetworks.size());
+        case OnlyMain:
+            directionCalculator.useOnlyMainDrainageNetwork();
             break;
-        case EnumDrainageNetworkLimit::Percent:
-            limit = m_drainageNetworkPercentLimit * drainageNetworks.size();
+        case Amount:
+            directionCalculator.useDrainageNetworkAmountLimit(m_drainageNetworkAmountLimit);
+            break;
+        case Percent:
+            directionCalculator.useDrainageNetworkPercentLimit(m_drainageNetworkPercentLimit);
             break;
         default:
-            limit = 1;
+            throw std::runtime_error("The limit of the drainage networks has not been defined.");
     }
+    directionCalculator.execute();
 
-    for (size_t auxi = 0; auxi < limit; auxi++)
+    std::shared_ptr<std::vector<std::shared_ptr<DrainageNetwork>>> drainageNetworks = directionCalculator.getDrainageNetworks();
+
+    for (const std::shared_ptr<DrainageNetwork> &drainageNetwork : *drainageNetworks)
     {
-        const std::shared_ptr<DrainageNetwork> &drainageNetwork = drainageNetworks[auxi];
 		bool isFirst = true;
 
 		for (PositionMatrix &position : drainageNetwork->positions)
@@ -404,26 +395,26 @@ void EroderAlgorithmService::executeWithErosionDeposition()
     // Executa o algoritmo de arvore para captação das diferentes redes de drenagem. true pega só a principal.
     DirectionCalculatorService directionCalculator(m_flowDirection, m_flowAccumulation);
     directionCalculator.setFlowAccumulationLimit(m_flowAccumulationLimit);
-    directionCalculator.execute(m_drainageNetworkTypeLimit == EnumDrainageNetworkLimit::OnlyMain);
+    switch (m_drainageNetworkTypeLimit)
+    {
+        case OnlyMain:
+            directionCalculator.useOnlyMainDrainageNetwork();
+            break;
+        case Amount:
+            directionCalculator.useDrainageNetworkAmountLimit(m_drainageNetworkAmountLimit);
+            break;
+        case Percent:
+            directionCalculator.useDrainageNetworkPercentLimit(m_drainageNetworkPercentLimit);
+            break;
+        default:
+            throw std::runtime_error("The limit of the drainage networks has not been defined.");
+    }
+    directionCalculator.execute();
 
     std::shared_ptr<std::vector<std::shared_ptr<DrainageNetwork>>> drainageNetworks = directionCalculator.getDrainageNetworks();
 
-    size_t limit = 0;
-    switch (m_drainageNetworkTypeLimit)
+    for (const std::shared_ptr<DrainageNetwork> &drainageNetwork : *drainageNetworks)
     {
-        case EnumDrainageNetworkLimit::Amount:
-            limit = m_drainageNetworkAmountLimit;
-            break;
-        case EnumDrainageNetworkLimit::Percent:
-            limit = m_drainageNetworkPercentLimit * drainageNetworks->size();
-            break;
-        default:
-            limit = 1;
-    }
-
-    for (size_t indexDrainage = 0; indexDrainage < limit; indexDrainage++)
-    {
-        const std::shared_ptr<DrainageNetwork> &drainageNetwork = drainageNetworks->at(indexDrainage);
         const size_t positionsSize = drainageNetwork->positions.size();
 
         std::vector<std::vector<double>> initialRaster(m_numberOfRows, std::vector<double>(m_numberOfCols));
@@ -459,16 +450,16 @@ void EroderAlgorithmService::executeWithErosionDeposition()
 
                 moveToFlowDirection(m_flowDirection->getData(fdrRow, fdrCol), fdrRow, fdrCol, m_numberOfRows, m_numberOfCols);
 
-                double bi = initialRaster[row][col] + (m_depositionCoeficient / (m_precipitationRate * facValue)) * pastSummation[row][col];
+                double bi = initialRaster[row][col] + (m_dimensionLessDepositionCoeficient / (m_dimensionLessPrecipitationRate * facValue)) * pastSummation[row][col];
 
                 if (m_uplift != nullptr)
                 {
                     bi += m_uplift->getData(row, col) * m_deltaTime;
                 }
 
-                const double f = (m_erodibility * std::pow(m_precipitationRate, m_concavityIndex) * std::pow(facValue * m_cellSize * m_cellSize, m_concavityIndex) * m_deltaTime) / m_cellSize;
+                const double f = (m_erodibility * std::pow(m_dimensionLessPrecipitationRate, m_concavityIndex) * std::pow(facValue * m_cellSize * m_cellSize, m_concavityIndex) * m_deltaTime) / m_cellSize;
 
-                m_raster->setData(row, col, (bi - (m_depositionCoeficient / (m_precipitationRate * facValue)) * futureSummation[row][col] + f * m_raster->getData(fdrRow, fdrCol)) / (1 + f));
+                m_raster->setData(row, col, (bi - (m_dimensionLessDepositionCoeficient / (m_dimensionLessPrecipitationRate * facValue)) * futureSummation[row][col] + f * m_raster->getData(fdrRow, fdrCol)) / (1 + f));
             }
         }
     }

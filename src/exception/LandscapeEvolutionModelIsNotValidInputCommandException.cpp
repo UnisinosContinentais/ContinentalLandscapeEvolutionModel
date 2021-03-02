@@ -1,9 +1,15 @@
 #include "continental/landscapeevolutionmodel/exception/LandscapeEvolutionModelIsNotValidInputCommandException.h"
 
-using namespace continental::landscapeevolutionmodel::exception;
+namespace continental {
+namespace landscapeevolutionmodel {
+namespace exception {
 
 LandscapeEvolutionModelIsNotValidInputCommandException::LandscapeEvolutionModelIsNotValidInputCommandException():
 std::runtime_error("Dados inválidos para realizar o processo do lem!")
 {
 
 }
+
+} // namespace exception
+} // namespace landscapeevolutionmodel
+} // namespace continental

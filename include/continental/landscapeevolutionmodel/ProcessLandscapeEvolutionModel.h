@@ -36,7 +36,7 @@ public:
     /// Função que prepara os dados de entrada para execução das interações.
     /// @param initialGrid Objeto do tipo Raster<float> com os valores de elevação topografica da simulação atual.
     /// @param inputParameters Objeto do tipo LandscapeEvolutionModelInput com os valores de parâmetros para execução do algoritimo do LEM.
-    void preprare(std::shared_ptr<continental::datamanagement::Raster<double>> initialGrid,
+    void prepare(std::shared_ptr<datamanagement::Raster<double>> initialGrid,
                   std::shared_ptr<dto::LandscapeEvolutionModelInput> inputParameters
                 );
 
@@ -46,9 +46,9 @@ public:
 
     /// Função de retorno do resultado da Simulação.
     /// @return Objeto do tipo Raster<float> com resultado final da simulação.
-    std::shared_ptr<continental::datamanagement::Raster<double>> getResultSimulation();
+    std::shared_ptr<datamanagement::Raster<double>> getResultSimulation();
 
-    std::shared_ptr<continental::datamanagement::Raster<short>> getResultDispersionSimulation();
+    std::shared_ptr<datamanagement::Raster<short>> getResultDispersionSimulation();
 
     /// Função de retorno do sub-passo de tempo da Simulação atual.
     /// @return Valor do tipo size_t com o valor do sub-passo que esta sendo processado.
@@ -58,18 +58,13 @@ private :
     /// Membros.
     size_t m_simulateUntilTime = 0;
     size_t m_difusionDeltaT = constant::LandscapeEvolutionModelConstant::DifusionDeltaT;
-    size_t m_saveEachDeltaT = constant::LandscapeEvolutionModelConstant::SaveEachDeltaT;
-    size_t m_timeStepCount = 0;
-    size_t m_drainagesLength = 0;
-
     double m_erosionDeltaT = constant::LandscapeEvolutionModelConstant::ErosionDeltaT;
-    double m_diffusivity = 0;
-    double m_erodibility = 0;
-    double m_concavityIndex = 0;
+    size_t m_timeStepCount = 0;    
+    int m_flowAccumulationLimit = 0;
 
     bool m_enableSurfaceLog = false;
     QString m_logSurfacePath;
-    double m_age = 0.0;
+    double m_logAge = 0.0;
 
     std::shared_ptr<datamanagement::Raster<double>> m_surface;
     std::shared_ptr<datamanagement::Raster<short>> m_grainDispersion;
@@ -79,11 +74,9 @@ private :
     service::EroderAlgorithmService m_eroderAlgorithm;
     service::LithologyDefinionCalculator m_grainDispersionService;
 
-    size_t m_flowAccumulationLimit = 0;
-
     /// Função que valida se a interação é valida.
     void validateInterate();
-    void prepareFacLimit();
+    void prepareFlowAccumulationLimit();
 };
 
 } // landscapeevolutionmodel

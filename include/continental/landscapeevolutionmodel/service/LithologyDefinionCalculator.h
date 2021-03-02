@@ -26,11 +26,11 @@ class CONTINENTALLANDSCAPEEVOLUTIONMODELPLUGIN_EXPORT_DECL LithologyDefinionCalc
 public:
     void calculateGrainDiscretizationRaster();
 
-    std::shared_ptr<continental::datamanagement::Raster<int> > getFlowAccumulationRaster() const;
-    void setFlowAccumulationRaster(const std::shared_ptr<continental::datamanagement::Raster<int> > flowAccumulationRaster);
+    std::shared_ptr<continental::datamanagement::Raster<int>> getFlowAccumulationRaster() const;
+    void setFlowAccumulationRaster(const std::shared_ptr<continental::datamanagement::Raster<int>> flowAccumulationRaster);
 
-    std::shared_ptr<continental::datamanagement::Raster<short> > getLithologyDefinitionRaster() const;
-    void setLithologyDefinitionRaster(const std::shared_ptr<continental::datamanagement::Raster<short> > lithologyDefinitionRaster);
+    std::shared_ptr<continental::datamanagement::Raster<short>> getLithologyDefinitionRaster() const;
+    void setLithologyDefinitionRaster(const std::shared_ptr<continental::datamanagement::Raster<short>> lithologyDefinitionRaster);
 
     double getDischargeKParameter() const;
     void setDischargeKParameter(const double dischargeKParameter);

@@ -29,18 +29,16 @@ ProcessLandscapeEvolutionModel::ProcessLandscapeEvolutionModel()
 
 }
 
-void ProcessLandscapeEvolutionModel::preprare(
+void ProcessLandscapeEvolutionModel::prepare(
         std::shared_ptr<datamanagement::Raster<double>> surface,
         std::shared_ptr<LandscapeEvolutionModelInput> inputParameters
     )
 {
     //Prparando parâmetros para Exucução
-    m_diffusivity = inputParameters->getSimulationLandscapeEvolutionModelConfig()->getDiffusion();
-    m_erodibility = inputParameters->getSimulationLandscapeEvolutionModelConfig()->getErodibility();
-    m_concavityIndex = inputParameters->getSimulationLandscapeEvolutionModelConfig()->getValueM();
-    m_drainagesLength = inputParameters->getSimulationLandscapeEvolutionModelConfig()->getDrainagesLength();
+    std::shared_ptr<SimulationLandscapeEvolutionModelConfig> config = inputParameters->getSimulationLandscapeEvolutionModelConfig();
+
     m_simulateUntilTime = inputParameters->getSimulateUntilTime();
-    m_age = inputParameters->getAge();
+    m_logAge = inputParameters->getAge();
 
     m_enableSurfaceLog = inputParameters->getEnableSurfaceLog();
     m_logSurfacePath = inputParameters->getPathSurfaceLog();
@@ -49,20 +47,41 @@ void ProcessLandscapeEvolutionModel::preprare(
     m_inputParameters = inputParameters;
 
     m_hydroToolsAlgorithm = HydroToolsAlgorithmService(m_surface, m_inputParameters);
-    m_difusionAlgorithm = DifusionAlgorithmService(m_surface, m_simulateUntilTime, m_diffusivity, m_difusionDeltaT);
+    m_difusionAlgorithm = DifusionAlgorithmService(m_surface, config->getDiffusivity(), m_difusionDeltaT);
 
     m_difusionAlgorithm.allocateTopography();
 
     m_hydroToolsAlgorithm.prepareDem();
 
-    m_eroderAlgorithm = EroderAlgorithmService(m_surface, m_erodibility, m_erosionDeltaT, m_concavityIndex);
+    m_eroderAlgorithm.setRaster(m_surface);
+    m_eroderAlgorithm.setErodibility(config->getErodibility());
+    m_eroderAlgorithm.setDeltaTime(m_erosionDeltaT);
+    m_eroderAlgorithm.setConcavityIndex(config->getConcavityIndex());
+    m_eroderAlgorithm.setDimensionLessPrecipitationRate(config->getDimensionLessPrecipitationRate());
+    m_eroderAlgorithm.setDimensionLessDepositionCoeficient(config->getDimensionLessDepositionCoeficient());
+    m_eroderAlgorithm.setFlowAccumulationLimit(m_flowAccumulationLimit);
+    switch (config->getDrainageNetworkTypeLimit())
+    {
+        case OnlyMain:
+            m_eroderAlgorithm.useOnlyMainDrainageNetwork();
+            break;
+        case Amount:
+            m_eroderAlgorithm.useDrainageNetworkAmountLimit(config->getDrainageNetworkAmountLimit());
+            break;
+        case Percent:
+            m_eroderAlgorithm.useDrainageNetworkPercentLimit(config->getDrainageNetworkPercentLimit());
+            break;
+        default:
+            throw std::runtime_error("The limit of the drainage networks has not been defined.");
+    }
+
     m_timeStepCount = 0;
 
-    prepareFacLimit();
+    prepareFlowAccumulationLimit();
 
     if (m_enableSurfaceLog)
     {
-        QString basePath = m_logSurfacePath + "/" + QString::number(m_age);
+        QString basePath = m_logSurfacePath + "/" + QString::number(m_logAge);
         QString pathParameters = basePath + "_lem_01_parameters.txt";
 
         qDebug() << "lem_01_parameters: " << pathParameters;
@@ -72,10 +91,29 @@ void ProcessLandscapeEvolutionModel::preprare(
         {
             QTextStream out(&file);
 
-            out << "diffusivity: " << QString::number(m_diffusivity, 'f', 10) << "\n";
-            out << "erodibility: " << QString::number(m_erodibility, 'f', 10) << "\n";
-            out << "concavityIndex: " << QString::number(m_concavityIndex, 'f', 10) << "\n";
-            out << "drainagesLength: " << QString::number(m_drainagesLength) << "\n";
+            out << "diffusivity: " << QString::number(config->getDiffusivity(), 'f', 10) << "\n";
+            out << "erodibility: " << QString::number(config->getErodibility(), 'f', 10) << "\n";
+            out << "concavityIndex: " << QString::number(config->getConcavityIndex(), 'f', 10) << "\n";
+            out << "precipitationRate: " << QString::number(config->getDimensionLessPrecipitationRate(), 'f', 10) << "\n";
+            out << "depositionCoeficient: " << QString::number(config->getDimensionLessDepositionCoeficient(), 'f', 10) << "\n";
+            out << "drainageNetworkTypeLimit: ";
+            switch (config->getDrainageNetworkTypeLimit())
+            {
+                case OnlyMain:
+                    out << "OnlyMain";
+                    break;
+                case Percent:
+                    out << "Percent";
+                    break;
+                case Amount:
+                    out << "Amount";
+                    break;
+                default:
+                    out << "Undefined";
+                    break;
+            }
+            out << "drainageNetworkAmountLimit: " << QString::number(config->getDrainageNetworkAmountLimit()) << "\n";
+            out << "drainageNetworkPercentLimit: " << QString::number(config->getDrainageNetworkPercentLimit()) << "\n";
             out << "simulateUntilTime: " << QString::number(m_simulateUntilTime) << "\n";
             out << "facLimit: " << QString::number(m_flowAccumulationLimit) << "\n";
         }
@@ -86,7 +124,7 @@ void ProcessLandscapeEvolutionModel::preprare(
     }
 }
 
-void continental::landscapeevolutionmodel::ProcessLandscapeEvolutionModel::prepareFacLimit()
+void continental::landscapeevolutionmodel::ProcessLandscapeEvolutionModel::prepareFlowAccumulationLimit()
 {
     auto streamDefinitionConfig = m_inputParameters->getStreamDefinitionConfig();
     double value = streamDefinitionConfig->getThresoldValue();
@@ -122,36 +160,37 @@ bool ProcessLandscapeEvolutionModel::iterate()
 
     m_hydroToolsAlgorithm.execute();
 
-    m_eroderAlgorithm.setFlowAccumulation(m_hydroToolsAlgorithm.getFlowAccumulation());
-    m_eroderAlgorithm.setStreamDefinition(m_hydroToolsAlgorithm.getStreamDefinition());
-    m_eroderAlgorithm.setFlowDirection(m_hydroToolsAlgorithm.getFlowDirection());
-    if (m_drainagesLength == 0)
-    {
-        m_eroderAlgorithm.useOnlyMainDrainageNetwork();
-    }
-    else if (m_drainagesLength)
-    {
-        m_eroderAlgorithm.useDrainageNetworkPercentLimit(m_drainagesLength / 10.0);
-    }
-    m_eroderAlgorithm.setFlowAccumulationLimit(m_flowAccumulationLimit);
-
     std::shared_ptr<Raster<short>> streams = m_hydroToolsAlgorithm.getStreamDefinition();
     std::shared_ptr<Raster<int>> flowAccumalation = m_hydroToolsAlgorithm.getFlowAccumulation();
 
     qDebug() << "6º Executa o processo de Erosão para cada sub-passo.";
 
+    m_eroderAlgorithm.setFlowAccumulation(m_hydroToolsAlgorithm.getFlowAccumulation());
+    m_eroderAlgorithm.setStreamDefinition(m_hydroToolsAlgorithm.getStreamDefinition());
+    m_eroderAlgorithm.setFlowDirection(m_hydroToolsAlgorithm.getFlowDirection());
+
     for (size_t erosionTimeStepCount = 0; erosionTimeStepCount < (m_difusionDeltaT / m_erosionDeltaT); ++erosionTimeStepCount)
     {
-        m_eroderAlgorithm.executeWithImplicitErosion();
+        if (qFuzzyCompare(m_eroderAlgorithm.getDimensionLessDepositionCoeficient(), 0.0))
+        {
+            m_eroderAlgorithm.executeWithImplicitErosion();
+        }
+        else
+        {
+            m_eroderAlgorithm.executeWithErosionDeposition();
+        }
     }
     qDebug() << "7º Executa o processo de Difusividade \n";
 
-    m_difusionAlgorithm.executeWithVariableBoundary(
-            m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getEastBoundaryFactor(),
-            m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getWestBoundaryFactor(),
-            m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getSouthBoundaryFactor(),
-            m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getNorthBoundaryFactor()
-        );
+    if (!qFuzzyCompare(m_difusionAlgorithm.getDiffusivity(), 0.0))
+    {
+        m_difusionAlgorithm.executeWithVariableBoundary(
+                m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getEastBoundaryFactor(),
+                m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getWestBoundaryFactor(),
+                m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getSouthBoundaryFactor(),
+                m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getNorthBoundaryFactor()
+            );
+    }
 
     ++m_timeStepCount;
 
@@ -176,7 +215,7 @@ bool ProcessLandscapeEvolutionModel::iterate()
 
         if (m_enableSurfaceLog)
         {
-            QString basePath = m_logSurfacePath + "/" + QString::number(m_age);
+            QString basePath = m_logSurfacePath + "/" + QString::number(m_logAge);
 
             QString pathParameters = basePath + "_lem_01_parameters.txt";
 

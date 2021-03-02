@@ -350,7 +350,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, DirectionCalculator)
 {
     QString basePath = "C:/Git/ContinentalLandscapeEvolutionModelMock";
 
-    std::vector<std::pair<QString, float>> compares = {
+    std::vector<std::pair<QString, int>> compares = {
         {basePath + "/bacia_piratini_90m_directions.csv", 0},
         {basePath + "/bacia_piratini_90m_directionsOneNegative.csv", -1}
     };
@@ -376,7 +376,8 @@ TEST(ContinentalLandscapeEvolutionModelTest, DirectionCalculator)
 
             DirectionCalculatorService directionCalculator(flowDir, flowAcc);
             directionCalculator.setFlowAccumulationLimit(compare.second);
-            directionCalculator.execute(true);
+            directionCalculator.useOnlyMainDrainageNetwork();
+            directionCalculator.execute();
 
             std::shared_ptr<DrainageNetwork> &drainageNetwork = directionCalculator.getDrainageNetworks()->at(0);
 
@@ -410,7 +411,8 @@ TEST(ContinentalLandscapeEvolutionModelTest, FutureDonorsSummation)
     
     DirectionCalculatorService directionCalculator(flowDir, flowAcc);
     directionCalculator.setFlowAccumulationLimit(flowAccumulationLimit);
-    directionCalculator.execute(true);
+    directionCalculator.useOnlyMainDrainageNetwork();
+    directionCalculator.execute();
 
     std::shared_ptr<std::vector<std::shared_ptr<DrainageNetwork>>> drainageNetworks = directionCalculator.getDrainageNetworks();
 
@@ -447,7 +449,8 @@ TEST(ContinentalLandscapeEvolutionModelTest, PastDonorsSummation)
 
     DirectionCalculatorService directionCalculator(flowDir, flowAcc);
     directionCalculator.setFlowAccumulationLimit(flowAccumulationLimit);
-    directionCalculator.execute(true);
+    directionCalculator.useOnlyMainDrainageNetwork();
+    directionCalculator.execute();
 
     std::shared_ptr<std::vector<std::shared_ptr<DrainageNetwork>>> drainageNetworks = directionCalculator.getDrainageNetworks();
 
@@ -480,8 +483,8 @@ TEST(ContinentalLandscapeEvolutionModelTest, ErosionDeposition)
     eroderService.setFlowAccumulation(flowAcc);
     eroderService.setErodibility(0.00001);
     eroderService.setConcavityIndex(0.4);
-    eroderService.setDepositionCoeficient(1);
-    eroderService.setPrecipitationRate(0.2);
+    eroderService.setDimensionLessDepositionCoeficient(1);
+    eroderService.setDimensionLessPrecipitationRate(0.2);
     eroderService.setDeltaTime(1000);
     eroderService.setFlowAccumulationLimit(2);
     eroderService.useDrainageNetworkAmountLimit(5);

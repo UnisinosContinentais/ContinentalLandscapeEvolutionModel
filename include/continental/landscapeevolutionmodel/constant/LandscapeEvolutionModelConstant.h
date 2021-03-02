@@ -9,6 +9,7 @@
 
 #include <QString>
 #include "continental/landscapeevolutionmodel/export.h"
+
 namespace continental {
 namespace landscapeevolutionmodel {
 namespace constant {
@@ -23,9 +24,11 @@ public:
 
     //Parametros bibliograficos
     constexpr static const double ParametersSimulationErodibility = 0.00002;
-    constexpr static const double ParametersSimulationDiffusion = 0.01;
-    constexpr static const double ParametersSimulationValueM = 0.4; // concavity index
-    constexpr static const double ParametersSimulationValueN = 1; // // slop index
+    constexpr static const double ParametersSimulationDiffusivity = 0.01;
+    constexpr static const double ParametersSimulationValueConcavityIndex = 0.4; // concavity index
+    constexpr static const double ParametersSimulationValueN = 1.0; // // slop index
+    constexpr static const double ParametersSimulationDimensionLessPrecipitationRate = 0.2;
+    constexpr static const double ParametersSimulationDimensionLessDepositionCoeficient = 1.0;
 
     constexpr static const size_t ParametersSinkDestroyConfigMaxOpenList = 1000000;
     constexpr static const size_t ParametersSinkDestroyConfigMaxClosedList = 500000;

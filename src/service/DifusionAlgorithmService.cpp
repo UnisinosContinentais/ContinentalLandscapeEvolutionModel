@@ -21,12 +21,10 @@ DifusionAlgorithmService::DifusionAlgorithmService()
 
 }
 
-DifusionAlgorithmService::DifusionAlgorithmService(std::shared_ptr<Raster<double>> initialGrid, size_t simulateUltilTime, double diffusivity, size_t deltaT) :
+DifusionAlgorithmService::DifusionAlgorithmService(std::shared_ptr<Raster<double>> initialGrid, double diffusivity, size_t deltaT) :
     m_initialGrid(initialGrid),
-    //m_saveEachDeltaT(saveEachDeltaT),
-    m_simulateUltilTime(simulateUltilTime),
-    m_diffusivity(diffusivity),
-    m_deltaT(deltaT)
+    m_deltaT(deltaT),
+    m_diffusivity(diffusivity)
 {
     m_numberOfCols = m_initialGrid->getCols();
     m_numberOfRows = m_initialGrid->getRows();
@@ -68,9 +66,6 @@ void DifusionAlgorithmService::execute()
 
     // t = 1 para indicar que o dado é do tempo futuro.
     size_t t = 1;
-
-    // quantidade de passos de tempo
-    size_t numberOfTimeSteps = static_cast<size_t>(m_simulateUltilTime / m_deltaT);
 
     // contador do numero de passo de tempo para os processos iterativos
     size_t timeStepCount = 0; // Acho que não está sendo usado
@@ -373,6 +368,11 @@ void DifusionAlgorithmService::executeWithVariableBoundary(
 		}
 	}
 
+}
+
+double DifusionAlgorithmService::getDiffusivity() const
+{
+    return m_diffusivity;
 }
 
 }
