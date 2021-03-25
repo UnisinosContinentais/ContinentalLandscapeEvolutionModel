@@ -123,9 +123,9 @@ void ProcessLandscapeEvolutionModel::prepare(
 void continental::landscapeevolutionmodel::ProcessLandscapeEvolutionModel::prepareFlowAccumulationLimit()
 {
     auto streamDefinitionConfig = m_inputParameters->getStreamDefinitionConfig();
-    double value = streamDefinitionConfig->getThresoldValue();
+    double value = streamDefinitionConfig->getThresholdValue();
 
-    if (streamDefinitionConfig->getThresoldType() == StreamDefinitionThresholdType::PercentualOfMaximumCells)
+    if (streamDefinitionConfig->getThresholdType() == StreamDefinitionThresholdType::PercentualOfMaximumCells)
     {
         auto calculateMaxValue = m_hydroToolsAlgorithm.getFlowAccumulation()->calculateMaxValue();
 
@@ -137,12 +137,12 @@ void continental::landscapeevolutionmodel::ProcessLandscapeEvolutionModel::prepa
         auto aux = (value == 100) ? 0.01 : (100 - value);
         m_flowAccumulationLimit = (static_cast<size_t>(calculateMaxValue * aux)) / static_cast<size_t>(calculateMaxValue);
     }
-    else if (streamDefinitionConfig->getThresoldType() == StreamDefinitionThresholdType::NumberOfCells)
+    else if (streamDefinitionConfig->getThresholdType() == StreamDefinitionThresholdType::NumberOfCells)
     {
         // Retorna o próprio valor
         m_flowAccumulationLimit = static_cast<size_t>(value);
     }
-    else if (streamDefinitionConfig->getThresoldType() == StreamDefinitionThresholdType::Area)
+    else if (streamDefinitionConfig->getThresholdType() == StreamDefinitionThresholdType::Area)
     {
         auto aux = static_cast<double>(value) * pow(10, 6);
         m_flowAccumulationLimit = static_cast<size_t>(aux / (std::pow(m_surface->getCellSize(), 2)));

@@ -5,6 +5,7 @@
 #include <continental/landscapeevolutionmodel/domain/SimulationLandscapeEvolutionModelConfig.h>
 #include <continental/landscapeevolutionmodel/domain/SinkDestroyConfig.h>
 #include <continental/landscapeevolutionmodel/domain/StreamDefinitionConfig.h>
+#include <continental/landscapeevolutionmodel/domain/StreamDefinitionThresholdType.h>
 #include <continental/landscapeevolutionmodel/domain/definition/SlopeTypes.h>
 #include <continental/landscapeevolutionmodel/domain/definition/SlopeUnits.h>
 #include <continental/landscapeevolutionmodel/dto/LandscapeEvolutionModelInput.h>
@@ -519,8 +520,8 @@ TEST(ContinentalLandscapeEvolutionModelTest, ProcessLandscapeEvolutionModel)
     sinkDestroyConfig->setProcessingAlgorithm(HeuristicSinkRemovalProcessingMode::MHS);
 
     auto streamDefinitionConfig = std::make_shared<StreamDefinitionConfig>();
-    streamDefinitionConfig->setThresoldType("NumberOfCells");
-    streamDefinitionConfig->setThresoldValue(2.0);
+    streamDefinitionConfig->setThresholdType(StreamDefinitionThresholdType::NumberOfCells);
+    streamDefinitionConfig->setThresholdValue(2.0);
 
     auto simulationLandscapeEvolutionModelConfig = std::make_shared<SimulationLandscapeEvolutionModelConfig>();
     simulationLandscapeEvolutionModelConfig->setErodibility(0.00001);
@@ -579,7 +580,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, ProcessLandscapeEvolutionModel)
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    //::testing::GTEST_FLAG(filter) = "*ProcessLandscapeEvolutionModel*";
+    testing::GTEST_FLAG(filter) = "*ProcessLandscapeEvolutionModel*";
     return RUN_ALL_TESTS();
 }
 

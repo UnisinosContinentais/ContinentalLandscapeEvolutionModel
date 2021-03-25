@@ -15,6 +15,7 @@
 #include "continental/landscapeevolutionmodel/domain/SimulationLandscapeEvolutionModelConfig.h"
 #include "continental/landscapeevolutionmodel/domain/SinkDestroyConfig.h"
 #include "continental/landscapeevolutionmodel/domain/StreamDefinitionConfig.h"
+#include "continental/landscapeevolutionmodel/domain/StreamDefinitionThresholdType.h"
 #include "continental/landscapeevolutionmodel/domain/GrainDispersionConfig.h"
 #include "continental/landscapeevolutionmodel/constant/LandscapeEvolutionModelConstant.h"
 #include <continental/landscapeevolutionmodel/util/RasterFileUtil.h>
@@ -47,8 +48,8 @@ int main(int argc, char **argv)
     sinkDestroyConfig->setProcessingAlgorithm(domain::HeuristicSinkRemovalProcessingMode::MHS);
     
     auto streamDefinitionConfig = std::make_shared<domain::StreamDefinitionConfig>();
-    streamDefinitionConfig->setThresoldType("NumberOfCells");
-    streamDefinitionConfig->setThresoldValue(2.0);
+    streamDefinitionConfig->setThresholdType(domain::StreamDefinitionThresholdType::NumberOfCells);
+    streamDefinitionConfig->setThresholdValue(2.0);
 
     auto simulationLandscapeEvolutionModelConfig = std::make_shared<domain::SimulationLandscapeEvolutionModelConfig>();
     simulationLandscapeEvolutionModelConfig->setErodibility(0.00001);

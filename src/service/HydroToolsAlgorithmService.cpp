@@ -104,10 +104,10 @@ void HydroToolsAlgorithmService::execute()
     m_flowAccumulation = flowAccumulationCalculator.getFlowAccumulation();
 
     // 4º Desenha os rios
-    double thresoldValue = m_inputParameters->getStreamDefinitionConfig()->getThresoldValue();
-    StreamDefinitionThresholdType thresoldType = m_inputParameters->getStreamDefinitionConfig()->getThresoldType();
+    double thresholdValue = m_inputParameters->getStreamDefinitionConfig()->getThresholdValue();
+    StreamDefinitionThresholdType thresholdType = m_inputParameters->getStreamDefinitionConfig()->getThresholdType();
     StreamDefinition streamDefinitionCalculator;
-    streamDefinitionCalculator.setFlowAccumulation(m_flowAccumulation, thresoldValue, static_cast<StreamDefinition::ThresholdType>(thresoldType));
+    streamDefinitionCalculator.setFlowAccumulation(m_flowAccumulation, thresholdValue, static_cast<StreamDefinition::ThresholdType>(thresholdType));
     // Executa o processo
 	streamDefinitionCalculator.defineStreams();
 

@@ -73,9 +73,6 @@ public:
     size_t getNorthBoundaryFactor() const;
     void setNorthBoundaryFactor(const size_t &northBoundaryFactor);
 
-    size_t getDrainagesLength() const;
-    void setDrainagesLength(const size_t &drainagesLength);
-
     double getDimensionLessPrecipitationRate() const;
     void setDimensionLessPrecipitationRate(double precipitationRate);
 

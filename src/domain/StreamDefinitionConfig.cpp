@@ -5,32 +5,32 @@ namespace continental {
 namespace landscapeevolutionmodel {
 namespace domain {
 
-double StreamDefinitionConfig::getThresoldValue() const
+double StreamDefinitionConfig::getThresholdValue() const
 {
-    return m_thresoldValue;
+    return m_thresholdValue;
 }
 
-void StreamDefinitionConfig::setThresoldValue(double ThresoldValue)
+void StreamDefinitionConfig::setThresholdValue(double ThresholdValue)
 {
-    m_thresoldValue = ThresoldValue;
+    m_thresholdValue = ThresholdValue;
 }
 
-StreamDefinitionThresholdType StreamDefinitionConfig::getThresoldType() const
+StreamDefinitionThresholdType StreamDefinitionConfig::getThresholdType() const
 {
-    return m_thresoldType;
+    return m_thresholdType;
 }
 
-QString StreamDefinitionConfig::getThresoldTypeName() const
+QString StreamDefinitionConfig::getThresholdTypeName() const
 {
-    if (m_thresoldType == StreamDefinitionThresholdType::Area)
+    if (m_thresholdType == StreamDefinitionThresholdType::Area)
     {
         return "Área aproximada";
     }
-    else if (m_thresoldType == StreamDefinitionThresholdType::NumberOfCells)
+    else if (m_thresholdType == StreamDefinitionThresholdType::NumberOfCells)
     {
         return "Número de Células";
     }
-    else if (m_thresoldType == StreamDefinitionThresholdType::PercentualOfMaximumCells)
+    else if (m_thresholdType == StreamDefinitionThresholdType::PercentualOfMaximumCells)
     {
         return "Percentual do número de células";
     }
@@ -38,22 +38,9 @@ QString StreamDefinitionConfig::getThresoldTypeName() const
         return "";
 }
 
-void StreamDefinitionConfig::setThresoldType(QString thresoldTypeId)
+void StreamDefinitionConfig::setThresholdType(StreamDefinitionThresholdType thresholdType)
 {
-    if (thresoldTypeId == "Area")
-    {
-        m_thresoldType  = StreamDefinitionThresholdType::Area;
-    }
-    else if (thresoldTypeId == "NumberOfCells")
-    {
-        m_thresoldType  = StreamDefinitionThresholdType::NumberOfCells;
-    }
-    else if (thresoldTypeId == "PercentualOfMaximumCells")
-    {
-        m_thresoldType  = StreamDefinitionThresholdType::PercentualOfMaximumCells;
-    }
-    else
-        m_thresoldType  = StreamDefinitionThresholdType::NumberOfCells;
+    m_thresholdType  = thresholdType;
 }
 
 } // namespace domain

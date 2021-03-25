@@ -23,28 +23,28 @@ class CONTINENTALLANDSCAPEEVOLUTIONMODELPLUGIN_EXPORT_DECL StreamDefinitionConfi
 public:
     /// Função de retorno do valor da área mínima.
     /// @return Retorna o valor da área mínima.
-    double getThresoldValue() const;
+    double getThresholdValue() const;
 
     /// Função de definição do valor da área mínima.
-    /// @param thresoldValue Retorna o valor da área mínima.
-    void setThresoldValue(double thresoldValue);
+    /// @param thresholdValue Retorna o valor da área mínima.
+    void setThresholdValue(double thresholdValue);
 
     /// Função de retorno do enum do tipo de algoritmo.
     /// @return Retorna o enum do tipo de algoritmo.
-    StreamDefinitionThresholdType getThresoldType() const;
+    StreamDefinitionThresholdType getThresholdType() const;
 
     /// Função de retorno do nome do tipo de algoritmo.
     /// @return Retorna o nome do tipo de algoritmo.
-    QString getThresoldTypeName() const;
+    QString getThresholdTypeName() const;
 
     /// Função de definição do enum do tipo de algoritmo.
-    /// @param thresoldType Enum do tipo de algoritmo.
-    void setThresoldType(QString thresoldTypeId);
+    /// @param thresholdType Enum do tipo de algoritmo.
+    void setThresholdType(StreamDefinitionThresholdType thresholdType);
 
 private:
     /// Membros.
-    double m_thresoldValue = 0.0f; //Acho que o usuário deve poderalterar esse valor
-    StreamDefinitionThresholdType m_thresoldType;
+    double m_thresholdValue = 0.0f; //Acho que o usuário deve poderalterar esse valor
+    StreamDefinitionThresholdType m_thresholdType;
 };
 
 } //fluvialsystem
