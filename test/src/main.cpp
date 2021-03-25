@@ -1,18 +1,26 @@
 #include <continental/datamanagement/RasterFile.h>
 #include <continental/landscapeevolutionmodel/constant/LandscapeEvolutionModelConstant.h>
 #include <continental/landscapeevolutionmodel/domain/DrainageNetwork.h>
+#include <continental/landscapeevolutionmodel/domain/GrainDispersionConfig.h>
+#include <continental/landscapeevolutionmodel/domain/SimulationLandscapeEvolutionModelConfig.h>
+#include <continental/landscapeevolutionmodel/domain/SinkDestroyConfig.h>
+#include <continental/landscapeevolutionmodel/domain/StreamDefinitionConfig.h>
 #include <continental/landscapeevolutionmodel/domain/definition/SlopeTypes.h>
 #include <continental/landscapeevolutionmodel/domain/definition/SlopeUnits.h>
+#include <continental/landscapeevolutionmodel/dto/LandscapeEvolutionModelInput.h>
 #include <continental/landscapeevolutionmodel/service/DirectionCalculatorService.h>
 #include <continental/landscapeevolutionmodel/service/EroderAlgorithmService.h>
 #include <continental/landscapeevolutionmodel/service/LithologyDefinionCalculator.h>
 #include <continental/landscapeevolutionmodel/service/SlopeCalculator.h>
+#include <continental/landscapeevolutionmodel/ProcessLandscapeEvolutionModel.h>
 #include <gtest/gtest.h>
 
 using namespace continental::datamanagement;
+using namespace continental::landscapeevolutionmodel;
 using namespace continental::landscapeevolutionmodel::service;
 using namespace continental::landscapeevolutionmodel::domain;
 using namespace continental::landscapeevolutionmodel::domain::definition;
+using namespace continental::landscapeevolutionmodel::dto;
 using namespace continental::landscapeevolutionmodel::constant;
 
 
@@ -494,10 +502,84 @@ TEST(ContinentalLandscapeEvolutionModelTest, ErosionDeposition)
     RasterFile<double>::writeData(*eroderService.getRaster(), basePath + "/micro_regiao_Piratini_result_cpp.asc");
 }
 
+TEST(ContinentalLandscapeEvolutionModelTest, ProcessLandscapeEvolutionModel)
+{
+    // Dados de Entrada da superficie inicial
+    QString basePath = "C:/Git/ContinentalLandscapeEvolutionModelMock/erosion_deposition";
+    QString initialGridPath = basePath + "/micro_regiao_Piratini.asc";
+    QString resultComparePath = basePath + "/micro_regiao_Piratini_result_python.asc";
+    std::shared_ptr<Raster<double>> initialGrid = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(initialGridPath));
+    Raster<double> resultCompare = RasterFile<double>::loadRasterByFile(resultComparePath);
+
+    auto sinkDestroyConfig = std::make_shared<SinkDestroyConfig>();
+    sinkDestroyConfig->setVersion(1);
+    sinkDestroyConfig->setMaxOpenList(1000000);
+    sinkDestroyConfig->setMaxClosedList(500000);
+    sinkDestroyConfig->setCostFunctionWeight(2.0);
+    sinkDestroyConfig->setProcessingAlgorithm(HeuristicSinkRemovalProcessingMode::MHS);
+
+    auto streamDefinitionConfig = std::make_shared<StreamDefinitionConfig>();
+    streamDefinitionConfig->setThresoldType("NumberOfCells");
+    streamDefinitionConfig->setThresoldValue(2.0);
+
+    auto simulationLandscapeEvolutionModelConfig = std::make_shared<SimulationLandscapeEvolutionModelConfig>();
+    simulationLandscapeEvolutionModelConfig->setErodibility(0.00001);
+    simulationLandscapeEvolutionModelConfig->setDiffusivity(0.0);
+    simulationLandscapeEvolutionModelConfig->setConcavityIndex(0.4);
+    simulationLandscapeEvolutionModelConfig->setValueN(1.0);
+    simulationLandscapeEvolutionModelConfig->setDimensionLessPrecipitationRate(0.2);
+    simulationLandscapeEvolutionModelConfig->setDimensionLessDepositionCoeficient(1.0);
+    simulationLandscapeEvolutionModelConfig->setEastBoundaryFactor(0);
+    simulationLandscapeEvolutionModelConfig->setWestBoundaryFactor(0);
+    simulationLandscapeEvolutionModelConfig->setNorthBoundaryFactor(0);
+    simulationLandscapeEvolutionModelConfig->setSouthBoundaryFactor(0);
+    simulationLandscapeEvolutionModelConfig->useDrainageNetworkAmountLimit(5);
+
+    auto grainDispersionConfig = std::make_shared<GrainDispersionConfig>();
+    grainDispersionConfig->setDischargeEParameter(LandscapeEvolutionModelConstant::DischargeEParameter);
+    grainDispersionConfig->setDischargeKParameter(LandscapeEvolutionModelConstant::DischargeKParameter);
+    grainDispersionConfig->setChannelDepthCParameter(LandscapeEvolutionModelConstant::ChannelDepthCParameter);
+    grainDispersionConfig->setChannelDepthFParameter(LandscapeEvolutionModelConstant::ChannelDepthFParameter);
+    grainDispersionConfig->setGrainSizeWaterDensity(LandscapeEvolutionModelConstant::GrainSizeWaterDensity);
+    grainDispersionConfig->setGrainSizeSedimentDensity(LandscapeEvolutionModelConstant::GrainSizeSedimentDensity);
+    grainDispersionConfig->setGrainSizeShieldsNumber(LandscapeEvolutionModelConstant::GrainSizeShieldsNumber);
+
+    //Parametros para execução
+    auto lemInput = std::make_shared<LandscapeEvolutionModelInput>();
+    lemInput->setSinkDestroyConfig(sinkDestroyConfig);
+    lemInput->setStreamDefinitionConfig(streamDefinitionConfig);
+    lemInput->setSimulationLandscapeEvolutionModelConfig(simulationLandscapeEvolutionModelConfig);
+    lemInput->setSimulateUntilTime(1000);
+    lemInput->setGrainDispersionConfig(grainDispersionConfig);
+
+    //Executa o lEM com iteração
+    ProcessLandscapeEvolutionModel processLem;
+    processLem.prepare(initialGrid, lemInput);
+
+    bool result = true;
+    do
+    {
+        result = processLem.iterate();
+    }
+    while(result == true);
+
+    double epsilon = std::pow(10, -10);
+    for (size_t row = 0; row < resultCompare.getRows(); ++row)
+    {
+        for (size_t col = 0; col < resultCompare.getCols(); ++col)
+        {
+            double value = processLem.getResultSimulation()->getData(row, col);
+            double valueCompare = resultCompare.getData(row, col);
+            EXPECT_LT(std::abs(value - valueCompare), epsilon)
+                    << "row: " << row << " col: " << col << "value: " << value << " compare: " << valueCompare;
+        }
+    }
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    //::testing::GTEST_FLAG(filter) = "*ErosionDeposition*";
+    //::testing::GTEST_FLAG(filter) = "*ProcessLandscapeEvolutionModel*";
     return RUN_ALL_TESTS();
 }
 

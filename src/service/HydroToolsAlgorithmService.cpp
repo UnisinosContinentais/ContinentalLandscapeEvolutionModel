@@ -90,30 +90,25 @@ void HydroToolsAlgorithmService::execute()
 
     continental::datamanagement::Raster<double> dem = *m_initialGrid;
     std::shared_ptr<Raster<double>> demShared = std::make_shared<Raster<double>>(dem);
-    qDebug() << "1º Executa o Sink Destroy com uma copia da superficie inicial atual";
     //1º Executa o Sink Destroy com uma copia da superficie inicial atual
     sinkDestroy->setDem(demShared);
 
-    qDebug() << "2º Remove as Depressões";
     //2º Remove as Depressões
 	sinkDestroy->removeSinks();
 	m_flowDirection = sinkDestroy->getFlowDirection();
 
-    qDebug() << "3º Calcula as direções do FLuxo";
     //3º Calcula as direções do FLuxo
 	FlowAccumulation flowAccumulationCalculator;
     flowAccumulationCalculator.setFlowDirection(m_flowDirection);
 	flowAccumulationCalculator.runoff();
     m_flowAccumulation = flowAccumulationCalculator.getFlowAccumulation();
 
-    qDebug() << "4º Desenha os rios";
     // 4º Desenha os rios
     double thresoldValue = m_inputParameters->getStreamDefinitionConfig()->getThresoldValue();
     StreamDefinitionThresholdType thresoldType = m_inputParameters->getStreamDefinitionConfig()->getThresoldType();
     StreamDefinition streamDefinitionCalculator;
     streamDefinitionCalculator.setFlowAccumulation(m_flowAccumulation, thresoldValue, static_cast<StreamDefinition::ThresholdType>(thresoldType));
     // Executa o processo
-    qDebug() << "5º Executa o processo de Definição dos Rios";
 	streamDefinitionCalculator.defineStreams();
 
     m_streamDefinition = streamDefinitionCalculator.getStreamDefinition();

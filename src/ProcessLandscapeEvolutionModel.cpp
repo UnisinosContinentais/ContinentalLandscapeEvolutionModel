@@ -1,5 +1,4 @@
 #include "continental/landscapeevolutionmodel/ProcessLandscapeEvolutionModel.h"
-#include <continental/datamanagement/RasterFile.h>
 #include <continental/landscapeevolutionmodel/service/HydroToolsAlgorithmService.h>
 #include <continental/landscapeevolutionmodel/service/EroderAlgorithmService.h>
 #include <continental/landscapeevolutionmodel/service/DifusionAlgorithmService.h>
@@ -9,6 +8,7 @@
 #include "continental/landscapeevolutionmodel/domain/StreamDefinitionConfig.h"
 #include "continental/landscapeevolutionmodel/domain/GrainDispersionConfig.h"
 #include "continental/landscapeevolutionmodel/constant/LandscapeEvolutionModelConstant.h"
+#include <continental/datamanagement/RasterFile.h>
 #include <memory>
 #include <QString>
 #include <QDebug>
@@ -23,12 +23,6 @@ using namespace continental::landscapeevolutionmodel::service;
 
 namespace continental {
 namespace landscapeevolutionmodel {
-
-ProcessLandscapeEvolutionModel::ProcessLandscapeEvolutionModel()
-{
-
-}
-
 void ProcessLandscapeEvolutionModel::prepare(
         std::shared_ptr<datamanagement::Raster<double>> surface,
         std::shared_ptr<LandscapeEvolutionModelInput> inputParameters
@@ -46,6 +40,8 @@ void ProcessLandscapeEvolutionModel::prepare(
     m_surface= surface;
     m_inputParameters = inputParameters;
 
+    prepareFlowAccumulationLimit();
+
     m_hydroToolsAlgorithm = HydroToolsAlgorithmService(m_surface, m_inputParameters);
     m_difusionAlgorithm = DifusionAlgorithmService(m_surface, config->getDiffusivity(), m_difusionDeltaT);
 
@@ -60,6 +56,8 @@ void ProcessLandscapeEvolutionModel::prepare(
     m_eroderAlgorithm.setDimensionLessPrecipitationRate(config->getDimensionLessPrecipitationRate());
     m_eroderAlgorithm.setDimensionLessDepositionCoeficient(config->getDimensionLessDepositionCoeficient());
     m_eroderAlgorithm.setFlowAccumulationLimit(m_flowAccumulationLimit);
+    m_eroderAlgorithm.setUplift(inputParameters->getUplift());
+
     switch (config->getDrainageNetworkTypeLimit())
     {
         case OnlyMain:
@@ -76,8 +74,6 @@ void ProcessLandscapeEvolutionModel::prepare(
     }
 
     m_timeStepCount = 0;
-
-    prepareFlowAccumulationLimit();
 
     if (m_enableSurfaceLog)
     {
@@ -155,15 +151,9 @@ void continental::landscapeevolutionmodel::ProcessLandscapeEvolutionModel::prepa
 
 bool ProcessLandscapeEvolutionModel::iterate()
 {
-    qDebug() << "ContinentalLandscapeEvolutionModel timeStepCount: " << m_timeStepCount;
     validateInterate();
 
     m_hydroToolsAlgorithm.execute();
-
-    std::shared_ptr<Raster<short>> streams = m_hydroToolsAlgorithm.getStreamDefinition();
-    std::shared_ptr<Raster<int>> flowAccumalation = m_hydroToolsAlgorithm.getFlowAccumulation();
-
-    qDebug() << "6º Executa o processo de Erosão para cada sub-passo.";
 
     m_eroderAlgorithm.setFlowAccumulation(m_hydroToolsAlgorithm.getFlowAccumulation());
     m_eroderAlgorithm.setStreamDefinition(m_hydroToolsAlgorithm.getStreamDefinition());
@@ -180,7 +170,6 @@ bool ProcessLandscapeEvolutionModel::iterate()
             m_eroderAlgorithm.executeWithErosionDeposition();
         }
     }
-    qDebug() << "7º Executa o processo de Difusividade \n";
 
     if (!qFuzzyCompare(m_difusionAlgorithm.getDiffusivity(), 0.0))
     {

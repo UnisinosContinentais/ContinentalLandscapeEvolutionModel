@@ -93,7 +93,6 @@ public:
     size_t getDrainageNetworkAmountLimit() const;
 
     double getDrainageNetworkPercentLimit() const;
-
 private:
     /// Membros.
     double m_erodibility = 0.0;

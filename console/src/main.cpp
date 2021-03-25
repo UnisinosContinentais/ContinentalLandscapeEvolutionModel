@@ -5,10 +5,13 @@
 * date: March, 2020
 */
 #include <iostream>
+#include <iomanip>
 #include <QString>
 #include <QCoreApplication>
+#include <continental/datamanagement/RasterFile.h>
 #include "continental/landscapeevolutionmodel/ProcessLandscapeEvolutionModel.h"
 #include "continental/landscapeevolutionmodel/dto/LandscapeEvolutionModelInput.h"
+#include <continental/landscapeevolutionmodel/domain/HeuristicSinkRemovalProcessingMode.h>
 #include "continental/landscapeevolutionmodel/domain/SimulationLandscapeEvolutionModelConfig.h"
 #include "continental/landscapeevolutionmodel/domain/SinkDestroyConfig.h"
 #include "continental/landscapeevolutionmodel/domain/StreamDefinitionConfig.h"
@@ -29,11 +32,11 @@ int main(int argc, char **argv)
     QCoreApplication app(argc, argv);
     QStringList args = app.arguments();
 
-    std::cout << "INICIOU O PROCESSO DO LEM  \n" << std::endl;
+    std::cout << "INICIOU O PROCESSO DO LEM" << std::endl;
 
-    //Dados de Entrada da superficie inicial
-    QString inputDemFile = "C:/Git/ContinentalLandscapeEvolutionModelMock/micro_regiao_Piratini.asc";
-    QString saveDemFile = "C:/Git/ContinentalLandscapeEvolutionModelMock/micro_regiao_Piratini_result_cpp.asc";
+    // Dados de Entrada da superficie inicial
+    QString inputDemFile = "C:/Git/ContinentalLandscapeEvolutionModelMock/erosion_deposition/micro_regiao_Piratini.asc";
+    QString saveDemFile = "C:/Git/ContinentalLandscapeEvolutionModelMock/erosion_deposition/micro_regiao_Piratini_result_cpp.asc";
     std::shared_ptr<Raster<double>> initialGrid = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(inputDemFile));
 
     auto sinkDestroyConfig = std::make_shared<domain::SinkDestroyConfig>();
@@ -41,12 +44,11 @@ int main(int argc, char **argv)
     sinkDestroyConfig->setMaxOpenList(1000000);
     sinkDestroyConfig->setMaxClosedList(500000);
     sinkDestroyConfig->setCostFunctionWeight(2.0);
-    sinkDestroyConfig->setProcessingAlgorithm("MHS");
-
+    sinkDestroyConfig->setProcessingAlgorithm(domain::HeuristicSinkRemovalProcessingMode::MHS);
     
     auto streamDefinitionConfig = std::make_shared<domain::StreamDefinitionConfig>();
     streamDefinitionConfig->setThresoldType("NumberOfCells");
-    streamDefinitionConfig->setThresoldValue(50.0);
+    streamDefinitionConfig->setThresoldValue(2.0);
 
     auto simulationLandscapeEvolutionModelConfig = std::make_shared<domain::SimulationLandscapeEvolutionModelConfig>();
     simulationLandscapeEvolutionModelConfig->setErodibility(0.00001);
@@ -85,14 +87,14 @@ int main(int argc, char **argv)
     bool result = true;
     do
     {
-        std::cout << "\n PROCESSANDOO PASSO DE TEMPO " << processLem.getSimulationTimeStep() << " ANOS \n" << std::endl;
+        std::cout << "PROCESSANDOO PASSO DE TEMPO " << processLem.getSimulationTimeStep() << " ANOS" << std::endl;
         result = processLem.iterate();
     }
     while(result == true);
 
-    RasterFile<double>::writeData(*initialGrid, saveDemFile);
+    RasterFile<double>::writeData(*initialGrid, saveDemFile, 14);
 
-    std::cout << "ENCERROU O PROCESSO DO LEM \n" << std::endl;
+    std::cout << "ENCERROU O PROCESSO DO LEM" << std::endl;
 
     return 0;
 

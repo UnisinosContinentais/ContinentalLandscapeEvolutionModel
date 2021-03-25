@@ -7,8 +7,9 @@
 #ifndef CONTINENTALLANDSCAPEEVOLUTIONMODELPLUGIN_DTO_LANDSCAPEEVOLUTIONMODELINPUT_H
 #define CONTINENTALLANDSCAPEEVOLUTIONMODELPLUGIN_DTO_LANDSCAPEEVOLUTIONMODELINPUT_H
 
-#include <QString>
+#include <continental/datamanagement/Raster.h>
 #include <memory>
+#include <QString>
 #include "../export.h"
 
 namespace continental
@@ -47,8 +48,8 @@ public:
     std::shared_ptr<domain::StreamDefinitionConfig> getStreamDefinitionConfig() const;
 
     /// Função de definição da configuração utilizados pelo processo de Definição e segmentação dos Rios.
-    /// @param StreamDefinitionConfig Objeto do tipo StreamDefinitionConfig com dados de configuração.
-    void setStreamDefinitionConfig(const std::shared_ptr<domain::StreamDefinitionConfig> &StreamDefinitionConfig);
+    /// @param streamDefinitionConfig Objeto do tipo StreamDefinitionConfig com dados de configuração.
+    void setStreamDefinitionConfig(const std::shared_ptr<domain::StreamDefinitionConfig> &streamDefinitionConfig);
 
     /// Função de retorno da configuração utilizados pelo processo LEM.
     /// @return Objeto do tipo SimulationLandscapeEvolutionModelConfig com os dados de configuração.
@@ -77,12 +78,16 @@ public:
 
     double getAge() const;
     void setAge(double age);
+
+    std::shared_ptr<datamanagement::Raster<double> > getUplift() const;
+    void setUplift(const std::shared_ptr<datamanagement::Raster<double> > &uplift);
 private:
     /// Membros.
     std::shared_ptr<domain::SinkDestroyConfig> m_sinkDestroyConfig;
     std::shared_ptr<domain::StreamDefinitionConfig> m_streamDefinitionConfig;
     std::shared_ptr<domain::SimulationLandscapeEvolutionModelConfig> m_simulationLandscapeEvolutionModelConfig;
     std::shared_ptr<domain::GrainDispersionConfig> m_grainDispersionConfig;
+    std::shared_ptr<datamanagement::Raster<double>> m_uplift;
     size_t m_simulateUntilTime = 0;
     double m_age = 0.0;
     bool m_enableSurfaceLog = false;

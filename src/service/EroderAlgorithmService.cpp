@@ -473,7 +473,7 @@ bool EroderAlgorithmService::moveToFlowDirection(short value, size_t& row, size_
 
 	switch (value) //Identifica o sentido conforme o numero
 	{
-	case 128:
+    case EnumDirection::UpRight:
 		if (row == 0)
 		{
 			return false;
@@ -485,14 +485,14 @@ bool EroderAlgorithmService::moveToFlowDirection(short value, size_t& row, size_
 		}
 		column++;
 		return true;
-	case 1:
+    case EnumDirection::Right:
 		if (column + 1 == cols)
 		{
 			return false;
 		}
 		column++;
 		return true;
-	case 2:
+    case EnumDirection::DownRight:
 		if (row + 1 == rows)
 		{
 			return false;
@@ -504,14 +504,14 @@ bool EroderAlgorithmService::moveToFlowDirection(short value, size_t& row, size_
 		}
 		column++;
 		return true;
-	case 4:
+    case EnumDirection::Down:
 		if (row + 1 == rows)
 		{
 			return false;
 		}
 		row++;
 		return true;
-	case 8:
+    case EnumDirection::DownLeft:
 		if (row + 1 == rows)
 		{
 			return false;
@@ -523,14 +523,14 @@ bool EroderAlgorithmService::moveToFlowDirection(short value, size_t& row, size_
 		}
 		column--;
 		return true;
-	case 16:
+    case EnumDirection::Left:
 		if (column == 0)
 		{
 			return false;
 		}
 		column--;
 		return true;
-	case 32:
+    case EnumDirection::UpLeft:
 		if (row == 0)
 		{
 			return false;
@@ -542,7 +542,7 @@ bool EroderAlgorithmService::moveToFlowDirection(short value, size_t& row, size_
 		}
 		column--;
 		return true;
-	case 64:
+    case EnumDirection::Up:
 		if (row == 0)
 		{
 			return false;

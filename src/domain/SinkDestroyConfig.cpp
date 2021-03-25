@@ -58,25 +58,9 @@ QString SinkDestroyConfig::getProcessingAlgorithmName() const
         return "";
 }
 
-void SinkDestroyConfig::setProcessingAlgorithm(QString value)
+void SinkDestroyConfig::setProcessingAlgorithm(HeuristicSinkRemovalProcessingMode value)
 {
-    if (value == "HS")
-    {
-        m_processingAlgorithm =  HeuristicSinkRemovalProcessingMode::HS;
-    }
-    else if (value == "MHS")
-    {
-        m_processingAlgorithm = HeuristicSinkRemovalProcessingMode::MHS;
-    }
-    else if (value == "PFS")
-    {
-        m_processingAlgorithm = HeuristicSinkRemovalProcessingMode::PFS;
-    }
-    else
-    {
-        m_processingAlgorithm = HeuristicSinkRemovalProcessingMode::MHS;
-    }
-
+    m_processingAlgorithm = value;
 }
 
 unsigned short SinkDestroyConfig::getVersion() const

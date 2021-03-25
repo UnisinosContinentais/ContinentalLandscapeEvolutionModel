@@ -8,7 +8,6 @@
 #define CONTINENTALLANDSCAPEEVOLUTIONMODELPLUGIN_PROCESSLANDSCAPEEVOLUTIONMODEL_H1
 
 #include <continental/datamanagement/Raster.h>
-#include <continental/datamanagement/RasterFile.h>
 #include "continental/landscapeevolutionmodel/service/HydroToolsAlgorithmService.h"
 #include "continental/landscapeevolutionmodel/service/EroderAlgorithmService.h"
 #include "continental/landscapeevolutionmodel/service/DifusionAlgorithmService.h"
@@ -16,13 +15,8 @@
 #include "continental/landscapeevolutionmodel/dto/LandscapeEvolutionModelInput.h"
 #include "continental/landscapeevolutionmodel/export.h"
 #include "continental/landscapeevolutionmodel/constant/LandscapeEvolutionModelConstant.h"
-
 #include <QString>
 #include <memory>
-#include <cmath>
-#include <vector>
-#include <iostream>
-
 
 namespace continental {
 namespace landscapeevolutionmodel {
@@ -30,8 +24,6 @@ namespace landscapeevolutionmodel {
 class CONTINENTALLANDSCAPEEVOLUTIONMODELPLUGIN_EXPORT_DECL ProcessLandscapeEvolutionModel
 {
 public:
-    /// Construtor.
-    ProcessLandscapeEvolutionModel();
 
     /// Função que prepara os dados de entrada para execução das interações.
     /// @param initialGrid Objeto do tipo Raster<float> com os valores de elevação topografica da simulação atual.
@@ -59,7 +51,7 @@ private :
     size_t m_simulateUntilTime = 0;
     size_t m_difusionDeltaT = constant::LandscapeEvolutionModelConstant::DifusionDeltaT;
     double m_erosionDeltaT = constant::LandscapeEvolutionModelConstant::ErosionDeltaT;
-    size_t m_timeStepCount = 0;    
+    size_t m_timeStepCount = 0;
     int m_flowAccumulationLimit = 0;
 
     bool m_enableSurfaceLog = false;

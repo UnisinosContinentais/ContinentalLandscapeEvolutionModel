@@ -55,7 +55,7 @@ public:
 
     /// Função de definição do enum do algoritmo de processo.
     /// @param name Enum do algoritmo de processo.
-    void setProcessingAlgorithm(QString name);
+    void setProcessingAlgorithm(HeuristicSinkRemovalProcessingMode name);
 
     /// Função de retorno do valor da versão.
     /// @return Valor da versão.
