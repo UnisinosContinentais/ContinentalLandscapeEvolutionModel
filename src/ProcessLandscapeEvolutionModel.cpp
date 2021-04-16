@@ -58,6 +58,15 @@ void ProcessLandscapeEvolutionModel::prepare(
     m_eroderAlgorithm.setFlowAccumulationLimit(m_flowAccumulationLimit);
     m_eroderAlgorithm.setUplift(inputParameters->getUplift());
 
+    auto grainDispersionConfig = m_inputParameters->getGrainDispersionConfig();
+    m_grainDispersionService.setChannelDepthCParameter(grainDispersionConfig->getChannelDepthCParameter());
+    m_grainDispersionService.setChannelDepthFParameter(grainDispersionConfig->getChannelDepthFParameter());
+    m_grainDispersionService.setDischargeEParameter(grainDispersionConfig->getDischargeEParameter());
+    m_grainDispersionService.setDischargeKParameter(grainDispersionConfig->getDischargeKParameter());
+    m_grainDispersionService.setGrainSizeWaterDensity(grainDispersionConfig->getGrainSizeWaterDensity());
+    m_grainDispersionService.setGrainSizeShieldsNumber(grainDispersionConfig->getGrainSizeShieldsNumber());
+    m_grainDispersionService.setGrainSizeSedimentDensity(grainDispersionConfig->getGrainSizeSedimentDensity());
+
     switch (config->getDrainageNetworkTypeLimit())
     {
         case OnlyMain:
@@ -112,6 +121,13 @@ void ProcessLandscapeEvolutionModel::prepare(
             out << "drainageNetworkPercentLimit: " << QString::number(config->getDrainageNetworkPercentLimit()) << "\n";
             out << "simulateUntilTime: " << QString::number(m_simulateUntilTime) << "\n";
             out << "facLimit: " << QString::number(m_flowAccumulationLimit) << "\n";
+            out << "channelDepthCParameter: " << m_grainDispersionService.getChannelDepthCParameter() << "\n";
+            out << "channelDepthFParameter: " << m_grainDispersionService.getChannelDepthFParameter() << "\n";
+            out << "dischargeEParameter: " << m_grainDispersionService.getDischargeEParameter() << "\n";
+            out << "dischargeKParameter: " << m_grainDispersionService.getDischargeKParameter() << "\n";
+            out << "grainSizeWaterDensity: " << m_grainDispersionService.getGrainSizeWaterDensity() << "\n";
+            out << "grainSizeShieldsNumber: " << m_grainDispersionService.getGrainSizeShieldsNumber() << "\n";
+            out << "grainSizeSedimentDensity: " << m_grainDispersionService.getGrainSizeSedimentDensity() << "\n";
         }
 
         QString path = basePath + "_lem_02_initialGrid.asc";
@@ -164,10 +180,12 @@ bool ProcessLandscapeEvolutionModel::iterate()
         if (qFuzzyCompare(m_eroderAlgorithm.getDimensionLessDepositionCoeficient(), 0.0))
         {
             m_eroderAlgorithm.executeWithImplicitErosion();
+            qDebug() << "executeWithImplicitErosion";
         }
         else
         {
             m_eroderAlgorithm.executeWithErosionDeposition();
+            qDebug() << "executeWithErosionDeposition";
         }
     }
 
@@ -179,6 +197,7 @@ bool ProcessLandscapeEvolutionModel::iterate()
                 m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getSouthBoundaryFactor(),
                 m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getNorthBoundaryFactor()
             );
+        qDebug() << "executeWithVariableBoundary";
     }
 
     ++m_timeStepCount;
@@ -191,13 +210,6 @@ bool ProcessLandscapeEvolutionModel::iterate()
         //Dispersão de Grãos
         m_grainDispersionService.setFlowAccumulationRaster(m_hydroToolsAlgorithm.getFlowAccumulation());
         m_grainDispersionService.setDemRaster(m_surface);
-        m_grainDispersionService.setChannelDepthCParameter(m_inputParameters->getGrainDispersionConfig()->getChannelDepthCParameter());
-        m_grainDispersionService.setChannelDepthFParameter(m_inputParameters->getGrainDispersionConfig()->getChannelDepthFParameter());
-        m_grainDispersionService.setDischargeEParameter(m_inputParameters->getGrainDispersionConfig()->getDischargeEParameter());
-        m_grainDispersionService.setDischargeKParameter(m_inputParameters->getGrainDispersionConfig()->getDischargeKParameter());
-        m_grainDispersionService.setGrainSizeWaterDensity(m_inputParameters->getGrainDispersionConfig()->getGrainSizeWaterDensity());
-        m_grainDispersionService.setGrainSizeShieldsNumber(m_inputParameters->getGrainDispersionConfig()->getGrainSizeShieldsNumber());
-        m_grainDispersionService.setGrainSizeSedimentDensity(m_inputParameters->getGrainDispersionConfig()->getGrainSizeSedimentDensity());
         m_grainDispersionService.calculateGrainDiscretizationRaster();
 
         m_grainDispersion = m_grainDispersionService.getLithologyDefinitionRaster();
@@ -206,42 +218,19 @@ bool ProcessLandscapeEvolutionModel::iterate()
         {
             QString basePath = m_logSurfacePath + "/" + QString::number(m_logAge);
 
-            QString pathParameters = basePath + "_lem_01_parameters.txt";
-
-            qDebug() << "lem_01_parameters: " << pathParameters;
-
-            QFile file(pathParameters);
-            if (file.open(QFile::WriteOnly | QFile::Truncate))
-            {
-                QTextStream out(&file);
-
-                out << "Channel Depth C: " << QString::number(m_grainDispersionService.getChannelDepthCParameter(), 'f', 10) << "\n";
-                out << "Channel Depth F: " << QString::number(m_grainDispersionService.getChannelDepthFParameter(), 'f', 10) << "\n";
-                out << "Discharge E: " << QString::number(m_grainDispersionService.getDischargeEParameter(), 'f', 10) << "\n";
-                out << "Discharge K: " << QString::number(m_grainDispersionService.getDischargeKParameter(), 'f', 10) << "\n";
-                out << "Grain Size Water Density: " << QString::number(m_grainDispersionService.getGrainSizeWaterDensity(), 'f', 10) << "\n";
-                out << "Grain Size Shields Number: " << QString::number(m_grainDispersionService.getGrainSizeShieldsNumber(), 'f', 10) << "\n";
-                out << "Grain Size Sediment Density: " << QString::number(m_grainDispersionService.getGrainSizeSedimentDensity(), 'f', 10) << "\n";
-            }
-
             QString pathNewGrid = basePath + "_lem_03_newGrid.asc";
-            qDebug() << "lem_03_newGrid: " << pathNewGrid;
             RasterFile<double>::writeData(*m_surface, pathNewGrid);
 
             QString pathFlowAccumulation = basePath + "_lem_03_flowAccumulation.asc";
-            qDebug() << "lem_03_flowAccumulation: " << pathNewGrid;
             RasterFile<int>::writeData(*m_grainDispersionService.getFlowAccumulationRaster(), pathFlowAccumulation);
 
             QString pathSlope = basePath + "_lem_03_slope.asc";
-            qDebug() << "lem_03_slope: " << pathNewGrid;
             RasterFile<double>::writeData(*m_grainDispersionService.getSlope(), pathSlope);
 
             QString pathD50 = basePath + "_lem_03_d50.asc";
-            qDebug() << "lem_03_d50: " << pathNewGrid;
             RasterFile<double>::writeData(*m_grainDispersionService.getD50(), pathD50);
 
             QString pathGrainDispersion = basePath + "_lem_04_grainDispersion.asc";
-            qDebug() << "lem_04_grainDispersion: " << pathGrainDispersion;
             RasterFile<short>::writeData(*m_grainDispersion, pathGrainDispersion);
         }
     }
