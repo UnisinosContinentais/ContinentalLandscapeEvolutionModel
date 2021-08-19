@@ -47,7 +47,7 @@ public:
     constexpr static const size_t DifusionDeltaT = 1000; // ano
     constexpr static const double ErosionDeltaT = 1000; // ano
     constexpr static const size_t SaveEachDeltaT = 1000; // ano
-    constexpr static const size_t SimulateUntilTime = DifusionDeltaT;
+    constexpr static const size_t SimulateUntilTime = DifusionDeltaT*2;
 
     //Constantes para o cálculo da dispersão
     constexpr static const double DischargeKParameter = 0.08;
@@ -69,7 +69,7 @@ public:
     constexpr static const double MaxClaySize = 0.004;
 
     //Parâmetro para salvar os logs
-     constexpr static const bool EnableLogs = false;
+     constexpr static const bool EnableLogs = true;
 };
 
 }

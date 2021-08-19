@@ -89,6 +89,7 @@ void ProcessLandscapeEvolutionModel::prepare(
 
     if (m_enableSurfaceLog)
     {
+        m_logSurfacePath = "C:/Users/ADM_LOCAL/Desktop";
         QString basePath = m_logSurfacePath + "/" + QString::number(m_logAge);
         QString pathParameters = basePath + "_lem_01_parameters.txt";
 

@@ -81,6 +81,7 @@ int main(int argc, char **argv)
     lemInput->setSimulationLandscapeEvolutionModelConfig(simulationLandscapeEvolutionModelConfig);
     lemInput->setSimulateUntilTime(LandscapeEvolutionModelConstant::SimulateUntilTime);
     lemInput->setGrainDispersionConfig(grainDispersionConfig);
+    lemInput->setEnableSurfaceLog(LandscapeEvolutionModelConstant::EnableLogs);
 
     //Executa o lEM com iteração
     ProcessLandscapeEvolutionModel processLem;
