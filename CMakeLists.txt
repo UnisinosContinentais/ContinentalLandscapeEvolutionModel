@@ -64,6 +64,7 @@ add_library(ContinentalLandscapeEvolutionModel
     src/service/EroderAlgorithmService.cpp
     src/service/HydroToolsAlgorithmService.cpp
     src/util/RasterFileUtil.cpp
+    src/util/ProcessLandscapeEvolutionModelLogUtil.cpp
 )
 
 #Add an alias so that library can be used inside the build tree, e.g. when testing

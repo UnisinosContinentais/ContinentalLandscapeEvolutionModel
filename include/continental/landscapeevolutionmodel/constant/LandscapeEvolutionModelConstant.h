@@ -30,6 +30,11 @@ public:
     constexpr static const double ParametersSimulationDimensionLessPrecipitationRate = 0.2;
     constexpr static const double ParametersSimulationDimensionLessDepositionCoeficient = 1.0;
 
+    constexpr static const double BoundaryConditionNorth = 0;
+    constexpr static const double BoundaryConditionWest = 0;
+    constexpr static const double BoundaryConditionSouth = 0;
+    constexpr static const double BoundaryConditionEast = 0;
+
     constexpr static const size_t ParametersSinkDestroyConfigMaxOpenList = 1000000;
     constexpr static const size_t ParametersSinkDestroyConfigMaxClosedList = 500000;
     constexpr static const size_t ParametersSinkDestroyConfigWeightFunctionCost = 2.00;
@@ -62,6 +67,9 @@ public:
     constexpr static const double MaxFineSandSize = 0.25;
     constexpr static const double MaxSiltSize = 0.062;
     constexpr static const double MaxClaySize = 0.004;
+
+    //Parâmetro para salvar os logs
+     constexpr static const bool EnableLogs = false;
 };
 
 }

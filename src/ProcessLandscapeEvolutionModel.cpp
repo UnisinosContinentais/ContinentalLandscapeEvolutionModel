@@ -37,25 +37,25 @@ void ProcessLandscapeEvolutionModel::prepare(
     m_enableSurfaceLog = inputParameters->getEnableSurfaceLog();
     m_logSurfacePath = inputParameters->getPathSurfaceLog();
 
-    m_surface= surface;
+    m_surface = surface;
     m_inputParameters = inputParameters;
 
-    prepareFlowAccumulationLimit();
+    prepareFlowAccumulationLimit(); // método desta classe que calcula o flowAccLimit
 
     m_hydroToolsAlgorithm = HydroToolsAlgorithmService(m_surface, m_inputParameters);
     m_difusionAlgorithm = DifusionAlgorithmService(m_surface, config->getDiffusivity(), m_difusionDeltaT);
 
-    m_difusionAlgorithm.allocateTopography();
+    m_difusionAlgorithm.allocateTopography(); //aloca o espaço de m_surface em m_T da classe difusionAlgorithm
 
-    m_hydroToolsAlgorithm.prepareDem();
+    m_hydroToolsAlgorithm.prepareDem(); //Executa o Hydrotools -> executa o syncAndDestroy
 
-    m_eroderAlgorithm.setRaster(m_surface);
+    m_eroderAlgorithm.setRaster(m_surface); //o raster do eroder pegou as modificações do syncAndDestroy
     m_eroderAlgorithm.setErodibility(config->getErodibility());
     m_eroderAlgorithm.setDeltaTime(m_erosionDeltaT);
     m_eroderAlgorithm.setConcavityIndex(config->getConcavityIndex());
     m_eroderAlgorithm.setDimensionLessPrecipitationRate(config->getDimensionLessPrecipitationRate());
     m_eroderAlgorithm.setDimensionLessDepositionCoeficient(config->getDimensionLessDepositionCoeficient());
-    m_eroderAlgorithm.setFlowAccumulationLimit(m_flowAccumulationLimit);
+    m_eroderAlgorithm.setFlowAccumulationLimit(m_flowAccumulationLimit); //setando com 0 ?
     m_eroderAlgorithm.setUplift(inputParameters->getUplift());
 
     auto grainDispersionConfig = m_inputParameters->getGrainDispersionConfig();
@@ -82,6 +82,7 @@ void ProcessLandscapeEvolutionModel::prepare(
             throw std::runtime_error("The limit of the drainage networks has not been defined.");
     }
 
+    // ???
     m_timeStepCount = 0;
 
     if (m_enableSurfaceLog)
@@ -116,7 +117,7 @@ void ProcessLandscapeEvolutionModel::prepare(
                 default:
                     out << "Undefined";
                     break;
-            }
+            } //pq aqui pega de m_grainDispersionService e não de grainDispersionConfig ?
             out << "drainageNetworkAmountLimit: " << QString::number(config->getDrainageNetworkAmountLimit()) << "\n";
             out << "drainageNetworkPercentLimit: " << QString::number(config->getDrainageNetworkPercentLimit()) << "\n";
             out << "simulateUntilTime: " << QString::number(m_simulateUntilTime) << "\n";
@@ -189,6 +190,7 @@ bool ProcessLandscapeEvolutionModel::iterate()
         }
     }
 
+    // não é dentro do for ?
     if (!qFuzzyCompare(m_difusionAlgorithm.getDiffusivity(), 0.0))
     {
         m_difusionAlgorithm.executeWithVariableBoundary(

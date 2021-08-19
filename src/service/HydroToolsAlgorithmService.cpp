@@ -88,8 +88,9 @@ void HydroToolsAlgorithmService::execute()
 
     std::shared_ptr<HeuristicSinkRemoval<double>> sinkDestroy = std::make_shared<HeuristicSinkRemoval<double>>(maxOpenList, maxClosedList, weightFunctionG, static_cast<HeuristicSinkRemoval<double>::ProcessingMode>(processingAlgorithm));
 
-    continental::datamanagement::Raster<double> dem = *m_initialGrid;
-    std::shared_ptr<Raster<double>> demShared = std::make_shared<Raster<double>>(dem);
+    continental::datamanagement::Raster<double> dem = *m_initialGrid; //pegando a cópia?
+    std::shared_ptr<Raster<double>> demShared = std::make_shared<Raster<double>>(dem); //pq cria um shared da cópia do shared?
+
     //1º Executa o Sink Destroy com uma copia da superficie inicial atual
     sinkDestroy->setDem(demShared);
 

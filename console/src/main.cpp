@@ -42,9 +42,9 @@ int main(int argc, char **argv)
 
     auto sinkDestroyConfig = std::make_shared<domain::SinkDestroyConfig>();
     sinkDestroyConfig->setVersion(1);
-    sinkDestroyConfig->setMaxOpenList(1000000);
-    sinkDestroyConfig->setMaxClosedList(500000);
-    sinkDestroyConfig->setCostFunctionWeight(2.0);
+    sinkDestroyConfig->setMaxOpenList(LandscapeEvolutionModelConstant::ParametersSinkDestroyConfigMaxOpenList);
+    sinkDestroyConfig->setMaxClosedList(LandscapeEvolutionModelConstant::ParametersSinkDestroyConfigMaxClosedList);
+    sinkDestroyConfig->setCostFunctionWeight(LandscapeEvolutionModelConstant::ParametersSinkDestroyConfigWeightFunctionCost);
     sinkDestroyConfig->setProcessingAlgorithm(domain::HeuristicSinkRemovalProcessingMode::MHS);
     
     auto streamDefinitionConfig = std::make_shared<domain::StreamDefinitionConfig>();
@@ -52,16 +52,17 @@ int main(int argc, char **argv)
     streamDefinitionConfig->setThresholdValue(2.0);
 
     auto simulationLandscapeEvolutionModelConfig = std::make_shared<domain::SimulationLandscapeEvolutionModelConfig>();
-    simulationLandscapeEvolutionModelConfig->setErodibility(0.00001);
-    simulationLandscapeEvolutionModelConfig->setDiffusivity(0.0);
-    simulationLandscapeEvolutionModelConfig->setConcavityIndex(0.4);
-    simulationLandscapeEvolutionModelConfig->setValueN(1.0);
-    simulationLandscapeEvolutionModelConfig->setDimensionLessPrecipitationRate(0.2);
-    simulationLandscapeEvolutionModelConfig->setDimensionLessDepositionCoeficient(1.0);
-    simulationLandscapeEvolutionModelConfig->setEastBoundaryFactor(0);
-    simulationLandscapeEvolutionModelConfig->setWestBoundaryFactor(0);
-    simulationLandscapeEvolutionModelConfig->setNorthBoundaryFactor(0);
-    simulationLandscapeEvolutionModelConfig->setSouthBoundaryFactor(0);
+    simulationLandscapeEvolutionModelConfig->setErodibility(LandscapeEvolutionModelConstant::ParametersSimulationErodibility);
+    simulationLandscapeEvolutionModelConfig->setDiffusivity(LandscapeEvolutionModelConstant::ParametersSimulationDiffusivity);
+    simulationLandscapeEvolutionModelConfig->setConcavityIndex(LandscapeEvolutionModelConstant::ParametersSimulationValueConcavityIndex);
+    simulationLandscapeEvolutionModelConfig->setValueN(LandscapeEvolutionModelConstant::ParametersSimulationValueN);
+    simulationLandscapeEvolutionModelConfig->setDimensionLessPrecipitationRate(LandscapeEvolutionModelConstant::ParametersSimulationDimensionLessPrecipitationRate);
+    simulationLandscapeEvolutionModelConfig->setDimensionLessDepositionCoeficient(LandscapeEvolutionModelConstant::ParametersSimulationDimensionLessDepositionCoeficient);
+
+    simulationLandscapeEvolutionModelConfig->setEastBoundaryFactor(LandscapeEvolutionModelConstant::BoundaryConditionEast);
+    simulationLandscapeEvolutionModelConfig->setWestBoundaryFactor(LandscapeEvolutionModelConstant::BoundaryConditionWest);
+    simulationLandscapeEvolutionModelConfig->setNorthBoundaryFactor(LandscapeEvolutionModelConstant::BoundaryConditionNorth);
+    simulationLandscapeEvolutionModelConfig->setSouthBoundaryFactor(LandscapeEvolutionModelConstant::BoundaryConditionSouth);
     simulationLandscapeEvolutionModelConfig->useDrainageNetworkAmountLimit(5);
 
     auto grainDispersionConfig = std::make_shared<domain::GrainDispersionConfig>();
@@ -78,7 +79,7 @@ int main(int argc, char **argv)
     lemInput->setSinkDestroyConfig(sinkDestroyConfig);
     lemInput->setStreamDefinitionConfig(streamDefinitionConfig);
     lemInput->setSimulationLandscapeEvolutionModelConfig(simulationLandscapeEvolutionModelConfig);
-    lemInput->setSimulateUntilTime(1000);
+    lemInput->setSimulateUntilTime(LandscapeEvolutionModelConstant::SimulateUntilTime);
     lemInput->setGrainDispersionConfig(grainDispersionConfig);
 
     //Executa o lEM com iteração
