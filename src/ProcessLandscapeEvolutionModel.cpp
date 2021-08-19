@@ -9,6 +9,7 @@
 #include "continental/landscapeevolutionmodel/domain/GrainDispersionConfig.h"
 #include "continental/landscapeevolutionmodel/constant/LandscapeEvolutionModelConstant.h"
 #include <continental/datamanagement/RasterFile.h>
+#include "continental/landscapeevolutionmodel/util/ProcessLandscapeEvolutionModelLogUtil.h"
 #include <memory>
 #include <QString>
 #include <QDebug>
@@ -20,6 +21,7 @@ using namespace continental::landscapeevolutionmodel::constant;
 using namespace continental::landscapeevolutionmodel::domain;
 using namespace continental::landscapeevolutionmodel::dto;
 using namespace continental::landscapeevolutionmodel::service;
+using namespace continental::landscapeevolutionmodel::util;
 
 namespace continental {
 namespace landscapeevolutionmodel {
@@ -55,7 +57,7 @@ void ProcessLandscapeEvolutionModel::prepare(
     m_eroderAlgorithm.setConcavityIndex(config->getConcavityIndex());
     m_eroderAlgorithm.setDimensionLessPrecipitationRate(config->getDimensionLessPrecipitationRate());
     m_eroderAlgorithm.setDimensionLessDepositionCoeficient(config->getDimensionLessDepositionCoeficient());
-    m_eroderAlgorithm.setFlowAccumulationLimit(m_flowAccumulationLimit); //setando com 0 ?
+    m_eroderAlgorithm.setFlowAccumulationLimit(m_flowAccumulationLimit);
     m_eroderAlgorithm.setUplift(inputParameters->getUplift());
 
     auto grainDispersionConfig = m_inputParameters->getGrainDispersionConfig();
@@ -134,6 +136,10 @@ void ProcessLandscapeEvolutionModel::prepare(
         QString path = basePath + "_lem_02_initialGrid.asc";
         qDebug() << "lem_02_initialGrid: " << path;
         RasterFile<double>::writeData(*m_surface, path);
+
+        ProcessLandscapeEvolutionModelLogUtil::writeParametersLog(pathParameters, m_flowAccumulationLimit, config, grainDispersionConfig, inputParameters);
+        ProcessLandscapeEvolutionModelLogUtil::writeSurfaceLog( "__lem_02_initialGrid.asc", basePath, m_surface);
+
     }
 }
 
@@ -219,21 +225,33 @@ bool ProcessLandscapeEvolutionModel::iterate()
         if (m_enableSurfaceLog)
         {
             QString basePath = m_logSurfacePath + "/" + QString::number(m_logAge);
-
+            //1
             QString pathNewGrid = basePath + "_lem_03_newGrid.asc";
             RasterFile<double>::writeData(*m_surface, pathNewGrid);
 
+            ProcessLandscapeEvolutionModelLogUtil::writeSurfaceLog( "_lem_03_newGrid.asc", basePath, m_surface);
+            //2
             QString pathFlowAccumulation = basePath + "_lem_03_flowAccumulation.asc";
             RasterFile<int>::writeData(*m_grainDispersionService.getFlowAccumulationRaster(), pathFlowAccumulation);
 
+            ProcessLandscapeEvolutionModelLogUtil::writeFlowAccumulationLog("__lem_03_flowAccumulation.asc", basePath, m_grainDispersionService.getFlowAccumulationRaster());
+            //3
             QString pathSlope = basePath + "_lem_03_slope.asc";
             RasterFile<double>::writeData(*m_grainDispersionService.getSlope(), pathSlope);
 
+            ProcessLandscapeEvolutionModelLogUtil::writeSlopeLog("__lem_03_slope.asc", basePath, m_grainDispersionService.getSlope());
+
+            //3
             QString pathD50 = basePath + "_lem_03_d50.asc";
             RasterFile<double>::writeData(*m_grainDispersionService.getD50(), pathD50);
 
+            ProcessLandscapeEvolutionModelLogUtil::writeD50Log("__lem_03_d50.asc", basePath, m_grainDispersionService.getD50());
+
             QString pathGrainDispersion = basePath + "_lem_04_grainDispersion.asc";
             RasterFile<short>::writeData(*m_grainDispersion, pathGrainDispersion);
+
+            ProcessLandscapeEvolutionModelLogUtil::writeGrainDispersionLog("__lem_04_grainDispersion.asc", basePath, m_grainDispersion);
+
         }
     }
 

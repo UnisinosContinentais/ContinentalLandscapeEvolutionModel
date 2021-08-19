@@ -40,10 +40,7 @@ public:
                                    std::shared_ptr<domain::GrainDispersionConfig >grainDispersionConfig,
                                    std::shared_ptr<dto::LandscapeEvolutionModelInput> inputParameters);
 
-
-
     static void writeSurfaceLog(QString surfaceTitle, QString basePath, std::shared_ptr<datamanagement::Raster<double>> surface);
-
 
     static void writeFlowAccumulationLog(QString title, QString basePath, std::shared_ptr<datamanagement::Raster<int>> flowAccumulationLog);
 
