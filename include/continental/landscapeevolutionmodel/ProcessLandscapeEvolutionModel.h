@@ -57,6 +57,7 @@ private :
     bool m_enableSurfaceLog = false;
     QString m_logSurfacePath;
     double m_logAge = 0.0;
+    int m_logNode = 0;
 
     std::shared_ptr<datamanagement::Raster<double>> m_surface;
     std::shared_ptr<datamanagement::Raster<short>> m_grainDispersion;
