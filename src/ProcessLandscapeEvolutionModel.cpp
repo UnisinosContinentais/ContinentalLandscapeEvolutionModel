@@ -89,16 +89,16 @@ void ProcessLandscapeEvolutionModel::prepare(
 
     if (m_enableSurfaceLog)
     {
-        m_logSurfacePath = "C:/Users/ADM_LOCAL/Desktop/teste_logs"; //precisa ver
+        m_logSurfacePath = "C:/Users/ADM_LOCAL/Desktop/teste_logs"; //precisa ver: esse cara só fica liberado para o teste
 
-        QString basePath = m_logSurfacePath + "/" + QString::number(m_logAge) + QString::number(m_logNode);
-        QString pathParameters = basePath + "_lem_01_parameters.txt";
+        QString basePath = m_logSurfacePath + "/" + "ContinentalLEM_" + QString::number(m_logAge) + "_" + QString::number(m_logNode);
+        QString pathParameters = basePath + "-01_Parameters.txt";
 
         qDebug() << "lem_01_parameters: " << pathParameters;
-
-        ProcessLandscapeEvolutionModelLogUtil::writeParametersLog("C:/Users/ADM_LOCAL/Desktop/teste_logs/__lem_01_parameters.txt", m_flowAccumulationLimit, config, grainDispersionConfig, inputParameters);
-
-        ProcessLandscapeEvolutionModelLogUtil::writeSurfaceLog( "__lem_02_initialGrid.asc", basePath, m_surface);
+        //1
+        ProcessLandscapeEvolutionModelLogUtil::writeParametersLog(pathParameters, m_flowAccumulationLimit, config, grainDispersionConfig, inputParameters);
+        //2
+        ProcessLandscapeEvolutionModelLogUtil::writeSurfaceLog( "-02_Grid_Inicial.asc", basePath, m_surface);
 
     }
 }
@@ -184,30 +184,18 @@ bool ProcessLandscapeEvolutionModel::iterate()
 
         if (m_enableSurfaceLog)
         {
-            QString basePath = m_logSurfacePath + "/" + QString::number(m_logAge) + QString::number(m_logNode);
-            //1
-            //QString pathNewGrid = basePath + "_lem_03_newGrid.asc";
+            QString basePath = m_logSurfacePath + "/" + "ContinentalLEM_" + QString::number(m_logAge) + "_" + QString::number(m_logNode);
 
-            ProcessLandscapeEvolutionModelLogUtil::writeSurfaceLog( "_lem_03_newGrid", basePath, m_surface);
-            //2
-            //QString pathFlowAccumulation = basePath + "_lem_03_flowAccumulation.asc";
-
-            ProcessLandscapeEvolutionModelLogUtil::writeFlowAccumulationLog("__lem_03_flowAccumulation", basePath, m_grainDispersionService.getFlowAccumulationRaster());
             //3
-            //QString pathSlope = basePath + "_lem_03_slope.asc";
-
-            ProcessLandscapeEvolutionModelLogUtil::writeSlopeLog("__lem_03_slope", basePath, m_grainDispersionService.getSlope());
-
+            ProcessLandscapeEvolutionModelLogUtil::writeFlowAccumulationLog("-03_Area_de_Drenagem_do_Grid_Inicial", basePath, m_grainDispersionService.getFlowAccumulationRaster());
             //4
-            //QString pathD50 = basePath + "_lem_03_d50.asc";
-
-            ProcessLandscapeEvolutionModelLogUtil::writeD50Log("__lem_03_d50", basePath, m_grainDispersionService.getD50());
-
+            ProcessLandscapeEvolutionModelLogUtil::writeSlopeLog("-04_Gradiente_do_Grid_Inicial", basePath, m_grainDispersionService.getSlope());
             //5
-            //QString pathGrainDispersion = basePath + "_lem_04_grainDispersion.asc";
-
-            ProcessLandscapeEvolutionModelLogUtil::writeGrainDispersionLog("__lem_04_grainDispersion", basePath, m_grainDispersion);
-
+            ProcessLandscapeEvolutionModelLogUtil::writeD50Log("-05_D50_do_Grid_Inicial", basePath, m_grainDispersionService.getD50());
+            //6
+            ProcessLandscapeEvolutionModelLogUtil::writeGrainDispersionLog("-06_Litologias_do_Grid_Final", basePath, m_grainDispersion);
+            //7
+            ProcessLandscapeEvolutionModelLogUtil::writeSurfaceLog( "-07_Grid_Final", basePath, m_surface);
         }
     }
 
