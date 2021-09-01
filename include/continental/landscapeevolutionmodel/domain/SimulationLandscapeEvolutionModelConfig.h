@@ -9,6 +9,7 @@
 
 #include "../export.h"
 #include "../domain/EnumDrainageNetworkLimit.h"
+#include <vector>
 
 namespace continental {
 namespace landscapeevolutionmodel {
@@ -90,6 +91,8 @@ public:
     size_t getDrainageNetworkAmountLimit() const;
 
     double getDrainageNetworkPercentLimit() const;
+
+
 private:
     /// Membros.
     double m_erodibility = 0.0;

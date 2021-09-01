@@ -79,15 +79,16 @@ public:
     double getAge() const;
     void setAge(double age);
 
-    std::shared_ptr<datamanagement::Raster<double> > getUplift() const;
-    void setUplift(const std::shared_ptr<datamanagement::Raster<double> > &uplift);
+    std::shared_ptr<datamanagement::Raster<double> > getUpliftRate() const;
+    void setUpliftRate(const std::shared_ptr<datamanagement::Raster<double> > &upliftRate);
+
 private:
     /// Membros.
     std::shared_ptr<domain::SinkDestroyConfig> m_sinkDestroyConfig;
     std::shared_ptr<domain::StreamDefinitionConfig> m_streamDefinitionConfig;
     std::shared_ptr<domain::SimulationLandscapeEvolutionModelConfig> m_simulationLandscapeEvolutionModelConfig;
     std::shared_ptr<domain::GrainDispersionConfig> m_grainDispersionConfig;
-    std::shared_ptr<datamanagement::Raster<double>> m_uplift;
+    std::shared_ptr<datamanagement::Raster<double>> m_upliftRate;
     size_t m_simulateUntilTime = 0;
     double m_age = 0.0;
     bool m_enableSurfaceLog = false;

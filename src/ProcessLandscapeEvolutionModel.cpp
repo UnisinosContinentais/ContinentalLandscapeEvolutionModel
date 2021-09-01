@@ -2,6 +2,7 @@
 #include <continental/landscapeevolutionmodel/service/HydroToolsAlgorithmService.h>
 #include <continental/landscapeevolutionmodel/service/EroderAlgorithmService.h>
 #include <continental/landscapeevolutionmodel/service/DifusionAlgorithmService.h>
+#include <continental/landscapeevolutionmodel/service/UpliftAlgorithmService.h>
 #include <continental/landscapeevolutionmodel/dto/LandscapeEvolutionModelInput.h>
 #include "continental/landscapeevolutionmodel/domain/SimulationLandscapeEvolutionModelConfig.h"
 #include "continental/landscapeevolutionmodel/domain/SinkDestroyConfig.h"
@@ -25,10 +26,13 @@ using namespace continental::landscapeevolutionmodel::util;
 
 namespace continental {
 namespace landscapeevolutionmodel {
+
+
 void ProcessLandscapeEvolutionModel::prepare(
         std::shared_ptr<datamanagement::Raster<double>> surface,
         std::shared_ptr<LandscapeEvolutionModelInput> inputParameters
     )
+
 {
     //Prparando parâmetros para Exucução
     std::shared_ptr<SimulationLandscapeEvolutionModelConfig> config = inputParameters->getSimulationLandscapeEvolutionModelConfig();
@@ -42,6 +46,10 @@ void ProcessLandscapeEvolutionModel::prepare(
     m_surface = surface;
     m_inputParameters = inputParameters;
 
+    //este grid é inicializado como uma cópia do grid que vai processar o LEM
+    //assim se subtrair esta copia e o uplift do resultado do LEM, tem-se o grid de erosão e deposição
+    m_onlyErosionDepositionGrid = std::make_shared<datamanagement::Raster<double>>(*m_surface);
+
     prepareFlowAccumulationLimit(); // método desta classe que calcula o flowAccLimit
 
     m_hydroToolsAlgorithm = HydroToolsAlgorithmService(m_surface, m_inputParameters);
@@ -51,6 +59,11 @@ void ProcessLandscapeEvolutionModel::prepare(
 
     m_hydroToolsAlgorithm.prepareDem(); //Executa o Hydrotools -> executa o syncAndDestroy
 
+    m_upliftAlgorithm.setInitialGrid(surface);
+    m_upliftAlgorithm.setNumberOfTimeSteps(m_simulateUntilTime/m_difusionDeltaT);
+    m_upliftAlgorithm.setTimeStep(m_difusionDeltaT);
+    m_upliftAlgorithm.setUpliftRate(inputParameters->getUpliftRate());
+
     m_eroderAlgorithm.setRaster(m_surface); //o raster do eroder pegou as modificações do syncAndDestroy
     m_eroderAlgorithm.setErodibility(config->getErodibility());
     m_eroderAlgorithm.setDeltaTime(m_erosionDeltaT);
@@ -58,7 +71,7 @@ void ProcessLandscapeEvolutionModel::prepare(
     m_eroderAlgorithm.setDimensionLessPrecipitationRate(config->getDimensionLessPrecipitationRate());
     m_eroderAlgorithm.setDimensionLessDepositionCoeficient(config->getDimensionLessDepositionCoeficient());
     m_eroderAlgorithm.setFlowAccumulationLimit(m_flowAccumulationLimit);
-    m_eroderAlgorithm.setUplift(inputParameters->getUplift());
+    m_eroderAlgorithm.setUplift(inputParameters->getUpliftRate());
 
     auto grainDispersionConfig = m_inputParameters->getGrainDispersionConfig();
     m_grainDispersionService.setChannelDepthCParameter(grainDispersionConfig->getChannelDepthCParameter());
@@ -168,6 +181,8 @@ bool ProcessLandscapeEvolutionModel::iterate()
         qDebug() << "executeWithVariableBoundary";
     }
 
+    m_upliftAlgorithm.executeUplift();
+
     ++m_timeStepCount;
 
     bool isLast = m_timeStepCount == (m_simulateUntilTime / m_difusionDeltaT);
@@ -181,6 +196,10 @@ bool ProcessLandscapeEvolutionModel::iterate()
         m_grainDispersionService.calculateGrainDiscretizationRaster();
 
         m_grainDispersion = m_grainDispersionService.getLithologyDefinitionRaster();
+
+        m_totalUplift = m_upliftAlgorithm.totalUplift();
+
+        calculateOnlyErosionDepositionGrid();
 
         if (m_enableSurfaceLog)
         {
@@ -215,6 +234,18 @@ std::shared_ptr<continental::datamanagement::Raster<short>> ProcessLandscapeEvol
 size_t ProcessLandscapeEvolutionModel::getSimulationTimeStep()
 {
     return m_timeStepCount * m_difusionDeltaT;
+}
+
+void ProcessLandscapeEvolutionModel::calculateOnlyErosionDepositionGrid()
+{
+    for(size_t i = 0; i < m_onlyErosionDepositionGrid->getRows(); ++i)
+    {
+        for(size_t j = 0; j < m_onlyErosionDepositionGrid->getCols(); ++j)
+        {
+            m_onlyErosionDepositionGrid->setData(i, j, m_surface->getData(i, j) - m_onlyErosionDepositionGrid->getData(i, j) - m_totalUplift->getData(i, j));
+        }
+    }
+
 }
 
 void ProcessLandscapeEvolutionModel::validateInterate()

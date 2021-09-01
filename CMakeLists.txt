@@ -63,6 +63,7 @@ add_library(ContinentalLandscapeEvolutionModel
     src/service/DirectionCalculatorService.cpp
     src/service/EroderAlgorithmService.cpp
     src/service/HydroToolsAlgorithmService.cpp
+    src/service/UpliftAlgorithmService.cpp
     src/util/RasterFileUtil.cpp
     src/util/ProcessLandscapeEvolutionModelLogUtil.cpp
 )

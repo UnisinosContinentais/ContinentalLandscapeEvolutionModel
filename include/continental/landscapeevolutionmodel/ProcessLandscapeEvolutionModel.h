@@ -12,6 +12,7 @@
 #include "continental/landscapeevolutionmodel/service/EroderAlgorithmService.h"
 #include "continental/landscapeevolutionmodel/service/DifusionAlgorithmService.h"
 #include "continental/landscapeevolutionmodel/service/LithologyDefinionCalculator.h"
+#include "continental/landscapeevolutionmodel/service/UpliftAlgorithmService.h"
 #include "continental/landscapeevolutionmodel/dto/LandscapeEvolutionModelInput.h"
 #include "continental/landscapeevolutionmodel/export.h"
 #include "continental/landscapeevolutionmodel/constant/LandscapeEvolutionModelConstant.h"
@@ -46,6 +47,8 @@ public:
     /// @return Valor do tipo size_t com o valor do sub-passo que esta sendo processado.
     size_t getSimulationTimeStep();
 
+    void calculateOnlyErosionDepositionGrid();
+
 private :
     /// Membros.
     size_t m_simulateUntilTime = 0;
@@ -66,6 +69,12 @@ private :
     service::DifusionAlgorithmService m_difusionAlgorithm;
     service::EroderAlgorithmService m_eroderAlgorithm;
     service::LithologyDefinionCalculator m_grainDispersionService;
+    service::UpliftAlgorithmService m_upliftAlgorithm;
+
+    std::shared_ptr<datamanagement::Raster<double>> m_totalUplift;
+
+    //nomear para ser o grid que possui as erosões e deposições
+    std::shared_ptr<datamanagement::Raster<double>> m_onlyErosionDepositionGrid;
 
     /// Função que valida se a interação é valida.
     void validateInterate();

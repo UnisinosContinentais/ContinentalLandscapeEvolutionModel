@@ -88,20 +88,22 @@ void LandscapeEvolutionModelInput::setAge(double age)
     m_age = age;
 }
 
-std::shared_ptr<datamanagement::Raster<double> > LandscapeEvolutionModelInput::getUplift() const
+std::shared_ptr<datamanagement::Raster<double> > LandscapeEvolutionModelInput::getUpliftRate() const
 {
-    return m_uplift;
+    return m_upliftRate;
 }
 
-void LandscapeEvolutionModelInput::setUplift(const std::shared_ptr<datamanagement::Raster<double> > &uplift)
+void LandscapeEvolutionModelInput::setUpliftRate(const std::shared_ptr<datamanagement::Raster<double> > &upliftRate)
 {
-    m_uplift = uplift;
+    m_upliftRate = upliftRate;
 }
 
 size_t LandscapeEvolutionModelInput::getSimulateUntilTime() const
 {
     return m_simulateUntilTime;
 }
+
+
 
 } //dto
 } //landscapeevolutionmodel

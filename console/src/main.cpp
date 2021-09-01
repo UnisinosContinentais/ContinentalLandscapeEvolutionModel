@@ -40,6 +40,7 @@ int main(int argc, char **argv)
     QString saveDemFile = "C:/Git/ContinentalLandscapeEvolutionModelMock/erosion_deposition/micro_regiao_Piratini_result_cpp.asc";
     std::shared_ptr<Raster<double>> initialGrid = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(inputDemFile));
 
+
     auto sinkDestroyConfig = std::make_shared<domain::SinkDestroyConfig>();
     sinkDestroyConfig->setVersion(1);
     sinkDestroyConfig->setMaxOpenList(LandscapeEvolutionModelConstant::ParametersSinkDestroyConfigMaxOpenList);
@@ -82,6 +83,14 @@ int main(int argc, char **argv)
     lemInput->setSimulateUntilTime(LandscapeEvolutionModelConstant::SimulateUntilTime);
     lemInput->setGrainDispersionConfig(grainDispersionConfig);
     lemInput->setEnableSurfaceLog(LandscapeEvolutionModelConstant::EnableLogs);
+
+    lemInput->setUpliftRate(std::make_shared<Raster<double>>
+                            (initialGrid->getRows(),
+                             initialGrid->getCols(),
+                             initialGrid->getXOrigin(),
+                             initialGrid->getYOrigin(),
+                             initialGrid->getCellSize(),
+                             initialGrid->getNoDataValue())); //só pra testar: colocar um if no proceess para tratar se tem uplift
 
     //Executa o lEM com iteração
     ProcessLandscapeEvolutionModel processLem;
