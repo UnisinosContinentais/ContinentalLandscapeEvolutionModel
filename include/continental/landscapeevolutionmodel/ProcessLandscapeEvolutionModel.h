@@ -47,9 +47,12 @@ public:
     /// @return Valor do tipo size_t com o valor do sub-passo que esta sendo processado.
     size_t getSimulationTimeStep();
 
-    void calculateOnlyErosionDepositionGrid();
+    std::shared_ptr<datamanagement::Raster<double>> getOnlyErosionDepositionGrid() const;
 
 private :
+
+    void calculateOnlyErosionDepositionGrid();
+
     /// Membros.
     size_t m_simulateUntilTime = 0;
     size_t m_difusionDeltaT = constant::LandscapeEvolutionModelConstant::DifusionDeltaT;

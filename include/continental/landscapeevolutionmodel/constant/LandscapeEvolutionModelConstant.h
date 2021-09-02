@@ -47,7 +47,7 @@ public:
     constexpr static const size_t DifusionDeltaT = 1000; // ano
     constexpr static const double ErosionDeltaT = 1000; // ano
     constexpr static const size_t SaveEachDeltaT = 1000; // ano
-    constexpr static const size_t SimulateUntilTime = DifusionDeltaT*2;
+    constexpr static const size_t SimulateUntilTime = 10000;
 
     //Constantes para o cálculo da dispersão
     constexpr static const double DischargeKParameter = 0.08;

@@ -36,10 +36,18 @@ int main(int argc, char **argv)
     std::cout << "INICIOU O PROCESSO DO LEM" << std::endl;
 
     // Dados de Entrada da superficie inicial
-    QString inputDemFile = "C:/Git/ContinentalLandscapeEvolutionModelMock/erosion_deposition/micro_regiao_Piratini.asc";
-    QString saveDemFile = "C:/Git/ContinentalLandscapeEvolutionModelMock/erosion_deposition/micro_regiao_Piratini_result_cpp.asc";
-    std::shared_ptr<Raster<double>> initialGrid = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(inputDemFile));
 
+    const QString basePath = "C:/Git/ContinentalLandscapeEvolutionModelMock/teste_unitario_uplift_params_zero/";
+
+    const QString initialGridFileAfterSinkAndDestroy = "sup_inicial_ajustada_synk_destroy.asc";
+    const QString initialGridPath = basePath + initialGridFileAfterSinkAndDestroy;
+    std::shared_ptr<Raster<double>> initialGrid = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(initialGridPath));
+
+    const QString upliftRatefile = "uplift_matrix_zero.asc";
+    const QString upliftRatePath = basePath + upliftRatefile;
+    std::shared_ptr<Raster<double>> upliftRate = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(upliftRatePath));
+
+    QString saveDemFile = "C:/Git/ContinentalLandscapeEvolutionModelMock/teste_unitario_uplift_params_zero/saved.asc";
 
     auto sinkDestroyConfig = std::make_shared<domain::SinkDestroyConfig>();
     sinkDestroyConfig->setVersion(1);

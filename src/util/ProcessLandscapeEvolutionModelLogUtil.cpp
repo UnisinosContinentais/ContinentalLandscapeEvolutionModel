@@ -93,6 +93,12 @@ void ProcessLandscapeEvolutionModelLogUtil::writeGrainDispersionLog(QString titl
     datamanagement::RasterFile<short>::writeData(*grainDispersionLog, path);
 }
 
+void ProcessLandscapeEvolutionModelLogUtil::writeOnlyErosionDepositionLog(QString title, QString basePath, std::shared_ptr<datamanagement::Raster<double>> onlyErosionDepositionLog)
+{
+    QString path = basePath + title + ".asc";
+    datamanagement::RasterFile<double>::writeData(*onlyErosionDepositionLog, path);
+}
+
 }
 }
 }

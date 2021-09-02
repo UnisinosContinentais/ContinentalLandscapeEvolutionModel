@@ -50,6 +50,8 @@ public:
 
     static void writeGrainDispersionLog(QString title, QString basePath, std::shared_ptr<datamanagement::Raster<short>> grainDispersionLog);
 
+    static void writeOnlyErosionDepositionLog(QString title, QString basePath, std::shared_ptr<datamanagement::Raster<double>> onlyErosionDepositionLog);
+
 private:
     /// Singleton.
     ProcessLandscapeEvolutionModelLogUtil();

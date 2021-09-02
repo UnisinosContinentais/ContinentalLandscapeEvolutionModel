@@ -71,7 +71,7 @@ void ProcessLandscapeEvolutionModel::prepare(
     m_eroderAlgorithm.setDimensionLessPrecipitationRate(config->getDimensionLessPrecipitationRate());
     m_eroderAlgorithm.setDimensionLessDepositionCoeficient(config->getDimensionLessDepositionCoeficient());
     m_eroderAlgorithm.setFlowAccumulationLimit(m_flowAccumulationLimit);
-    m_eroderAlgorithm.setUplift(inputParameters->getUpliftRate());
+    //m_eroderAlgorithm.setUplift(inputParameters->getUpliftRate());
 
     auto grainDispersionConfig = m_inputParameters->getGrainDispersionConfig();
     m_grainDispersionService.setChannelDepthCParameter(grainDispersionConfig->getChannelDepthCParameter());
@@ -155,17 +155,22 @@ bool ProcessLandscapeEvolutionModel::iterate()
     m_eroderAlgorithm.setStreamDefinition(m_hydroToolsAlgorithm.getStreamDefinition());
     m_eroderAlgorithm.setFlowDirection(m_hydroToolsAlgorithm.getFlowDirection());
 
-    for (size_t erosionTimeStepCount = 0; erosionTimeStepCount < (m_difusionDeltaT / m_erosionDeltaT); ++erosionTimeStepCount)
+    //executa os métodos de erosão apenas se a erodibilidade for diferente de 0
+    if (!qFuzzyCompare(m_eroderAlgorithm.getErodibility(), 0.0))
     {
-        if (qFuzzyCompare(m_eroderAlgorithm.getDimensionLessDepositionCoeficient(), 0.0))
+        // esse for permite que a erosão possa ser executada mais vezes dentro do passso de tempo de difusão
+        for (size_t erosionTimeStepCount = 0; erosionTimeStepCount < (m_difusionDeltaT / m_erosionDeltaT); ++erosionTimeStepCount)
         {
-            m_eroderAlgorithm.executeWithImplicitErosion();
-            qDebug() << "executeWithImplicitErosion";
-        }
-        else
-        {
-            m_eroderAlgorithm.executeWithErosionDeposition();
-            qDebug() << "executeWithErosionDeposition";
+            if (qFuzzyCompare(m_eroderAlgorithm.getDimensionLessDepositionCoeficient(), 0.0))
+            {
+                m_eroderAlgorithm.executeWithImplicitErosion();
+                qDebug() << "executeWithImplicitErosion";
+            }
+            else
+            {
+                m_eroderAlgorithm.executeWithErosionDeposition();
+                qDebug() << "executeWithErosionDeposition";
+            }
         }
     }
 
@@ -186,6 +191,7 @@ bool ProcessLandscapeEvolutionModel::iterate()
     ++m_timeStepCount;
 
     bool isLast = m_timeStepCount == (m_simulateUntilTime / m_difusionDeltaT);
+
     if (isLast)
     {
         m_hydroToolsAlgorithm.execute();
@@ -197,9 +203,9 @@ bool ProcessLandscapeEvolutionModel::iterate()
 
         m_grainDispersion = m_grainDispersionService.getLithologyDefinitionRaster();
 
-        m_totalUplift = m_upliftAlgorithm.totalUplift();
+        //m_totalUplift = m_upliftAlgorithm.totalUplift();
 
-        calculateOnlyErosionDepositionGrid();
+        //calculateOnlyErosionDepositionGrid();
 
         if (m_enableSurfaceLog)
         {
@@ -215,6 +221,9 @@ bool ProcessLandscapeEvolutionModel::iterate()
             ProcessLandscapeEvolutionModelLogUtil::writeGrainDispersionLog("-06_Litologias_do_Grid_Final", basePath, m_grainDispersion);
             //7
             ProcessLandscapeEvolutionModelLogUtil::writeSurfaceLog( "-07_Grid_Final", basePath, m_surface);
+            //8
+            ProcessLandscapeEvolutionModelLogUtil::writeOnlyErosionDepositionLog( "-08_Grid_Apenas_da_Erosao_Deposicao", basePath, m_surface);
+
         }
     }
 
@@ -245,7 +254,11 @@ void ProcessLandscapeEvolutionModel::calculateOnlyErosionDepositionGrid()
             m_onlyErosionDepositionGrid->setData(i, j, m_surface->getData(i, j) - m_onlyErosionDepositionGrid->getData(i, j) - m_totalUplift->getData(i, j));
         }
     }
+}
 
+std::shared_ptr<datamanagement::Raster<double> > ProcessLandscapeEvolutionModel::getOnlyErosionDepositionGrid() const
+{
+    return m_onlyErosionDepositionGrid;
 }
 
 void ProcessLandscapeEvolutionModel::validateInterate()

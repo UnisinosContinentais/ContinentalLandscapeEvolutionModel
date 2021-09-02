@@ -39,8 +39,8 @@ public:
     double getTimeStep() const;
     void setTimeStep(double timeStep);
 
-    std::shared_ptr<datamanagement::Raster<double> > getUpliftRate() const;
-    void setUpliftRate(const std::shared_ptr<datamanagement::Raster<double> > &upliftRate);
+    std::shared_ptr<datamanagement::Raster<double>> getUpliftRate() const;
+    void setUpliftRate(const std::shared_ptr<datamanagement::Raster<double>> &upliftRate);
 
     size_t getNumberOfTimeSteps() const;
     void setNumberOfTimeSteps(const size_t &numberOfTimeSteps);

@@ -238,7 +238,8 @@ std::vector<std::vector<double>> EroderAlgorithmService::donorsSummation(std::ve
                 {
                     if (addUplift && m_uplift != nullptr)
                     {
-                        donorsSummation[directionFdrRow][directionFdrCol] += donorsSummation[row][col] + m_uplift->getData(row, col) * m_deltaTime;
+                        //donorsSummation[directionFdrRow][directionFdrCol] += donorsSummation[row][col] + m_uplift->getData(row, col) * m_deltaTime;
+                         donorsSummation[directionFdrRow][directionFdrCol] += donorsSummation[row][col];
                     }
                     else
                     {

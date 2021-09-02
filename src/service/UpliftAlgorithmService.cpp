@@ -88,8 +88,12 @@ void UpliftAlgorithmService::executeUplift()
 std::shared_ptr<datamanagement::Raster<double>>  UpliftAlgorithmService::totalUplift()
 {
 
-    std::shared_ptr<datamanagement::Raster<double>> totalUpliftResult;
-
+    std::shared_ptr<datamanagement::Raster<double>> totalUpliftResult = std::make_shared<datamanagement::Raster<double>>(m_initialGrid->getRows(),
+                                                                                                                         m_initialGrid->getCols(),
+                                                                                                                         m_initialGrid->getXOrigin(),
+                                                                                                                         m_initialGrid->getYOrigin(),
+                                                                                                                         m_initialGrid->getCellSize(),
+                                                                                                                         m_initialGrid->getNoDataValue());
     for (size_t i = 0; i < m_initialGrid->getRows(); ++i)
     {
         for(size_t j = 0; j < m_initialGrid->getCols(); ++j)
