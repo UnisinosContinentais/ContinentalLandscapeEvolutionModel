@@ -72,7 +72,7 @@ void UpliftAlgorithmService::setNumberOfTimeSteps(const size_t &numberOfTimeStep
     m_numberOfTimeSteps = numberOfTimeSteps;
 }
 
-void UpliftAlgorithmService::executeUplift()
+void UpliftAlgorithmService::applyUplift()
 {
 
     for (size_t i = 0; i < m_initialGrid->getRows(); ++i)

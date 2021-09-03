@@ -186,7 +186,7 @@ bool ProcessLandscapeEvolutionModel::iterate()
         qDebug() << "executeWithVariableBoundary";
     }
 
-    m_upliftAlgorithm.executeUplift();
+    m_upliftAlgorithm.applyUplift();
 
     ++m_timeStepCount;
 
@@ -203,9 +203,9 @@ bool ProcessLandscapeEvolutionModel::iterate()
 
         m_grainDispersion = m_grainDispersionService.getLithologyDefinitionRaster();
 
-        //m_totalUplift = m_upliftAlgorithm.totalUplift();
+        m_totalUplift = m_upliftAlgorithm.totalUplift();
 
-        //calculateOnlyErosionDepositionGrid();
+        calculateOnlyErosionDepositionGrid();
 
         if (m_enableSurfaceLog)
         {

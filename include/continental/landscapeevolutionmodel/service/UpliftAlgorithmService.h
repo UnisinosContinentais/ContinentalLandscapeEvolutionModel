@@ -45,7 +45,7 @@ public:
     size_t getNumberOfTimeSteps() const;
     void setNumberOfTimeSteps(const size_t &numberOfTimeSteps);
 
-    void executeUplift();
+    void applyUplift();
 
     std::shared_ptr<datamanagement::Raster<double>> totalUplift();
 

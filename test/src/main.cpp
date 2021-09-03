@@ -586,7 +586,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, ProcessLandscapeEvolutionModel)
     }
 }
 
-TEST(ContinentalLandscapeEvolutionModelTest, onlyErosionDeposionGridWithLemParametersZeroAndUpliftZero)
+TEST(ContinentalLandscapeEvolutionModelTest, testApplyUplift)
 {
     //este teste verifica se a solução do LEM com upliftRate = 0 é igual a solução do LEM com upliftRate != 0 - (upliftRate * passo_de_tempo).
     //o teste pode ser executado com parametros do LEM 0 e varios passos de tempo
@@ -688,20 +688,156 @@ TEST(ContinentalLandscapeEvolutionModelTest, onlyErosionDeposionGridWithLemParam
             EXPECT_LT(std::abs(value_0 - value_1), epsilon);
         }
     }
+}
+
+TEST(ContinentalLandscapeEvolutionModelTest, totalUplift)
+{
+    //este teste verifica se o uplift total implementado da UpliftAlgorithmService retorna o valor da expressão desejada
+    //m_upliftAlgorithm.getUpliftRate()->getData(row, col) * m_upliftAlgorithm.getTimeStep() * m_upliftAlgorithm.getNumberOfTimeSteps()
+
+    const QString basePath = "C:/Git/ContinentalLandscapeEvolutionModelMock/teste_unitario_uplift_params_zero/";
+
+    const QString initialGridFile = "jacui_tratado_reamostrado_2000.asc";
+    const QString initialGridPath = basePath + initialGridFile;
+    std::shared_ptr<Raster<double>> initialGrid = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(initialGridPath));
+
+    const QString upliftRateFile = "uplift_matrix_ones.asc";
+    const QString upliftRatePath = basePath + upliftRateFile;
+    std::shared_ptr<Raster<double>> upliftRate = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(upliftRatePath));
+
+
+    service::UpliftAlgorithmService m_upliftAlgorithm;
+
+    m_upliftAlgorithm.setInitialGrid(initialGrid);
+    m_upliftAlgorithm.setNumberOfTimeSteps(10000);
+    m_upliftAlgorithm.setTimeStep(1000);
+    m_upliftAlgorithm.setUpliftRate(upliftRate);
+
+    Raster<double> totaluplift = *m_upliftAlgorithm.totalUplift();
+
+    double epsilon = std::pow(10, -10);
+    for (size_t row = 0; row < initialGrid->getRows(); ++row)
+    {
+        for (size_t col = 0; col < initialGrid->getCols(); ++col)
+        {
+            double value = totaluplift.getData(row, col);
+
+            double expected = m_upliftAlgorithm.getUpliftRate()->getData(row, col) * m_upliftAlgorithm.getTimeStep() * m_upliftAlgorithm.getNumberOfTimeSteps();
+
+            EXPECT_LT(std::abs(value - expected), epsilon);
+        }
+    }
 
 
 }
 
-TEST(ContinentalLandscapeEvolutionModelTest, erosionDepositionGridTest)
+TEST(ContinentalLandscapeEvolutionModelTest, onlyErosionDepositionGridTest)
 {
+    //este teste verifica se o calculateOnlyErosionDepositionGrid possui o mesmo valor para duas simulações com uplift diferentes.
+    //este teste só pode considerar um passo de tempo, pois o uplift é aplicado em cada passo, oq afeta a solução do LEM em passos posteriores.
 
-    const QString basePath = "C:/Git/ContinentalLandscapeEvolutionModelMock/";
+    const QString basePath = "C:/Git/ContinentalLandscapeEvolutionModelMock/teste_unitario_uplift_params_zero/";
+
+    const QString initialGridFile = "jacui_tratado_reamostrado_2000.asc";
+    const QString initialGridPath = basePath + initialGridFile;
+    std::shared_ptr<Raster<double>> initialGrid_0 = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(initialGridPath));
+    std::shared_ptr<Raster<double>> initialGrid_1 = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(initialGridPath));
+
+
+    const QString upliftRateFile_0 = "uplift_matrix_zero.asc";
+    const QString upliftRatePath_0 = basePath + upliftRateFile_0;
+    std::shared_ptr<Raster<double>> upliftRate_0 = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(upliftRatePath_0));
+
+    const QString upliftRateFile_1 = "uplift_matrix_ones.asc";
+    const QString upliftRatePath_1 = basePath + upliftRateFile_1;
+    std::shared_ptr<Raster<double>> upliftRate_1 = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(upliftRatePath_1));
+
+    // Dados de Entrada da superficie inicial
+
+    auto sinkDestroyConfig = std::make_shared<SinkDestroyConfig>();
+    sinkDestroyConfig->setVersion(1);
+    sinkDestroyConfig->setMaxOpenList(1000000);
+    sinkDestroyConfig->setMaxClosedList(500000);
+    sinkDestroyConfig->setCostFunctionWeight(2.0);
+    sinkDestroyConfig->setProcessingAlgorithm(HeuristicSinkRemovalProcessingMode::MHS);
+
+    auto streamDefinitionConfig = std::make_shared<StreamDefinitionConfig>();
+    streamDefinitionConfig->setThresholdType(StreamDefinitionThresholdType::NumberOfCells);
+    streamDefinitionConfig->setThresholdValue(2.0);
+
+    auto simulationLandscapeEvolutionModelConfig = std::make_shared<SimulationLandscapeEvolutionModelConfig>();
+    simulationLandscapeEvolutionModelConfig->setErodibility(0.0001);
+    simulationLandscapeEvolutionModelConfig->setDiffusivity(0.01);
+    simulationLandscapeEvolutionModelConfig->setConcavityIndex(0.4);
+    simulationLandscapeEvolutionModelConfig->setValueN(0.0);
+    simulationLandscapeEvolutionModelConfig->setDimensionLessPrecipitationRate(0);
+    simulationLandscapeEvolutionModelConfig->setDimensionLessDepositionCoeficient(0);
+    simulationLandscapeEvolutionModelConfig->setEastBoundaryFactor(0);
+    simulationLandscapeEvolutionModelConfig->setWestBoundaryFactor(0);
+    simulationLandscapeEvolutionModelConfig->setNorthBoundaryFactor(0);
+    simulationLandscapeEvolutionModelConfig->setSouthBoundaryFactor(0);
+    simulationLandscapeEvolutionModelConfig->useDrainageNetworkAmountLimit(5);
+
+    auto grainDispersionConfig = std::make_shared<GrainDispersionConfig>();
+    grainDispersionConfig->setDischargeEParameter(LandscapeEvolutionModelConstant::DischargeEParameter);
+    grainDispersionConfig->setDischargeKParameter(LandscapeEvolutionModelConstant::DischargeKParameter);
+    grainDispersionConfig->setChannelDepthCParameter(LandscapeEvolutionModelConstant::ChannelDepthCParameter);
+    grainDispersionConfig->setChannelDepthFParameter(LandscapeEvolutionModelConstant::ChannelDepthFParameter);
+    grainDispersionConfig->setGrainSizeWaterDensity(LandscapeEvolutionModelConstant::GrainSizeWaterDensity);
+    grainDispersionConfig->setGrainSizeSedimentDensity(LandscapeEvolutionModelConstant::GrainSizeSedimentDensity);
+    grainDispersionConfig->setGrainSizeShieldsNumber(LandscapeEvolutionModelConstant::GrainSizeShieldsNumber);
+
+    //Parametros para execução
+    auto lemInput = std::make_shared<LandscapeEvolutionModelInput>();
+    lemInput->setSinkDestroyConfig(sinkDestroyConfig);
+    lemInput->setStreamDefinitionConfig(streamDefinitionConfig);
+    lemInput->setSimulationLandscapeEvolutionModelConfig(simulationLandscapeEvolutionModelConfig);
+    lemInput->setSimulateUntilTime(1000);
+    lemInput->setGrainDispersionConfig(grainDispersionConfig);
+
+    lemInput->setUpliftRate(upliftRate_0);
+
+    //Executa o lEM com iteração
+    ProcessLandscapeEvolutionModel processLem_0;
+    processLem_0.prepare(initialGrid_0, lemInput);
+
+    bool result = true;
+    do
+    {
+        result = processLem_0.iterate();
+    }
+    while(result == true);
+
+    lemInput->setUpliftRate(upliftRate_1);
+
+    //Executa o lEM com iteração
+    ProcessLandscapeEvolutionModel processLem_1;
+    processLem_1.prepare(initialGrid_1, lemInput);
+
+    result = true;
+    do
+    {
+        result = processLem_1.iterate();
+    }
+    while(result == true);
+
+    double epsilon = std::pow(10, -10);
+    for (size_t row = 0; row < initialGrid_1->getRows(); ++row)
+    {
+        for (size_t col = 0; col < initialGrid_1->getCols(); ++col)
+        {
+            auto value_0 = processLem_0.getOnlyErosionDepositionGrid()->getData(row, col);
+            auto value_1 = processLem_0.getOnlyErosionDepositionGrid()->getData(row, col);
+
+            EXPECT_LT(std::abs(value_0 - value_1), epsilon);
+        }
+    }
 }
 
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    ::testing::GTEST_FLAG(filter) = "*onlyErosionDeposionGridWithLemParametersZeroAndUpliftZero*";
+    ::testing::GTEST_FLAG(filter) = "*onlyErosionDepositionGridTest*";
     return RUN_ALL_TESTS();
 }
 
