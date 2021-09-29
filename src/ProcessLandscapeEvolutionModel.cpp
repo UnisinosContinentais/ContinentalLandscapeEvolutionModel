@@ -97,12 +97,10 @@ void ProcessLandscapeEvolutionModel::prepare(
             throw std::runtime_error("The limit of the drainage networks has not been defined.");
     }
 
-    // ???
     m_timeStepCount = 0;
 
     if (m_enableSurfaceLog)
     {
-        m_logSurfacePath = "C:/Users/ADM_LOCAL/Desktop/teste_logs"; //precisa ver: esse cara só fica liberado para o teste
 
         QString basePath = m_logSurfacePath + "/" + "ContinentalLEM_" + QString::number(m_logAge) + "_" + QString::number(m_logNode);
         QString pathParameters = basePath + "-01_Parameters.txt";
