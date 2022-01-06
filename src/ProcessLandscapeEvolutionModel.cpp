@@ -254,6 +254,11 @@ void ProcessLandscapeEvolutionModel::calculateOnlyErosionDepositionGrid()
     }
 }
 
+std::shared_ptr<datamanagement::Raster<double> > ProcessLandscapeEvolutionModel::getTotalUplift() const
+{
+    return m_totalUplift;
+}
+
 std::shared_ptr<datamanagement::Raster<double> > ProcessLandscapeEvolutionModel::getOnlyErosionDepositionGrid() const
 {
     return m_onlyErosionDepositionGrid;

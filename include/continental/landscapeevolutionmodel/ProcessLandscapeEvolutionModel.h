@@ -49,6 +49,8 @@ public:
 
     std::shared_ptr<datamanagement::Raster<double>> getOnlyErosionDepositionGrid() const;
 
+    std::shared_ptr<datamanagement::Raster<double> > getTotalUplift() const;
+
 private :
 
     void calculateOnlyErosionDepositionGrid();
