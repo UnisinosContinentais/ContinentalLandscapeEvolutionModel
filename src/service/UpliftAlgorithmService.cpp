@@ -75,11 +75,14 @@ void UpliftAlgorithmService::setNumberOfTimeSteps(const size_t &numberOfTimeStep
 void UpliftAlgorithmService::applyUplift()
 {
 
-    for (size_t i = 0; i < m_initialGrid->getRows(); ++i)
+    if (m_upliftRate != nullptr)
     {
-        for(size_t j = 0; j < m_initialGrid->getCols(); ++j)
+        for (size_t i = 0; i < m_initialGrid->getRows(); ++i)
         {
-            m_initialGrid->setData(i, j, m_upliftRate->getData(i, j) * m_timeStep + m_initialGrid->getData(i, j));
+            for(size_t j = 0; j < m_initialGrid->getCols(); ++j)
+            {
+                m_initialGrid->setData(i, j, m_upliftRate->getData(i, j) * m_timeStep + m_initialGrid->getData(i, j));
+            }
         }
     }
 
@@ -94,14 +97,17 @@ std::shared_ptr<datamanagement::Raster<double>>  UpliftAlgorithmService::totalUp
                                                                                                                          m_initialGrid->getYOrigin(),
                                                                                                                          m_initialGrid->getCellSize(),
                                                                                                                          m_initialGrid->getNoDataValue());
-    for (size_t i = 0; i < m_initialGrid->getRows(); ++i)
+
+    if (m_upliftRate != nullptr)
     {
-        for(size_t j = 0; j < m_initialGrid->getCols(); ++j)
+        for (size_t i = 0; i < m_initialGrid->getRows(); ++i)
         {
-            totalUpliftResult->setData(i, j, m_upliftRate->getData(i, j) * m_timeStep * m_numberOfTimeSteps);
+            for(size_t j = 0; j < m_initialGrid->getCols(); ++j)
+            {
+                totalUpliftResult->setData(i, j, m_upliftRate->getData(i, j) * m_timeStep * m_numberOfTimeSteps);
+            }
         }
     }
-
     return totalUpliftResult;
 }
 
