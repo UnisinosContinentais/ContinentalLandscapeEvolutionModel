@@ -34,7 +34,7 @@ public:
     /// Função que executa a preparação da topografia para execução do processo principal.
     void prepareDem();
 
-    /// Função que executa o algorítimo de erodibilidade.
+    /// Função que executa o hydrotools.
     void execute();
 
     /// Função de retorno dos valores de Direção do Fluxo.
