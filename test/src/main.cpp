@@ -521,6 +521,12 @@ TEST(ContinentalLandscapeEvolutionModelTest, ProcessLandscapeEvolutionModel)
     std::shared_ptr<Raster<double>> initialGrid = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(initialGridPath));
     Raster<double> resultCompare = RasterFile<double>::loadRasterByFile(resultComparePath);
 
+
+    // lembrar de selecionar um arquivo no formato do filtro que separa as regiões subaérea e subaquosa.
+    // Neste formato, os valores de 0 indicam região subaquosa e os valores de 1indicam regiões subaérea.
+    std::shared_ptr<Raster<short>> underwaterSeparatedGrid = std::make_shared<Raster<short>>(RasterFile<short>::loadRasterByFile(initialGridPath));
+
+
     auto sinkDestroyConfig = std::make_shared<SinkDestroyConfig>();
     sinkDestroyConfig->setVersion(1);
     sinkDestroyConfig->setMaxOpenList(1000000);
@@ -564,7 +570,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, ProcessLandscapeEvolutionModel)
 
     //Executa o lEM com iteração
     ProcessLandscapeEvolutionModel processLem;
-    processLem.prepare(initialGrid, lemInput);
+    processLem.prepare(initialGrid, lemInput, underwaterSeparatedGrid);
 
     bool result = true;
     do
@@ -608,6 +614,11 @@ TEST(ContinentalLandscapeEvolutionModelTest, testApplyUplift)
     const QString upliftRateFile_1 = "uplift_matrix_ones.asc";
     const QString upliftRatePath_1 = basePath + upliftRateFile_1;
     std::shared_ptr<Raster<double>> upliftRate_1 = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(upliftRatePath_1));
+
+
+    // lembrar de selecionar um arquivo no formato do filtro que separa as regiões subaérea e subaquosa.
+    // Neste formato, os valores de 0 indicam região subaquosa e os valores de 1indicam regiões subaérea.
+    std::shared_ptr<Raster<short>> underwaterSeparatedGrid = std::make_shared<Raster<short>>(RasterFile<short>::loadRasterByFile(initialGridPath));
 
     // Dados de Entrada da superficie inicial
 
@@ -656,7 +667,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, testApplyUplift)
 
     //Executa o lEM com iteração
     ProcessLandscapeEvolutionModel processLem_0;
-    processLem_0.prepare(initialGrid_0, lemInput);
+    processLem_0.prepare(initialGrid_0, lemInput, underwaterSeparatedGrid);
 
     bool result = true;
     do
@@ -669,7 +680,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, testApplyUplift)
 
     //Executa o lEM com iteração
     ProcessLandscapeEvolutionModel processLem_1;
-    processLem_1.prepare(initialGrid_1, lemInput);
+    processLem_1.prepare(initialGrid_1, lemInput, underwaterSeparatedGrid);
 
     result = true;
     do
@@ -752,6 +763,11 @@ TEST(ContinentalLandscapeEvolutionModelTest, onlyErosionDepositionGridTest)
     const QString upliftRatePath_1 = basePath + upliftRateFile_1;
     std::shared_ptr<Raster<double>> upliftRate_1 = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(upliftRatePath_1));
 
+
+    // lembrar de selecionar um arquivo no formato do filtro que separa as regiões subaérea e subaquosa.
+    // Neste formato, os valores de 0 indicam região subaquosa e os valores de 1indicam regiões subaérea.
+    std::shared_ptr<Raster<short>> underwaterSeparatedGrid = std::make_shared<Raster<short>>(RasterFile<short>::loadRasterByFile(initialGridPath));
+
     // Dados de Entrada da superficie inicial
 
     auto sinkDestroyConfig = std::make_shared<SinkDestroyConfig>();
@@ -799,7 +815,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, onlyErosionDepositionGridTest)
 
     //Executa o lEM com iteração
     ProcessLandscapeEvolutionModel processLem_0;
-    processLem_0.prepare(initialGrid_0, lemInput);
+    processLem_0.prepare(initialGrid_0, lemInput, underwaterSeparatedGrid);
 
     bool result = true;
     do
@@ -812,7 +828,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, onlyErosionDepositionGridTest)
 
     //Executa o lEM com iteração
     ProcessLandscapeEvolutionModel processLem_1;
-    processLem_1.prepare(initialGrid_1, lemInput);
+    processLem_1.prepare(initialGrid_1, lemInput, underwaterSeparatedGrid);
 
     result = true;
     do

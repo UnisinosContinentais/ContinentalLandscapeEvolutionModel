@@ -30,7 +30,8 @@ public:
     /// @param initialGrid Objeto do tipo Raster<float> com os valores de elevação topografica da simulação atual.
     /// @param inputParameters Objeto do tipo LandscapeEvolutionModelInput com os valores de parâmetros para execução do algoritimo do LEM.
     void prepare(std::shared_ptr<datamanagement::Raster<double>> initialGrid,
-                  std::shared_ptr<dto::LandscapeEvolutionModelInput> inputParameters
+                    std::shared_ptr<dto::LandscapeEvolutionModelInput> inputParameters,
+                    std::shared_ptr<datamanagement::Raster<short>> underwaterSeparatedGrid
                 );
 
     /// Função que executa o proximo passo de tempo.
@@ -70,6 +71,8 @@ private :
     std::shared_ptr<datamanagement::Raster<double>> m_surface;
     std::shared_ptr<datamanagement::Raster<short>> m_grainDispersion;
     std::shared_ptr<dto::LandscapeEvolutionModelInput> m_inputParameters;
+    std::shared_ptr<datamanagement::Raster<short>> m_underwaterSeparatedGrid;
+
     service::HydroToolsAlgorithmService m_hydroToolsAlgorithm;
     service::DifusionAlgorithmService m_difusionAlgorithm;
     service::EroderAlgorithmService m_eroderAlgorithm;

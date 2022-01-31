@@ -47,6 +47,13 @@ int main(int argc, char **argv)
     const QString upliftRatePath = basePath + upliftRatefile;
     std::shared_ptr<Raster<double>> upliftRate = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(upliftRatePath));
 
+    // lembrar de selecionar um arquivo no formato do filtro que separa as regiões subaérea e subaquosa.
+    // Neste formato, os valores de 0 indicam região subaquosa e os valores de 1indicam regiões subaérea.
+    std::shared_ptr<Raster<short>> underwaterSeparatedGrid = std::make_shared<Raster<short>>(RasterFile<short>::loadRasterByFile(upliftRatePath));
+
+
+
+
     QString saveDemFile = "C:/Git/ContinentalLandscapeEvolutionModelMock/teste_unitario_uplift_params_zero/saved.asc";
 
     auto sinkDestroyConfig = std::make_shared<domain::SinkDestroyConfig>();
@@ -102,7 +109,7 @@ int main(int argc, char **argv)
 
     //Executa o lEM com iteração
     ProcessLandscapeEvolutionModel processLem;
-    processLem.prepare(initialGrid, lemInput);
+    processLem.prepare(initialGrid, lemInput, underwaterSeparatedGrid);
 
     bool result = true;
     do

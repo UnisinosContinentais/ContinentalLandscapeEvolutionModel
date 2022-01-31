@@ -30,7 +30,8 @@ namespace landscapeevolutionmodel {
 
 void ProcessLandscapeEvolutionModel::prepare(
         std::shared_ptr<datamanagement::Raster<double>> surface,
-        std::shared_ptr<LandscapeEvolutionModelInput> inputParameters
+        std::shared_ptr<LandscapeEvolutionModelInput> inputParameters,
+        std::shared_ptr<datamanagement::Raster<short>> underwaterSeparatedGrid
     )
 
 {
@@ -45,6 +46,7 @@ void ProcessLandscapeEvolutionModel::prepare(
 
     m_surface = surface;
     m_inputParameters = inputParameters;
+    m_underwaterSeparatedGrid = underwaterSeparatedGrid;
 
     //este grid é inicializado como uma cópia do grid que vai processar o LEM
     //assim se subtrair esta copia e o uplift do resultado do LEM, tem-se o grid de erosão e deposição
@@ -52,7 +54,7 @@ void ProcessLandscapeEvolutionModel::prepare(
 
     prepareFlowAccumulationLimit(); // método desta classe que calcula o flowAccLimit
 
-    m_hydroToolsAlgorithm = HydroToolsAlgorithmService(m_surface, m_inputParameters);
+    m_hydroToolsAlgorithm = HydroToolsAlgorithmService(m_surface, m_inputParameters, m_underwaterSeparatedGrid);
     m_difusionAlgorithm = DifusionAlgorithmService(m_surface, config->getDiffusivity(), m_difusionDeltaT);
 
     m_difusionAlgorithm.allocateTopography(); //aloca o espaço de m_surface em m_T da classe difusionAlgorithm
@@ -245,11 +247,27 @@ size_t ProcessLandscapeEvolutionModel::getSimulationTimeStep()
 
 void ProcessLandscapeEvolutionModel::calculateOnlyErosionDepositionGrid()
 {
-    for(size_t i = 0; i < m_onlyErosionDepositionGrid->getRows(); ++i)
+
+    size_t rows = m_onlyErosionDepositionGrid->getRows();
+    size_t cols = m_onlyErosionDepositionGrid->getCols();
+
+
+    for(size_t i = 0; i < rows; ++i)
     {
-        for(size_t j = 0; j < m_onlyErosionDepositionGrid->getCols(); ++j)
+        for(size_t j = 0; j < cols; ++j)
         {
             m_onlyErosionDepositionGrid->setData(i, j, m_surface->getData(i, j) - m_onlyErosionDepositionGrid->getData(i, j) - m_totalUplift->getData(i, j));
+        }
+    }
+
+    for(size_t i = 0; i < rows; ++i)
+    {
+        for(size_t j = 0; j < cols; ++j)
+        {
+            if (m_underwaterSeparatedGrid->getData(static_cast<size_t>(i), static_cast<size_t>(j)) < 1 && 0 < i < rows-1 && 0 < j < cols-1)
+            {
+                m_onlyErosionDepositionGrid->setData(static_cast<size_t>(i), static_cast<size_t>(j), 0);
+            }
         }
     }
 }

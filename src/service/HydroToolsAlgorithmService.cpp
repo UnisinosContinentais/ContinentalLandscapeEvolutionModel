@@ -33,11 +33,14 @@ HydroToolsAlgorithmService::HydroToolsAlgorithmService()
 
 }
 
-HydroToolsAlgorithmService::HydroToolsAlgorithmService(std::shared_ptr<Raster<double>> initialGrid,
-                                         std::shared_ptr<LandscapeEvolutionModelInput> inputParameters) :
+HydroToolsAlgorithmService::HydroToolsAlgorithmService(std::shared_ptr<continental::datamanagement::Raster<double>> initialGrid,
+                                                       std::shared_ptr<continental::landscapeevolutionmodel::dto::LandscapeEvolutionModelInput> inputParameters,
+                                                       std::shared_ptr<continental::datamanagement::Raster<short>> underwaterSeparatedGrid) :
 m_initialGrid(initialGrid),
-m_inputParameters(inputParameters)
+m_inputParameters(inputParameters),
+m_underwaterSeparatedGrid(underwaterSeparatedGrid)
 {
+
 }
 
 const std::shared_ptr<Raster<short>> HydroToolsAlgorithmService::getFlowDirection() const
@@ -64,6 +67,12 @@ const std::shared_ptr<Raster<short>> HydroToolsAlgorithmService::getCatchment() 
 {
 	return m_catchment;
 }
+
+std::shared_ptr<continental::datamanagement::Raster<short> > HydroToolsAlgorithmService::getUnderwaterSeparatedGrid() const
+{
+    return m_underwaterSeparatedGrid;
+}
+
 
 void HydroToolsAlgorithmService::prepareDem()
 {
@@ -101,7 +110,8 @@ void HydroToolsAlgorithmService::execute()
     //3º Calcula as direções do FLuxo
 	FlowAccumulation flowAccumulationCalculator;
     flowAccumulationCalculator.setFlowDirection(m_flowDirection);
-	flowAccumulationCalculator.runoff();
+    flowAccumulationCalculator.setUnderWaterFilter(m_underwaterSeparatedGrid);
+    flowAccumulationCalculator.runoffUnderWater();
     m_flowAccumulation = flowAccumulationCalculator.getFlowAccumulation();
 
     // 4º Desenha os rios
