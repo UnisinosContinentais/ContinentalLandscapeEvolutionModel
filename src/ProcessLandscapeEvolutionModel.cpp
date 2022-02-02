@@ -44,6 +44,8 @@ void ProcessLandscapeEvolutionModel::prepare(
     m_enableSurfaceLog = inputParameters->getEnableSurfaceLog();
     m_logSurfacePath = inputParameters->getPathSurfaceLog();
 
+
+    //m_surface recebe a superfície inicial e os processo do LEM serão processados em sobre dela
     m_surface = surface;
     m_inputParameters = inputParameters;
     m_underwaterSeparatedGrid = underwaterSeparatedGrid;
@@ -51,6 +53,15 @@ void ProcessLandscapeEvolutionModel::prepare(
     //este grid é inicializado como uma cópia do grid que vai processar o LEM
     //assim se subtrair esta copia e o uplift do resultado do LEM, tem-se o grid de erosão e deposição
     m_onlyErosionDepositionGrid = std::make_shared<datamanagement::Raster<double>>(*m_surface);
+
+    //é a cópia da superfície de entrada
+    m_initialSurface = std::make_shared<datamanagement::Raster<double>>(*m_surface);
+
+
+    //é o dado necessário para plotar a superfície transiente no stratBR
+    m_transientSurfaceWithUnderwaterFilter = std::make_shared<datamanagement::Raster<double>>(*m_surface);
+
+
 
     prepareFlowAccumulationLimit(); // método desta classe que calcula o flowAccLimit
 
@@ -270,6 +281,34 @@ void ProcessLandscapeEvolutionModel::calculateOnlyErosionDepositionGrid()
             }
         }
     }
+}
+
+std::shared_ptr<datamanagement::Raster<double> > ProcessLandscapeEvolutionModel::getTransientSurfaceWithUnderwaterFilter() const
+{
+
+    size_t rows = m_onlyErosionDepositionGrid->getRows();
+    size_t cols = m_onlyErosionDepositionGrid->getCols();
+
+    for(size_t i = 0; i < rows; ++i)
+    {
+        for(size_t j = 0; j < cols; ++j)
+        {
+            m_transientSurfaceWithUnderwaterFilter->setData(i, j, m_surface->getData(i, j));
+        }
+    }
+
+    for(size_t i = 0; i < rows; ++i)
+    {
+        for(size_t j = 0; j < cols; ++j)
+        {
+            if (m_underwaterSeparatedGrid->getData(static_cast<size_t>(i), static_cast<size_t>(j)) < 1 && 0 < i < rows-1 && 0 < j < cols-1)
+            {
+                m_transientSurfaceWithUnderwaterFilter->setData(static_cast<size_t>(i), static_cast<size_t>(j), m_initialSurface->getData(static_cast<size_t>(i), static_cast<size_t>(j)));
+            }
+        }
+    }
+
+    return m_transientSurfaceWithUnderwaterFilter;
 }
 
 std::shared_ptr<datamanagement::Raster<double> > ProcessLandscapeEvolutionModel::getTotalUplift() const

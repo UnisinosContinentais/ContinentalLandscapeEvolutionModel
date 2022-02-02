@@ -37,24 +37,32 @@ int main(int argc, char **argv)
 
     // Dados de Entrada da superficie inicial
 
-    const QString basePath = "C:/Git/ContinentalLandscapeEvolutionModelMock/teste_unitario_uplift_params_zero/";
+    const QString basePath = "C:/Git-vs2019/ContinentalLandscapeEvolutionModelMock/";
 
-    const QString initialGridFileAfterSinkAndDestroy = "sup_inicial_ajustada_synk_destroy.asc";
+
+
+    const QString initialGridFileAfterSinkAndDestroy = "bacia_piratini_1000.asc";
     const QString initialGridPath = basePath + initialGridFileAfterSinkAndDestroy;
+
+    std::cout << initialGridPath.toStdString() << std::endl;
     std::shared_ptr<Raster<double>> initialGrid = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(initialGridPath));
 
-    const QString upliftRatefile = "uplift_matrix_zero.asc";
+
+
+    const QString upliftRatefile = "bacia_piratini_1000_uplift.asc";
     const QString upliftRatePath = basePath + upliftRatefile;
     std::shared_ptr<Raster<double>> upliftRate = std::make_shared<Raster<double>>(RasterFile<double>::loadRasterByFile(upliftRatePath));
 
     // lembrar de selecionar um arquivo no formato do filtro que separa as regiões subaérea e subaquosa.
     // Neste formato, os valores de 0 indicam região subaquosa e os valores de 1indicam regiões subaérea.
-    std::shared_ptr<Raster<short>> underwaterSeparatedGrid = std::make_shared<Raster<short>>(RasterFile<short>::loadRasterByFile(upliftRatePath));
+    const QString underwaterSeparatedFile = "bacia_piratini_1000_uplift.asc";
+    const QString underwaterSeparatedPath = basePath + underwaterSeparatedFile;
+    std::shared_ptr<Raster<short>> underwaterSeparatedGrid = std::make_shared<Raster<short>>(RasterFile<short>::loadRasterByFile(underwaterSeparatedPath));
 
 
+    QString saveDem = "saved_teste.asc";
+    QString saveDemFile = basePath + saveDem;
 
-
-    QString saveDemFile = "C:/Git/ContinentalLandscapeEvolutionModelMock/teste_unitario_uplift_params_zero/saved.asc";
 
     auto sinkDestroyConfig = std::make_shared<domain::SinkDestroyConfig>();
     sinkDestroyConfig->setVersion(1);
@@ -97,7 +105,8 @@ int main(int argc, char **argv)
     lemInput->setSimulationLandscapeEvolutionModelConfig(simulationLandscapeEvolutionModelConfig);
     lemInput->setSimulateUntilTime(LandscapeEvolutionModelConstant::SimulateUntilTime);
     lemInput->setGrainDispersionConfig(grainDispersionConfig);
-    lemInput->setEnableSurfaceLog(LandscapeEvolutionModelConstant::EnableLogs);
+    //lemInput->setEnableSurfaceLog(LandscapeEvolutionModelConstant::EnableLogs);
+    lemInput->setEnableSurfaceLog(false);
 
     lemInput->setUpliftRate(std::make_shared<Raster<double>>
                             (initialGrid->getRows(),
@@ -107,9 +116,14 @@ int main(int argc, char **argv)
                              initialGrid->getCellSize(),
                              initialGrid->getNoDataValue())); //só pra testar: colocar um if no proceess para tratar se tem uplift
 
+    std::cout << "CONSTRUTOR DO PROCESS LEM" << std::endl;
+
+
     //Executa o lEM com iteração
     ProcessLandscapeEvolutionModel processLem;
     processLem.prepare(initialGrid, lemInput, underwaterSeparatedGrid);
+
+    std::cout << " SAI CONSTRUTOR DO PROCESS LEM" << std::endl;
 
     bool result = true;
     do
@@ -122,6 +136,10 @@ int main(int argc, char **argv)
     RasterFile<double>::writeData(*initialGrid, saveDemFile, 14);
 
     std::cout << "ENCERROU O PROCESSO DO LEM" << std::endl;
+
+    std::cout << "EXECUTA O MÉTODO" << std::endl;
+    processLem.getTransientSurfaceWithUnderwaterFilter();
+    std::cout << "EXECUTA O MÉTODO" << std::endl;
 
     return 0;
 

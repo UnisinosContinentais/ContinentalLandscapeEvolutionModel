@@ -52,6 +52,8 @@ public:
 
     std::shared_ptr<datamanagement::Raster<double> > getTotalUplift() const;
 
+    std::shared_ptr<datamanagement::Raster<double> > getTransientSurfaceWithUnderwaterFilter() const;
+
 private :
 
     void calculateOnlyErosionDepositionGrid();
@@ -69,6 +71,8 @@ private :
     int m_logNode = 0;
 
     std::shared_ptr<datamanagement::Raster<double>> m_surface;
+
+
     std::shared_ptr<datamanagement::Raster<short>> m_grainDispersion;
     std::shared_ptr<dto::LandscapeEvolutionModelInput> m_inputParameters;
     std::shared_ptr<datamanagement::Raster<short>> m_underwaterSeparatedGrid;
@@ -83,6 +87,13 @@ private :
 
     //nomear para ser o grid que possui as erosões e deposições
     std::shared_ptr<datamanagement::Raster<double>> m_onlyErosionDepositionGrid;
+
+
+    // esse dado é utilizado apenas para filtrar a superfície transitória no plugin
+    std::shared_ptr<datamanagement::Raster<double>> m_initialSurface;
+    std::shared_ptr<datamanagement::Raster<double>> m_transientSurfaceWithUnderwaterFilter;
+
+
 
     /// Função que valida se a interação é valida.
     void validateInterate();
