@@ -303,7 +303,7 @@ std::shared_ptr<datamanagement::Raster<double> > ProcessLandscapeEvolutionModel:
         {
             if (m_underwaterSeparatedGrid->getData(static_cast<size_t>(i), static_cast<size_t>(j)) < 1 && 0 < i < rows-1 && 0 < j < cols-1)
             {
-                m_transientSurfaceWithUnderwaterFilter->setData(static_cast<size_t>(i), static_cast<size_t>(j), m_initialSurface->getData(static_cast<size_t>(i), static_cast<size_t>(j)));
+                //m_transientSurfaceWithUnderwaterFilter->setData(static_cast<size_t>(i), static_cast<size_t>(j), m_initialSurface->getData(static_cast<size_t>(i), static_cast<size_t>(j)));
             }
         }
     }
