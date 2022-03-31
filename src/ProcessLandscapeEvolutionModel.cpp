@@ -230,10 +230,13 @@ bool ProcessLandscapeEvolutionModel::iterate()
             ProcessLandscapeEvolutionModelLogUtil::writeD50Log("-05_D50_do_Grid_Inicial", basePath, m_grainDispersionService.getD50());
             //6
             ProcessLandscapeEvolutionModelLogUtil::writeGrainDispersionLog("-06_Litologias_do_Grid_Final", basePath, m_grainDispersion);
-            //7
-            ProcessLandscapeEvolutionModelLogUtil::writeSurfaceLog( "-07_Grid_Final", basePath, m_surface);
-            //8
-            ProcessLandscapeEvolutionModelLogUtil::writeOnlyErosionDepositionLog( "-08_Grid_Apenas_da_Erosao_Deposicao", basePath, m_surface);
+            ProcessLandscapeEvolutionModelLogUtil::writeSurfaceLog( "-7_Grid_Final", basePath, m_surface);
+
+            ProcessLandscapeEvolutionModelLogUtil::writeOnlyErosionDepositionLog( "-DEBUG_Grid_surface", basePath, m_surface);
+            ProcessLandscapeEvolutionModelLogUtil::writeOnlyErosionDepositionLog( "-DEBUG_Grid_Apenas_da_Erosao_Deposicao", basePath, m_onlyErosionDepositionGrid);
+            ProcessLandscapeEvolutionModelLogUtil::writeSurfaceLog( "-DEBUG_Total_Uplift", basePath, m_totalUplift);
+            ProcessLandscapeEvolutionModelLogUtil::writeSurfaceLog( "-DEBUG_Transient_Surface", basePath, m_transientSurfaceWithUnderwaterFilter);
+
 
         }
     }
