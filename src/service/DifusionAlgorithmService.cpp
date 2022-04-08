@@ -343,8 +343,8 @@ void DifusionAlgorithmService::executeWithVariableBoundary(
 			}
 		}
 
-		//ofstream myfile;
-		//myfile.open("saidaas.txt");
+        //ofstream myfile;
+        //myfile.open("saidaas.txt");
 		if (it == m_numberOfIterations - 1)
 		{
 			for (size_t i = 0, iAux = m_numberOfRows - 1; i < m_numberOfRows; ++i, --iAux)
@@ -357,13 +357,13 @@ void DifusionAlgorithmService::executeWithVariableBoundary(
 						m_T[i][j][it][t] = m_T[i][j][0][0];
 					}
 
-					//myfile <<setprecision(12) <<m_T[i][j][it][t] << " ";
+                    //myfile <<setprecision(12) <<m_T[i][j][it][t] << " ";
 					m_initialGrid->setData(iAux, j, static_cast<float>(m_T[i][j][it][t]));
 
 					m_T[i][j][0][t] = m_T[i][j][it][t];
 					m_T[i][j][0][t - 1] = m_T[i][j][0][t];
 				}
-				//myfile << "\n";
+                //myfile << "\n";
 			}
 		}
 	}
