@@ -193,13 +193,13 @@ bool ProcessLandscapeEvolutionModel::iterate()
         {
             if (qFuzzyCompare(m_eroderAlgorithm.getDimensionLessDepositionCoeficient(), 0.0))
             {
-                m_eroderAlgorithm.executeWithImplicitErosion();
-                qDebug() << "executeWithImplicitErosion";
+                //m_eroderAlgorithm.executeWithImplicitErosion();
+                //qDebug() << "executeWithImplicitErosion";
             }
             else
             {
                 m_eroderAlgorithm.executeWithErosionDeposition();
-                qDebug() << "executeWithErosionDeposition";
+                //qDebug() << "executeWithErosionDeposition";
             }
         }
     }
@@ -212,12 +212,12 @@ bool ProcessLandscapeEvolutionModel::iterate()
     // não é dentro do for ?
     if (!qFuzzyCompare(m_difusionAlgorithm.getDiffusivity(), 0.0))
     {
-        m_difusionAlgorithm.executeWithVariableBoundary(
+        /*m_difusionAlgorithm.executeWithVariableBoundary(
                 m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getEastBoundaryFactor(),
                 m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getWestBoundaryFactor(),
                 m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getSouthBoundaryFactor(),
                 m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getNorthBoundaryFactor()
-            );
+            );*/
         qDebug() << "executeWithVariableBoundary";
     }
 
@@ -260,7 +260,7 @@ bool ProcessLandscapeEvolutionModel::iterate()
 
         m_totalUplift = m_upliftAlgorithm.totalUplift();
 
-        calculateOnlyErosionDepositionGrid();
+        //calculateOnlyErosionDepositionGrid();
 
         if (m_enableSurfaceLog)
         {
