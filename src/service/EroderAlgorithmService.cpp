@@ -460,7 +460,7 @@ void EroderAlgorithmService::executeWithErosionDeposition()
 
                 const double f = (m_erodibility * std::pow(m_dimensionLessPrecipitationRate, m_concavityIndex) * std::pow(facValue * m_cellSize * m_cellSize, m_concavityIndex) * m_deltaTime) / m_cellSize;
 
-                m_raster->setData(row, col, (bi - (m_dimensionLessDepositionCoeficient / (m_dimensionLessPrecipitationRate * facValue)) * futureSummation[row][col] + f * m_raster->getData(fdrRow, fdrCol)) / (1 + f));
+                m_raster->setData(row, col, (bi - (m_dimensionLessDepositionCoeficient / (m_dimensionLessPrecipitationRate * facValue)) * futureSummation[row][col] + f * m_raster->getData(fdrRow, fdrCol)) / (1.0 + f));
             }
         }
     }

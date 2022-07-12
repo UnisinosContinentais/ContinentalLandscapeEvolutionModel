@@ -91,7 +91,7 @@ void ProcessLandscapeEvolutionModel::prepare(
     m_eroderAlgorithm.setDimensionLessPrecipitationRate(config->getDimensionLessPrecipitationRate());
     m_eroderAlgorithm.setDimensionLessDepositionCoeficient(config->getDimensionLessDepositionCoeficient());
     m_eroderAlgorithm.setFlowAccumulationLimit(m_flowAccumulationLimit);
-    //m_eroderAlgorithm.setUplift(inputParameters->getUpliftRate());
+    m_eroderAlgorithm.setUplift(inputParameters->getUpliftRate());
 
     auto grainDispersionConfig = m_inputParameters->getGrainDispersionConfig();
     m_grainDispersionService.setChannelDepthCParameter(grainDispersionConfig->getChannelDepthCParameter());
@@ -193,7 +193,7 @@ bool ProcessLandscapeEvolutionModel::iterate()
         {
             if (qFuzzyCompare(m_eroderAlgorithm.getDimensionLessDepositionCoeficient(), 0.0))
             {
-                //m_eroderAlgorithm.executeWithImplicitErosion();
+                m_eroderAlgorithm.executeWithImplicitErosion();
                 //qDebug() << "executeWithImplicitErosion";
             }
             else
@@ -212,13 +212,20 @@ bool ProcessLandscapeEvolutionModel::iterate()
     // não é dentro do for ?
     if (!qFuzzyCompare(m_difusionAlgorithm.getDiffusivity(), 0.0))
     {
-        /*m_difusionAlgorithm.executeWithVariableBoundary(
+        qDebug() << "m_difusionAlgorithm.getDiffusivity() != 0.0";
+
+        m_difusionAlgorithm.executeWithVariableBoundary(
                 m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getEastBoundaryFactor(),
                 m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getWestBoundaryFactor(),
                 m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getSouthBoundaryFactor(),
                 m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getNorthBoundaryFactor()
-            );*/
+            );
         qDebug() << "executeWithVariableBoundary";
+    }
+    // DEBUG...
+    else
+    {
+        qDebug() << "m_difusionAlgorithm.getDiffusivity() = 0.0";
     }
 
     if (m_enableSurfaceLog)
@@ -260,7 +267,7 @@ bool ProcessLandscapeEvolutionModel::iterate()
 
         m_totalUplift = m_upliftAlgorithm.totalUplift();
 
-        //calculateOnlyErosionDepositionGrid();
+        calculateOnlyErosionDepositionGrid();
 
         if (m_enableSurfaceLog)
         {
@@ -353,7 +360,7 @@ std::shared_ptr<datamanagement::Raster<double> > ProcessLandscapeEvolutionModel:
         {
             if (m_underwaterSeparatedGrid->getData(static_cast<size_t>(i), static_cast<size_t>(j)) < 1 && 0 < i < rows-1 && 0 < j < cols-1)
             {
-                //m_transientSurfaceWithUnderwaterFilter->setData(static_cast<size_t>(i), static_cast<size_t>(j), m_initialSurface->getData(static_cast<size_t>(i), static_cast<size_t>(j)));
+                m_transientSurfaceWithUnderwaterFilter->setData(static_cast<size_t>(i), static_cast<size_t>(j), m_initialSurface->getData(static_cast<size_t>(i), static_cast<size_t>(j)));
             }
         }
     }
