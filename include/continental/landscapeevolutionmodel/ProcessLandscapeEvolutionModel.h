@@ -13,6 +13,7 @@
 #include "continental/landscapeevolutionmodel/service/DifusionAlgorithmService.h"
 #include "continental/landscapeevolutionmodel/service/LithologyDefinionCalculator.h"
 #include "continental/landscapeevolutionmodel/service/UpliftAlgorithmService.h"
+#include "continental/landscapeevolutionmodel/service/SedimentaryInputService.h"
 #include "continental/landscapeevolutionmodel/dto/LandscapeEvolutionModelInput.h"
 #include "continental/landscapeevolutionmodel/export.h"
 #include "continental/landscapeevolutionmodel/constant/LandscapeEvolutionModelConstant.h"
@@ -54,9 +55,13 @@ public:
 
     std::shared_ptr<datamanagement::Raster<double> > getTransientSurfaceWithUnderwaterFilter() const;
 
+    std::shared_ptr<std::vector<std::shared_ptr<domain::SedimentaryInputContent>>> getSedimentaryInputs() const;
+
 private :
 
     void calculateOnlyErosionDepositionGrid();
+
+    void calculateSedimentaryInput();
 
     /// Membros.
     size_t m_simulateUntilTime = 0;
@@ -82,10 +87,11 @@ private :
     service::EroderAlgorithmService m_eroderAlgorithm;
     service::LithologyDefinionCalculator m_grainDispersionService;
     service::UpliftAlgorithmService m_upliftAlgorithm;
+    service::SedimentaryInputService m_sedimentaryInputService;
 
     std::shared_ptr<datamanagement::Raster<double>> m_totalUplift;
 
-    //nomear para ser o grid que possui as erosões e deposições
+    //Grid que possui as erosões e deposições
     std::shared_ptr<datamanagement::Raster<double>> m_onlyErosionDepositionGrid;
 
 

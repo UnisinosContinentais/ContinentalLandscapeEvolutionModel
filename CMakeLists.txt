@@ -54,6 +54,7 @@ add_library(ContinentalLandscapeEvolutionModel
     src/domain/SimulationLandscapeEvolutionModelConfig.cpp
     src/domain/GrainDispersionConfig.cpp
     src/domain/StreamDefinitionThresholdType.cpp
+    src/domain/SedimentaryInputContent.cpp
     src/domain/definition/SlopeTypes.cpp
     src/domain/definition/SlopeUnits.cpp
     src/domain/definition/GrainNames.cpp
@@ -64,6 +65,7 @@ add_library(ContinentalLandscapeEvolutionModel
     src/service/EroderAlgorithmService.cpp
     src/service/HydroToolsAlgorithmService.cpp
     src/service/UpliftAlgorithmService.cpp
+    src/service/SedimentaryInputService.cpp
     src/util/RasterFileUtil.cpp
     src/util/ProcessLandscapeEvolutionModelLogUtil.cpp
 )

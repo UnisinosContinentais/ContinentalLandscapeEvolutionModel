@@ -363,7 +363,7 @@ void EroderAlgorithmService::executeWithImplicitErosion()
 
 		for (PositionMatrix &position : drainageNetwork->positions)
         {
-            double value = 0.0;
+            double value = 0.0; // é igual ao f do Python
             double flowDirectionValue = m_flowDirection->getData(position.row, position.col);
 
             if (flowDirectionValue == EnumDirection::Down || flowDirectionValue == EnumDirection::Left
@@ -414,6 +414,7 @@ void EroderAlgorithmService::executeWithErosionDeposition()
 
     std::shared_ptr<std::vector<std::shared_ptr<DrainageNetwork>>> drainageNetworks = directionCalculator.getDrainageNetworks();
 
+    //linha 261 no python
     for (const std::shared_ptr<DrainageNetwork> &drainageNetwork : *drainageNetworks)
     {
         const size_t positionsSize = drainageNetwork->positions.size();

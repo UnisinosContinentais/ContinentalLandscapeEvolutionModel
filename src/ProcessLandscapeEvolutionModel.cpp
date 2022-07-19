@@ -3,6 +3,7 @@
 #include <continental/landscapeevolutionmodel/service/EroderAlgorithmService.h>
 #include <continental/landscapeevolutionmodel/service/DifusionAlgorithmService.h>
 #include <continental/landscapeevolutionmodel/service/UpliftAlgorithmService.h>
+#include <continental/landscapeevolutionmodel/service/SedimentaryInputService.h>
 #include <continental/landscapeevolutionmodel/dto/LandscapeEvolutionModelInput.h>
 #include "continental/landscapeevolutionmodel/domain/SimulationLandscapeEvolutionModelConfig.h"
 #include "continental/landscapeevolutionmodel/domain/SinkDestroyConfig.h"
@@ -93,6 +94,10 @@ void ProcessLandscapeEvolutionModel::prepare(
     m_eroderAlgorithm.setFlowAccumulationLimit(m_flowAccumulationLimit);
     m_eroderAlgorithm.setUplift(inputParameters->getUpliftRate());
 
+    qDebug("*** m_sedimentaryInputService.sets - 1 ***");
+    m_sedimentaryInputService.setFlowAccumulationLimit(m_flowAccumulationLimit);
+    qDebug("*** m_sedimentaryInputService.sets - 2 ***");
+
     auto grainDispersionConfig = m_inputParameters->getGrainDispersionConfig();
     m_grainDispersionService.setChannelDepthCParameter(grainDispersionConfig->getChannelDepthCParameter());
     m_grainDispersionService.setChannelDepthFParameter(grainDispersionConfig->getChannelDepthFParameter());
@@ -106,12 +111,15 @@ void ProcessLandscapeEvolutionModel::prepare(
     {
         case OnlyMain:
             m_eroderAlgorithm.useOnlyMainDrainageNetwork();
+            m_sedimentaryInputService.useOnlyMainDrainageNetwork();
             break;
         case Amount:
             m_eroderAlgorithm.useDrainageNetworkAmountLimit(config->getDrainageNetworkAmountLimit());
+            m_sedimentaryInputService.useDrainageNetworkAmountLimit(config->getDrainageNetworkAmountLimit());
             break;
         case Percent:
             m_eroderAlgorithm.useDrainageNetworkPercentLimit(config->getDrainageNetworkPercentLimit());
+            m_sedimentaryInputService.useDrainageNetworkPercentLimit(config->getDrainageNetworkPercentLimit());
             break;
         default:
             throw std::runtime_error("The limit of the drainage networks has not been defined.");
@@ -212,8 +220,6 @@ bool ProcessLandscapeEvolutionModel::iterate()
     // não é dentro do for ?
     if (!qFuzzyCompare(m_difusionAlgorithm.getDiffusivity(), 0.0))
     {
-        qDebug() << "m_difusionAlgorithm.getDiffusivity() != 0.0";
-
         m_difusionAlgorithm.executeWithVariableBoundary(
                 m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getEastBoundaryFactor(),
                 m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getWestBoundaryFactor(),
@@ -221,11 +227,6 @@ bool ProcessLandscapeEvolutionModel::iterate()
                 m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getNorthBoundaryFactor()
             );
         qDebug() << "executeWithVariableBoundary";
-    }
-    // DEBUG...
-    else
-    {
-        qDebug() << "m_difusionAlgorithm.getDiffusivity() = 0.0";
     }
 
     if (m_enableSurfaceLog)
@@ -268,6 +269,8 @@ bool ProcessLandscapeEvolutionModel::iterate()
         m_totalUplift = m_upliftAlgorithm.totalUplift();
 
         calculateOnlyErosionDepositionGrid();
+
+        calculateSedimentaryInput();
 
         if (m_enableSurfaceLog)
         {
@@ -340,6 +343,22 @@ void ProcessLandscapeEvolutionModel::calculateOnlyErosionDepositionGrid()
     }
 }
 
+void ProcessLandscapeEvolutionModel::calculateSedimentaryInput()
+{
+    qDebug("m_sedimentaryInputService.setOnlyErosionDepositionGrid(m_onlyErosionDepositionGrid)");
+    m_sedimentaryInputService.setOnlyErosionDepositionGrid(m_onlyErosionDepositionGrid);
+
+    qDebug("m_sedimentaryInputService.setFlowAccumulation(m_hydroToolsAlgorithm.getFlowAccumulation())");
+    m_sedimentaryInputService.setFlowAccumulation(m_hydroToolsAlgorithm.getFlowAccumulation());
+
+    qDebug("m_sedimentaryInputService.setFlowDirection(m_hydroToolsAlgorithm.getFlowDirection())");
+    m_sedimentaryInputService.setFlowDirection(m_hydroToolsAlgorithm.getFlowDirection());
+
+    qDebug("m_sedimentaryInputService.execute() - 1");
+    m_sedimentaryInputService.execute();
+    qDebug("m_sedimentaryInputService.execute() - 2");
+}
+
 std::shared_ptr<datamanagement::Raster<double> > ProcessLandscapeEvolutionModel::getTransientSurfaceWithUnderwaterFilter() const
 {
 
@@ -376,6 +395,11 @@ std::shared_ptr<datamanagement::Raster<double> > ProcessLandscapeEvolutionModel:
 std::shared_ptr<datamanagement::Raster<double> > ProcessLandscapeEvolutionModel::getOnlyErosionDepositionGrid() const
 {
     return m_onlyErosionDepositionGrid;
+}
+
+std::shared_ptr<std::vector<std::shared_ptr<domain::SedimentaryInputContent>>> ProcessLandscapeEvolutionModel::getSedimentaryInputs() const
+{
+    return m_sedimentaryInputService.sedimentaryInputs();
 }
 
 void ProcessLandscapeEvolutionModel::validateInterate()
