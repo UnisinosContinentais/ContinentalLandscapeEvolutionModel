@@ -55,6 +55,8 @@ public:
 
     std::shared_ptr<datamanagement::Raster<double> > getTransientSurfaceWithUnderwaterFilter() const;
 
+    std::shared_ptr<continental::datamanagement::Raster<short>> getCatchment() const;
+
     std::shared_ptr<std::vector<std::shared_ptr<domain::SedimentaryInputContent>>> getSedimentaryInputs() const;
 
 private :

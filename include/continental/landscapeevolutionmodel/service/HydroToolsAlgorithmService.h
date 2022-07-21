@@ -39,6 +39,9 @@ public:
     /// Função que executa o hydrotools.
     void execute();
 
+    /// Executa o cálculo que identifica as bacias
+    void executeCatchment(const size_t & row, const size_t & col);
+
     /// Função de retorno dos valores de Direção do Fluxo.
     /// @return Objeto do tipo Raster<short>.
     const std::shared_ptr<continental::datamanagement::Raster<short>> getFlowDirection() const;

@@ -125,6 +125,18 @@ void HydroToolsAlgorithmService::execute()
     m_streamDefinition = streamDefinitionCalculator.getStreamDefinition();
 }
 
+void HydroToolsAlgorithmService::executeCatchment(const size_t & row, const size_t & col)
+{
+    Catchment catchmentCalculator;
+    catchmentCalculator.setFlowDirection(m_flowDirection);
+    catchmentCalculator.setFlowAccumulation(m_flowAccumulation);
+    //catchmentCalculator.setStreamSegmentation(m_streamSegmentation);
+    //catchmentCalculator.insertOutletByRowCol(row, col);
+    catchmentCalculator.findWatersheds();
+
+    m_catchment = catchmentCalculator.getWaterShed();
+}
+
 }
 }
 }

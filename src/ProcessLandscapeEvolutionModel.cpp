@@ -290,8 +290,6 @@ bool ProcessLandscapeEvolutionModel::iterate()
             ProcessLandscapeEvolutionModelLogUtil::writeOnlyErosionDepositionLog( "ULTIMO-PASSO-DEBUG_Grid_Apenas_da_Erosao_Deposicao", basePath, m_onlyErosionDepositionGrid);
             ProcessLandscapeEvolutionModelLogUtil::writeSurfaceLog( "ULTIMO-PASSO-DEBUG_Total_Uplift", basePath, m_totalUplift);
             ProcessLandscapeEvolutionModelLogUtil::writeSurfaceLog( "ULTIMO-PASSO-DEBUG_Transient_Surface", basePath, m_transientSurfaceWithUnderwaterFilter);
-
-
         }
     }
 
@@ -345,18 +343,20 @@ void ProcessLandscapeEvolutionModel::calculateOnlyErosionDepositionGrid()
 
 void ProcessLandscapeEvolutionModel::calculateSedimentaryInput()
 {
-    qDebug("m_sedimentaryInputService.setOnlyErosionDepositionGrid(m_onlyErosionDepositionGrid)");
     m_sedimentaryInputService.setOnlyErosionDepositionGrid(m_onlyErosionDepositionGrid);
 
-    qDebug("m_sedimentaryInputService.setFlowAccumulation(m_hydroToolsAlgorithm.getFlowAccumulation())");
     m_sedimentaryInputService.setFlowAccumulation(m_hydroToolsAlgorithm.getFlowAccumulation());
 
-    qDebug("m_sedimentaryInputService.setFlowDirection(m_hydroToolsAlgorithm.getFlowDirection())");
     m_sedimentaryInputService.setFlowDirection(m_hydroToolsAlgorithm.getFlowDirection());
 
-    qDebug("m_sedimentaryInputService.execute() - 1");
     m_sedimentaryInputService.execute();
-    qDebug("m_sedimentaryInputService.execute() - 2");
+
+    const std::shared_ptr<std::vector<std::shared_ptr<domain::SedimentaryInputContent>>> & sInputs = m_sedimentaryInputService.sedimentaryInputs();
+
+    if (!sInputs->empty())
+    {
+        m_hydroToolsAlgorithm.executeCatchment((*sInputs)[0]->getPositionI(), (*sInputs)[0]->getPositionJ());
+    }
 }
 
 std::shared_ptr<datamanagement::Raster<double> > ProcessLandscapeEvolutionModel::getTransientSurfaceWithUnderwaterFilter() const
@@ -395,6 +395,11 @@ std::shared_ptr<datamanagement::Raster<double> > ProcessLandscapeEvolutionModel:
 std::shared_ptr<datamanagement::Raster<double> > ProcessLandscapeEvolutionModel::getOnlyErosionDepositionGrid() const
 {
     return m_onlyErosionDepositionGrid;
+}
+
+std::shared_ptr<continental::datamanagement::Raster<short>> ProcessLandscapeEvolutionModel::getCatchment() const
+{
+    return m_hydroToolsAlgorithm.getCatchment();
 }
 
 std::shared_ptr<std::vector<std::shared_ptr<domain::SedimentaryInputContent>>> ProcessLandscapeEvolutionModel::getSedimentaryInputs() const
