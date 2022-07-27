@@ -15,6 +15,11 @@
 #include "continental/landscapeevolutionmodel/export.h"
 
 namespace continental {
+namespace hydrotools {
+namespace service {
+    class CellWatershed;
+}
+}
 namespace landscapeevolutionmodel {
 namespace service {
 /**
@@ -40,7 +45,7 @@ public:
     void execute();
 
     /// Executa o cálculo que identifica as bacias
-    void executeCatchment(const size_t & row, const size_t & col);
+    void executeWaterShed();
 
     /// Função de retorno dos valores de Direção do Fluxo.
     /// @return Objeto do tipo Raster<short>.
@@ -60,7 +65,9 @@ public:
 
     /// Função de retorno dos valores de delimitação da bacia hidrográfica.
     /// @return Objeto do tipo Raster<short>.
-	const std::shared_ptr<continental::datamanagement::Raster<short>> getCatchment() const;
+    const std::shared_ptr<continental::datamanagement::Raster<short>> & getWaterShed() const;
+
+    const std::shared_ptr<std::vector<std::shared_ptr<hydrotools::service::CellWatershed>>> & getCellsExhilarating() const;
 
     std::shared_ptr<continental::datamanagement::Raster<short> > getUnderwaterSeparatedGrid() const;
 
@@ -73,7 +80,8 @@ private:
     std::shared_ptr<continental::datamanagement::Raster<int>> m_flowAccumulation;
 	std::shared_ptr<continental::datamanagement::Raster<short>> m_streamDefinition;
 	std::shared_ptr<continental::datamanagement::Raster<short>> m_streamSegmentation;
-	std::shared_ptr<continental::datamanagement::Raster<short>> m_catchment;
+    std::shared_ptr<continental::datamanagement::Raster<short>> m_waterShed;
+    std::shared_ptr<std::vector<std::shared_ptr<hydrotools::service::CellWatershed>>> m_cellExhilarating;
 
     std::shared_ptr<continental::landscapeevolutionmodel::dto::LandscapeEvolutionModelInput> m_inputParameters;
     std::shared_ptr<continental::datamanagement::Raster<short>> m_underwaterSeparatedGrid;

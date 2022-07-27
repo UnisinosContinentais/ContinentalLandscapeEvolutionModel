@@ -5,9 +5,9 @@
 #include <continental/hydrotools/service/HeuristicSinkRemoval.h>
 #include <continental/hydrotools/service/HeuristicSinkRemovalUtil.h>
 #include <continental/hydrotools/service/FlowDirection.h>
+#include <continental/hydrotools/service/CellWatershed.h>
 #include "continental/landscapeevolutionmodel/domain/EnumDirection.h"
 #include "continental/landscapeevolutionmodel/service/HydroToolsAlgorithmService.h"
-#include "continental/landscapeevolutionmodel/service/DirectionCalculatorService.h"
 #include <QString>
 #include <QDebug>
 #include <memory>
@@ -33,41 +33,14 @@ void SedimentaryInputService::setOnlyErosionDepositionGrid(const std::shared_ptr
     m_onlyErosionDepositionGrid = onlyErosionDepositionGrid;
 }
 
-void SedimentaryInputService::setFlowDirection(const std::shared_ptr<Raster<short>> & flowDirection)
+void SedimentaryInputService::setWaterShed(const std::shared_ptr<Raster<short>> & waterShed)
 {
-	m_flowDirection = flowDirection;
+    m_waterShed = waterShed;
 }
 
-void SedimentaryInputService::setFlowAccumulation(const std::shared_ptr<Raster<int>> & flowAccumulation)
+void SedimentaryInputService::setCellExhilarating(const std::shared_ptr<std::vector<std::shared_ptr<hydrotools::service::CellWatershed>>> & cellExhilarating)
 {
-	m_flowAccumulation = flowAccumulation;
-}
-
-void SedimentaryInputService::useOnlyMainDrainageNetwork()
-{
-    m_drainageNetworkTypeLimit = OnlyMain;
-}
-
-void SedimentaryInputService::useDrainageNetworkAmountLimit(size_t amountLimit)
-{
-    m_drainageNetworkTypeLimit = Amount;
-    m_drainageNetworkAmountLimit = amountLimit;
-}
-
-void SedimentaryInputService::useDrainageNetworkPercentLimit(double percentLimit)
-{
-    m_drainageNetworkTypeLimit = Percent;
-    m_drainageNetworkPercentLimit = percentLimit;
-}
-
-int SedimentaryInputService::getFlowAccumulationLimit() const
-{
-    return m_flowAccumulationLimit;
-}
-
-void SedimentaryInputService::setFlowAccumulationLimit(int flowAccumulationLimit)
-{
-    m_flowAccumulationLimit = flowAccumulationLimit;
+    m_cellExhilarating = cellExhilarating;
 }
 
 const std::shared_ptr<std::vector<std::shared_ptr<domain::SedimentaryInputContent>>> & SedimentaryInputService::sedimentaryInputs() const
@@ -79,64 +52,32 @@ void SedimentaryInputService::execute()
 {
     qDebug("\n\n *** SedimentaryInputService::execute() *** \n\n");
 
-    m_numberOfCols = m_flowDirection->getCols();
-    m_numberOfRows = m_flowDirection->getRows();
-    m_cellSize = m_flowDirection->getCellSize();
-
-    // Executa o algoritmo de arvore para captação das diferentes redes de drenagem. true pega só a principal.
-    DirectionCalculatorService directionCalculator(m_flowDirection, m_flowAccumulation);
-    directionCalculator.setFlowAccumulationLimit(m_flowAccumulationLimit);
-
-    switch (m_drainageNetworkTypeLimit)
-    {
-        case OnlyMain:
-            directionCalculator.useOnlyMainDrainageNetwork();
-            break;
-        case Amount:
-            directionCalculator.useDrainageNetworkAmountLimit(m_drainageNetworkAmountLimit);
-            break;
-        case Percent:
-            directionCalculator.useDrainageNetworkPercentLimit(m_drainageNetworkPercentLimit);
-            break;
-        default:
-            throw std::runtime_error("The limit of the drainage networks has not been defined.");
-    }
-
-    directionCalculator.execute();
-
-    const std::shared_ptr<std::vector<std::shared_ptr<DrainageNetwork>>> & drainageNetworks = directionCalculator.getDrainageNetworks();
+    m_numberOfCols = m_waterShed->getCols();
+    m_numberOfRows = m_waterShed->getRows();
+    m_cellSize = m_waterShed->getCellSize();
 
     qDebug("\n\n *** Lista de Exutórios *** \n\n");
 
-    for (const std::shared_ptr<DrainageNetwork> &drainageNetwork : *drainageNetworks)
+    for (const std::shared_ptr<hydrotools::service::CellWatershed> &cellWatershed : *m_cellExhilarating)
     {
-        bool isFirst = true;
-
         double valueSedimentaryInput = 0.0;
-        size_t posRowSedimentaryInput = 0;
-        size_t posColSedimentaryInput = 0;
+        const size_t & posRowSedimentaryInput = cellWatershed->y;
+        const size_t & posColSedimentaryInput = cellWatershed->x;
 
-        for (PositionMatrix &position : drainageNetwork->positions)
+        const short & watershedId = cellWatershed->getAttribute();
+
+        for (size_t i = 0; i < m_numberOfRows; ++i)
         {
-            const size_t & row = position.row;
-            const size_t & col = position.col;
-
-            if (isFirst)
+            for (size_t j = 0; j < m_numberOfCols; ++j)
             {
-                // Definir o exutório...
-                posRowSedimentaryInput = row;
-                posColSedimentaryInput = col;
-
-                // Verificar nível do mar aqui...
-
-
-                isFirst = false;
+                if (m_waterShed->getData(i, j) == watershedId)
+                {
+                    valueSedimentaryInput += m_onlyErosionDepositionGrid->getData(i, j);
+                }
             }
-
-            valueSedimentaryInput += m_onlyErosionDepositionGrid->getData(row, col);
         }
 
-        valueSedimentaryInput = valueSedimentaryInput * (m_cellSize*m_cellSize);
+        valueSedimentaryInput = valueSedimentaryInput * (m_cellSize * m_cellSize);
 
         auto sedimentaryInputContent = std::make_shared<domain::SedimentaryInputContent>();
 

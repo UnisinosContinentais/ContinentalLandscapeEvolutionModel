@@ -63,9 +63,14 @@ const std::shared_ptr<Raster<short>> HydroToolsAlgorithmService::getStreamSegmen
 	return m_streamSegmentation;
 }
 
-const std::shared_ptr<Raster<short>> HydroToolsAlgorithmService::getCatchment() const
+const std::shared_ptr<Raster<short>> & HydroToolsAlgorithmService::getWaterShed() const
 {
-	return m_catchment;
+    return m_waterShed;
+}
+
+const std::shared_ptr<std::vector<std::shared_ptr<hydrotools::service::CellWatershed>>> & HydroToolsAlgorithmService::getCellsExhilarating() const
+{
+    return m_cellExhilarating;
 }
 
 std::shared_ptr<continental::datamanagement::Raster<short> > HydroToolsAlgorithmService::getUnderwaterSeparatedGrid() const
@@ -125,16 +130,15 @@ void HydroToolsAlgorithmService::execute()
     m_streamDefinition = streamDefinitionCalculator.getStreamDefinition();
 }
 
-void HydroToolsAlgorithmService::executeCatchment(const size_t & row, const size_t & col)
+void HydroToolsAlgorithmService::executeWaterShed()
 {
     Catchment catchmentCalculator;
     catchmentCalculator.setFlowDirection(m_flowDirection);
     catchmentCalculator.setFlowAccumulation(m_flowAccumulation);
-    //catchmentCalculator.setStreamSegmentation(m_streamSegmentation);
-    //catchmentCalculator.insertOutletByRowCol(row, col);
     catchmentCalculator.findWatersheds();
 
-    m_catchment = catchmentCalculator.getWaterShed();
+    m_waterShed = catchmentCalculator.getWaterShed();
+    m_cellExhilarating = catchmentCalculator.getCellsExhilarating();
 }
 
 }

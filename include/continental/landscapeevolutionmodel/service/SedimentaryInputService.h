@@ -18,6 +18,12 @@
 #include <vector>
 
 namespace continental {
+namespace hydrotools {
+namespace service {
+    class CellWatershed;
+}
+}
+
 namespace landscapeevolutionmodel {
 namespace service {
 
@@ -30,29 +36,17 @@ public:
     /// Construtor.
     SedimentaryInputService();
 
-    /// Função que executa o algoritimo de erodibilidade.
+    /// Função que executa o algoritimo do aporte sedimentar.
     void execute();
 
     //Atribui o Grid que possui as erosões e deposições
     void setOnlyErosionDepositionGrid(const std::shared_ptr<datamanagement::Raster<double>> & onlyErosionDepositionGrid);
 
-    /// Função de definição dos valores de Direção do Fluxo.
-    /// @param flowDirection Objeto do tipo Raster<short>.
-    void setFlowDirection(const std::shared_ptr<datamanagement::Raster<short>> & flowDirection);
+    /// Função de definição das bacias.
+    /// @param waterShed Objeto do tipo Raster<short>.
+    void setWaterShed(const std::shared_ptr<datamanagement::Raster<short>> & waterShed);
 
-    /// Função de definição dos valores de Acumulação do Fluxo.
-    /// @param flowAccumulation Objeto do tipo Raster<float>.
-    void setFlowAccumulation(const std::shared_ptr<datamanagement::Raster<int>> & flowAccumulation);
-
-    void useOnlyMainDrainageNetwork();
-
-    void useDrainageNetworkAmountLimit(size_t amountLimit);
-
-    void useDrainageNetworkPercentLimit(double percentLimit);
-
-    int getFlowAccumulationLimit() const;
-
-    void setFlowAccumulationLimit(int flowAccumulationLimit);
+    void setCellExhilarating(const std::shared_ptr<std::vector<std::shared_ptr<hydrotools::service::CellWatershed>>> & cellExhilarating);
 
     const std::shared_ptr<std::vector<std::shared_ptr<domain::SedimentaryInputContent>>> & sedimentaryInputs() const;
 
@@ -63,18 +57,12 @@ private:
     size_t m_numberOfRows = 0;
     double m_cellSize = 0.0;
 
-    domain::EnumDrainageNetworkLimit m_drainageNetworkTypeLimit = domain::EnumDrainageNetworkLimit::OnlyMain;
-
-    size_t m_drainageNetworkAmountLimit = 0;
-    double m_drainageNetworkPercentLimit = 0.0;
-
-    int m_flowAccumulationLimit = 0;
-
-    std::shared_ptr<datamanagement::Raster<short>> m_flowDirection;
-    std::shared_ptr<datamanagement::Raster<int>> m_flowAccumulation;
-    std::shared_ptr<datamanagement::Raster<double>> m_onlyErosionDepositionGrid;    //Grid que possui as erosões e deposições
-
     std::shared_ptr<std::vector<std::shared_ptr<domain::SedimentaryInputContent>>> m_sedimentaryInputs;
+
+    std::shared_ptr<datamanagement::Raster<short>> m_waterShed; // Grid que possui as bacias
+    std::shared_ptr<datamanagement::Raster<double>> m_onlyErosionDepositionGrid; // Grid que possui as erosões e deposições
+    std::shared_ptr<std::vector<std::shared_ptr<hydrotools::service::CellWatershed>>> m_cellExhilarating; // Células com a posição dos exutórios
+
 };
 
 }
