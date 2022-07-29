@@ -168,19 +168,19 @@ bool ProcessLandscapeEvolutionModel::iterate()
 {
     validateInterate();
 
-    if (m_enableSurfaceLog)
+    /*if (m_enableSurfaceLog)
     {
         QString basePath = m_logSurfacePath + "/" + "ContinentalLEM_" + QString::number(m_logAge) + "_" + QString::number(m_logNode);
         ProcessLandscapeEvolutionModelLogUtil::writeOnlyErosionDepositionLog( QString::number(m_timeStepCount) + "-01-DEBUG_Grid_surface_antes_hydroToolsAlgorithm", basePath, m_surface);
-    }
+    }*/
 
     m_hydroToolsAlgorithm.execute();
 
-    if (m_enableSurfaceLog)
+    /*if (m_enableSurfaceLog)
     {
         QString basePath = m_logSurfacePath + "/" + "ContinentalLEM_" + QString::number(m_logAge) + "_" + QString::number(m_logNode);
         ProcessLandscapeEvolutionModelLogUtil::writeOnlyErosionDepositionLog( QString::number(m_timeStepCount) + "-02-DEBUG_Grid_surface_depois_hydroToolsAlgorithm", basePath, m_surface);
-    }
+    }*/
 
     m_eroderAlgorithm.setFlowAccumulation(m_hydroToolsAlgorithm.getFlowAccumulation());
     m_eroderAlgorithm.setStreamDefinition(m_hydroToolsAlgorithm.getStreamDefinition());
@@ -204,11 +204,12 @@ bool ProcessLandscapeEvolutionModel::iterate()
             }
         }
     }
-    if (m_enableSurfaceLog)
+
+    /*if (m_enableSurfaceLog)
     {
         QString basePath = m_logSurfacePath + "/" + "ContinentalLEM_" + QString::number(m_logAge) + "_" + QString::number(m_logNode);
         ProcessLandscapeEvolutionModelLogUtil::writeOnlyErosionDepositionLog( QString::number(m_timeStepCount) + "-03-DEBUG_Grid_surface_antes_Diffusivity_com_Erosion", basePath, m_surface);
-    }
+    }*/
 
     // não é dentro do for ?
     if (!qFuzzyCompare(m_difusionAlgorithm.getDiffusivity(), 0.0))
@@ -222,19 +223,19 @@ bool ProcessLandscapeEvolutionModel::iterate()
         qDebug() << "executeWithVariableBoundary";
     }
 
-    if (m_enableSurfaceLog)
+    /*if (m_enableSurfaceLog)
     {
         QString basePath = m_logSurfacePath + "/" + "ContinentalLEM_" + QString::number(m_logAge) + "_" + QString::number(m_logNode);
         ProcessLandscapeEvolutionModelLogUtil::writeOnlyErosionDepositionLog( QString::number(m_timeStepCount)+"-04-DEBUG_Grid_surface_depois_Diffusivity", basePath, m_surface);
-    }
+    }*/
 
     m_upliftAlgorithm.applyUplift();
 
-    if (m_enableSurfaceLog)
+    /*if (m_enableSurfaceLog)
     {
         QString basePath = m_logSurfacePath + "/" + "ContinentalLEM_" + QString::number(m_logAge) + "_" + QString::number(m_logNode);
         ProcessLandscapeEvolutionModelLogUtil::writeOnlyErosionDepositionLog( QString::number(m_timeStepCount) + "-05-DEBUG_Grid_surface_apos_uplift", basePath, m_surface);
-    }
+    }*/
 
 
     ++m_timeStepCount;
@@ -272,7 +273,7 @@ bool ProcessLandscapeEvolutionModel::iterate()
             //3
             ProcessLandscapeEvolutionModelLogUtil::writeFlowAccumulationLog("ULTIMO-PASSO-03_Area_de_Drenagem_do_Grid_Inicial", basePath, m_grainDispersionService.getFlowAccumulationRaster());
             //4
-            ProcessLandscapeEvolutionModelLogUtil::writeSlopeLog("ULTIMO-PASSO-04_Gradiente_do_Grid_Inicial", basePath, m_grainDispersionService.getSlope());
+            //ProcessLandscapeEvolutionModelLogUtil::writeSlopeLog("ULTIMO-PASSO-04_Gradiente_do_Grid_Inicial", basePath, m_grainDispersionService.getSlope());
             //5
             ProcessLandscapeEvolutionModelLogUtil::writeD50Log("ULTIMO-PASSO-05_D50_do_Grid_Inicial", basePath, m_grainDispersionService.getD50());
             //6
