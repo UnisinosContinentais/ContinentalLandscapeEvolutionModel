@@ -50,12 +50,16 @@ public:
 
     const std::shared_ptr<std::vector<std::shared_ptr<domain::SedimentaryInputContent>>> & sedimentaryInputs() const;
 
+    void setSimulateUntilTime(const double simulateUntilTime);
+
+
 private:
 
     /// Membros.
     size_t m_numberOfCols = 0;
     size_t m_numberOfRows = 0;
     double m_cellSize = 0.0;
+    double m_simulateUntilTime = 1.0;
 
     std::shared_ptr<std::vector<std::shared_ptr<domain::SedimentaryInputContent>>> m_sedimentaryInputs;
 

@@ -71,6 +71,9 @@ public:
     //Parâmetro para salvar os logs
      constexpr static const bool EnableLogs = true;
 
+    //Parâmetro para transformação de M^3/passo de tempo em Anos por anos
+
+
     //ACHO QUE PRECISA LIGAR UMA VARIÁVEL COM O PATH ONDE QUE QUE SALVE
     //constexpr static const QString LogsBasePath = "C:/Users/ADM_LOCAL/Desktop/teste_logs"; //ainda não está sendo usado
 
