@@ -1,4 +1,5 @@
 #include "continental/landscapeevolutionmodel/service/SedimentaryInputService.h"
+#include "continental/landscapeevolutionmodel/dto/LandscapeEvolutionModelInput.h"
 #include <continental/datamanagement/Raster.h>
 #include <continental/datamanagement/RasterFile.h>
 #include "continental/hydrotools/service/HeuristicSinkRemovalUtil.h"
@@ -48,6 +49,11 @@ const std::shared_ptr<std::vector<std::shared_ptr<domain::SedimentaryInputConten
     return m_sedimentaryInputs;
 }
 
+void SedimentaryInputService::setSimulateUntilTime(const double simulateUntilTime)
+{
+    m_simulateUntilTime = simulateUntilTime;
+}
+
 void SedimentaryInputService::execute()
 {
     qDebug("\n\n *** SedimentaryInputService::execute() *** \n\n");
@@ -78,6 +84,14 @@ void SedimentaryInputService::execute()
         }
 
         valueSedimentaryInput = valueSedimentaryInput * (m_cellSize * m_cellSize);
+
+        //valueSedimentaryInput = valueSedimentaryInput / (m_simulateUntilTime * 1000000.0 );
+
+        valueSedimentaryInput = valueSedimentaryInput / (m_simulateUntilTime);
+
+        valueSedimentaryInput = valueSedimentaryInput / (1000000.0); // transformação Mm^3/ano
+
+
 
         auto sedimentaryInputContent = std::make_shared<domain::SedimentaryInputContent>();
 

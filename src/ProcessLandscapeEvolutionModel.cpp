@@ -319,6 +319,8 @@ void ProcessLandscapeEvolutionModel::calculateSedimentaryInput()
 
     m_sedimentaryInputService.setOnlyErosionDepositionGrid(m_onlyErosionDepositionGrid);
 
+    m_sedimentaryInputService.setSimulateUntilTime(double(m_simulateUntilTime));
+
     m_sedimentaryInputService.setWaterShed(m_hydroToolsAlgorithm.getWaterShed());
 
     m_sedimentaryInputService.setCellExhilarating(m_hydroToolsAlgorithm.getCellsExhilarating());
