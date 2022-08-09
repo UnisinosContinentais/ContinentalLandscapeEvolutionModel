@@ -50,7 +50,7 @@ const std::shared_ptr<Raster<short>> HydroToolsAlgorithmService::getFlowDirectio
 
 const std::shared_ptr<Raster<int>> HydroToolsAlgorithmService::getFlowAccumulation() const
 {
-	return m_flowAccumulation;
+    return m_flowAccumulation;
 }
 
 const std::shared_ptr<Raster<short>> HydroToolsAlgorithmService::getStreamDefinition() const
@@ -132,9 +132,17 @@ void HydroToolsAlgorithmService::execute()
 
 void HydroToolsAlgorithmService::executeWaterShed()
 {
+    FlowAccumulation flowAccumulationCalculator;
+    flowAccumulationCalculator.setFlowDirection(m_flowDirection);
+    flowAccumulationCalculator.setUnderWaterFilter(m_underwaterSeparatedGrid);
+    flowAccumulationCalculator.runoffUnderWater();
+
+    auto flowAccumulation = flowAccumulationCalculator.getFlowAccumulation();
+
     Catchment catchmentCalculator;
     catchmentCalculator.setFlowDirection(m_flowDirection);
-    catchmentCalculator.setFlowAccumulation(m_flowAccumulation);
+    //catchmentCalculator.setFlowAccumulation(m_flowAccumulation);
+    catchmentCalculator.setFlowAccumulation(flowAccumulation);
     catchmentCalculator.findWatersheds();
 
     m_waterShed = catchmentCalculator.getWaterShed();
