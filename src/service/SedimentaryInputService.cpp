@@ -89,7 +89,7 @@ void SedimentaryInputService::execute()
 
         valueSedimentaryInput = valueSedimentaryInput / (m_simulateUntilTime);
 
-        valueSedimentaryInput = valueSedimentaryInput / (1000000.0); // transformação Mm^3/ano
+        valueSedimentaryInput = valueSedimentaryInput / (1000000.0) * - 1; // transformação Mm^3/ano e '*-1'  Lembrar da erosão e deposição
 
 
 
