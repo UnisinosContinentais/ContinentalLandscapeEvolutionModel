@@ -32,9 +32,10 @@ namespace landscapeevolutionmodel {
 void ProcessLandscapeEvolutionModel::prepare(
         std::shared_ptr<datamanagement::Raster<double>> surface,
         std::shared_ptr<LandscapeEvolutionModelInput> inputParameters,
-        std::shared_ptr<datamanagement::Raster<short>> underwaterSeparatedGrid
+        std::shared_ptr<datamanagement::Raster<short>> underwaterSeparatedGrid,
+        std::shared_ptr<datamanagement::Raster<short>> initialFlowDirection,
+        std::shared_ptr<datamanagement::Raster<int>> initialFlowAccumulation
     )
-
 {
     //Prparando parâmetros para Exucução
     std::shared_ptr<SimulationLandscapeEvolutionModelConfig> config = inputParameters->getSimulationLandscapeEvolutionModelConfig();
@@ -50,6 +51,8 @@ void ProcessLandscapeEvolutionModel::prepare(
     m_surface = surface;
     m_inputParameters = inputParameters;
     m_underwaterSeparatedGrid = underwaterSeparatedGrid;
+    m_initialFlowDirection = initialFlowDirection;
+    m_initialFlowAccumulation = initialFlowAccumulation;
 
     //este grid é inicializado como uma cópia do grid que vai processar o LEM
     //assim se subtrair esta copia e o uplift do resultado do LEM, tem-se o grid de erosão e deposição
@@ -72,7 +75,7 @@ void ProcessLandscapeEvolutionModel::prepare(
 
     prepareFlowAccumulationLimit(); // método desta classe que calcula o flowAccLimit
 
-    m_hydroToolsAlgorithm = HydroToolsAlgorithmService(m_surface, m_inputParameters, m_underwaterSeparatedGrid);
+    m_hydroToolsAlgorithm = HydroToolsAlgorithmService(m_surface, m_inputParameters, m_underwaterSeparatedGrid, m_initialFlowDirection, m_initialFlowAccumulation);
     m_difusionAlgorithm = DifusionAlgorithmService(m_surface, config->getDiffusivity(), m_difusionDeltaT);
 
     m_difusionAlgorithm.allocateTopography(); //aloca o espaço de m_surface em m_T da classe difusionAlgorithm
@@ -183,12 +186,10 @@ bool ProcessLandscapeEvolutionModel::iterate()
             if (qFuzzyCompare(m_eroderAlgorithm.getDimensionLessDepositionCoeficient(), 0.0))
             {
                 m_eroderAlgorithm.executeWithImplicitErosion();
-                //qDebug() << "executeWithImplicitErosion";
             }
             else
             {
                 m_eroderAlgorithm.executeWithErosionDeposition();
-                //qDebug() << "executeWithErosionDeposition";
             }
         }
     }
@@ -202,10 +203,19 @@ bool ProcessLandscapeEvolutionModel::iterate()
                 m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getSouthBoundaryFactor(),
                 m_inputParameters->getSimulationLandscapeEvolutionModelConfig()->getNorthBoundaryFactor()
             );
-        qDebug() << "executeWithVariableBoundary";
     }
 
     m_upliftAlgorithm.applyUplift();
+
+    if (m_timeStepCount == 0)
+    {
+        if (m_enableSurfaceLog)
+        {
+            const QString & basePath = m_logSurfacePath + "/" + "ContinentalLEM_" + QString::number(m_logAge) + "_" + QString::number(m_logNode);
+
+            ProcessLandscapeEvolutionModelLogUtil::writeFlowAccumulationLog("PRIMEIRO-PASSO_Flow-Accumulation-INICIAL", basePath, m_hydroToolsAlgorithm.getFlowAccumulation());
+        }
+    }
 
     ++m_timeStepCount;
 
@@ -215,14 +225,6 @@ bool ProcessLandscapeEvolutionModel::iterate()
     {
 
         m_hydroToolsAlgorithm.execute();
-
-        //! \todo IF - LOG TESTE - REMOVER
-        if (m_enableSurfaceLog)
-        {
-            const QString & basePath = m_logSurfacePath + "/" + "ContinentalLEM_" + QString::number(m_logAge) + "_" + QString::number(m_logNode);
-
-            ProcessLandscapeEvolutionModelLogUtil::writeFlowAccumulationLog("ULTIMO-PASSO-03_Flow-Accumulation-Pre", basePath, m_hydroToolsAlgorithm.getFlowAccumulation());
-        }
 
         if (m_enableSurfaceLog)
         {

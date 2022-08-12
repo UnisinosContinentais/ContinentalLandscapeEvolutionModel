@@ -570,7 +570,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, ProcessLandscapeEvolutionModel)
 
     //Executa o lEM com iteração
     ProcessLandscapeEvolutionModel processLem;
-    processLem.prepare(initialGrid, lemInput, underwaterSeparatedGrid);
+    processLem.prepare(initialGrid, lemInput, underwaterSeparatedGrid, nullptr, nullptr);
 
     bool result = true;
     do
@@ -667,7 +667,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, testApplyUplift)
 
     //Executa o lEM com iteração
     ProcessLandscapeEvolutionModel processLem_0;
-    processLem_0.prepare(initialGrid_0, lemInput, underwaterSeparatedGrid);
+    processLem_0.prepare(initialGrid_0, lemInput, underwaterSeparatedGrid, nullptr, nullptr);
 
     bool result = true;
     do
@@ -680,7 +680,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, testApplyUplift)
 
     //Executa o lEM com iteração
     ProcessLandscapeEvolutionModel processLem_1;
-    processLem_1.prepare(initialGrid_1, lemInput, underwaterSeparatedGrid);
+    processLem_1.prepare(initialGrid_1, lemInput, underwaterSeparatedGrid, nullptr, nullptr);
 
     result = true;
     do
@@ -815,7 +815,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, onlyErosionDepositionGridTest)
 
     //Executa o lEM com iteração
     ProcessLandscapeEvolutionModel processLem_0;
-    processLem_0.prepare(initialGrid_0, lemInput, underwaterSeparatedGrid);
+    processLem_0.prepare(initialGrid_0, lemInput, underwaterSeparatedGrid, nullptr, nullptr);
 
     bool result = true;
     do
@@ -828,7 +828,7 @@ TEST(ContinentalLandscapeEvolutionModelTest, onlyErosionDepositionGridTest)
 
     //Executa o lEM com iteração
     ProcessLandscapeEvolutionModel processLem_1;
-    processLem_1.prepare(initialGrid_1, lemInput, underwaterSeparatedGrid);
+    processLem_1.prepare(initialGrid_1, lemInput, underwaterSeparatedGrid, nullptr, nullptr);
 
     result = true;
     do

@@ -36,7 +36,9 @@ public:
     /// @param inputParameters Objeto do tipo LandscapeEvolutionModelInput com os parametros de entrada para realização do processamento.
     HydroToolsAlgorithmService(std::shared_ptr<continental::datamanagement::Raster<double>> initialGrid,
                                std::shared_ptr<continental::landscapeevolutionmodel::dto::LandscapeEvolutionModelInput> inputParameters,
-                               std::shared_ptr<continental::datamanagement::Raster<short>> underwaterSeparatedGrid);
+                               std::shared_ptr<continental::datamanagement::Raster<short>> underwaterSeparatedGrid,
+                               std::shared_ptr<continental::datamanagement::Raster<short>> initialFlowDirection,
+                               std::shared_ptr<continental::datamanagement::Raster<int>> initialFlowAccumulation);
 
     /// Função que executa a preparação da topografia para execução do processo principal.
     void prepareDem();
@@ -85,6 +87,9 @@ private:
 
     std::shared_ptr<continental::landscapeevolutionmodel::dto::LandscapeEvolutionModelInput> m_inputParameters;
     std::shared_ptr<continental::datamanagement::Raster<short>> m_underwaterSeparatedGrid;
+
+    std::shared_ptr<continental::datamanagement::Raster<short>> m_initialFlowDirection = nullptr;
+    std::shared_ptr<continental::datamanagement::Raster<int>> m_initialFlowAccumulation = nullptr;
 };
 
 }

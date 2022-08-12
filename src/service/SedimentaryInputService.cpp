@@ -56,13 +56,9 @@ void SedimentaryInputService::setSimulateUntilTime(const double simulateUntilTim
 
 void SedimentaryInputService::execute()
 {
-    qDebug("\n\n *** SedimentaryInputService::execute() *** \n\n");
-
     m_numberOfCols = m_waterShed->getCols();
     m_numberOfRows = m_waterShed->getRows();
     m_cellSize = m_waterShed->getCellSize();
-
-    qDebug("\n\n *** Lista de Exutórios *** \n\n");
 
     for (const std::shared_ptr<hydrotools::service::CellWatershed> &cellWatershed : *m_cellExhilarating)
     {
@@ -85,13 +81,9 @@ void SedimentaryInputService::execute()
 
         valueSedimentaryInput = valueSedimentaryInput * (m_cellSize * m_cellSize);
 
-        //valueSedimentaryInput = valueSedimentaryInput / (m_simulateUntilTime * 1000000.0 );
-
         valueSedimentaryInput = valueSedimentaryInput / (m_simulateUntilTime);
 
-        valueSedimentaryInput = valueSedimentaryInput / (1000000.0) * - 1; // transformação Mm^3/ano e '*-1'  Lembrar da erosão e deposição
-
-
+        valueSedimentaryInput = valueSedimentaryInput / (1000000.0) * -1.0; // transformação Mm^3/ano e '*-1'  Lembrar da erosão e deposição
 
         auto sedimentaryInputContent = std::make_shared<domain::SedimentaryInputContent>();
 

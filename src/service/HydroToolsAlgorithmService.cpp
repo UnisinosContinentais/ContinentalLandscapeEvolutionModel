@@ -35,10 +35,14 @@ HydroToolsAlgorithmService::HydroToolsAlgorithmService()
 
 HydroToolsAlgorithmService::HydroToolsAlgorithmService(std::shared_ptr<continental::datamanagement::Raster<double>> initialGrid,
                                                        std::shared_ptr<continental::landscapeevolutionmodel::dto::LandscapeEvolutionModelInput> inputParameters,
-                                                       std::shared_ptr<continental::datamanagement::Raster<short>> underwaterSeparatedGrid) :
-m_initialGrid(initialGrid),
-m_inputParameters(inputParameters),
-m_underwaterSeparatedGrid(underwaterSeparatedGrid)
+                                                       std::shared_ptr<continental::datamanagement::Raster<short>> underwaterSeparatedGrid,
+                                                       std::shared_ptr<continental::datamanagement::Raster<short>> initialFlowDirection,
+                                                       std::shared_ptr<continental::datamanagement::Raster<int>> initialFlowAccumulation) :
+    m_initialGrid(initialGrid),
+    m_inputParameters(inputParameters),
+    m_underwaterSeparatedGrid(underwaterSeparatedGrid),
+    m_initialFlowDirection(initialFlowDirection),
+    m_initialFlowAccumulation(initialFlowAccumulation)
 {
 
 }
@@ -77,7 +81,6 @@ std::shared_ptr<continental::datamanagement::Raster<short> > HydroToolsAlgorithm
 {
     return m_underwaterSeparatedGrid;
 }
-
 
 void HydroToolsAlgorithmService::prepareDem()
 {
@@ -132,17 +135,11 @@ void HydroToolsAlgorithmService::execute()
 
 void HydroToolsAlgorithmService::executeWaterShed()
 {
-    FlowAccumulation flowAccumulationCalculator;
-    flowAccumulationCalculator.setFlowDirection(m_flowDirection);
-    flowAccumulationCalculator.setUnderWaterFilter(m_underwaterSeparatedGrid);
-    flowAccumulationCalculator.runoffUnderWater();
-
-    auto flowAccumulation = flowAccumulationCalculator.getFlowAccumulation();
-
     Catchment catchmentCalculator;
-    catchmentCalculator.setFlowDirection(m_flowDirection);
+    //catchmentCalculator.setFlowDirection(m_flowDirection);
     //catchmentCalculator.setFlowAccumulation(m_flowAccumulation);
-    catchmentCalculator.setFlowAccumulation(flowAccumulation);
+    catchmentCalculator.setFlowDirection(m_initialFlowDirection);
+    catchmentCalculator.setFlowAccumulation(m_initialFlowAccumulation);
     catchmentCalculator.findWatersheds();
 
     m_waterShed = catchmentCalculator.getWaterShed();

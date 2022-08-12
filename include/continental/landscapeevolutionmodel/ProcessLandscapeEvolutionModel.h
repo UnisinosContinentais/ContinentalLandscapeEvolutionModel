@@ -32,7 +32,9 @@ public:
     /// @param inputParameters Objeto do tipo LandscapeEvolutionModelInput com os valores de parâmetros para execução do algoritimo do LEM.
     void prepare(std::shared_ptr<datamanagement::Raster<double>> initialGrid,
                     std::shared_ptr<dto::LandscapeEvolutionModelInput> inputParameters,
-                    std::shared_ptr<datamanagement::Raster<short>> underwaterSeparatedGrid
+                    std::shared_ptr<datamanagement::Raster<short>> underwaterSeparatedGrid,
+                    std::shared_ptr<datamanagement::Raster<short>> initialFlowDirection,
+                    std::shared_ptr<datamanagement::Raster<int>> initialFlowAccumulation
                 );
 
     /// Função que executa o proximo passo de tempo.
@@ -83,6 +85,8 @@ private :
     std::shared_ptr<datamanagement::Raster<short>> m_grainDispersion;
     std::shared_ptr<dto::LandscapeEvolutionModelInput> m_inputParameters;
     std::shared_ptr<datamanagement::Raster<short>> m_underwaterSeparatedGrid;
+    std::shared_ptr<datamanagement::Raster<short>> m_initialFlowDirection;
+    std::shared_ptr<datamanagement::Raster<int>> m_initialFlowAccumulation;
 
     service::HydroToolsAlgorithmService m_hydroToolsAlgorithm;
     service::DifusionAlgorithmService m_difusionAlgorithm;

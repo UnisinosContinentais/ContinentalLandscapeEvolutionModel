@@ -121,7 +121,8 @@ int main(int argc, char **argv)
 
     //Executa o lEM com iteração
     ProcessLandscapeEvolutionModel processLem;
-    processLem.prepare(initialGrid, lemInput, underwaterSeparatedGrid);
+    //processLem.prepare(initialGrid, lemInput, underwaterSeparatedGrid);
+    processLem.prepare(initialGrid, lemInput, underwaterSeparatedGrid, nullptr, nullptr);
 
     std::cout << " SAI CONSTRUTOR DO PROCESS LEM" << std::endl;
 
