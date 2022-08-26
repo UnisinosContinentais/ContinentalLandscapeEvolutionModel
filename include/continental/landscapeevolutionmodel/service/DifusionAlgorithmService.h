@@ -27,10 +27,10 @@ public:
     /// Construtor.
     DifusionAlgorithmService();
 
-    /// Construtor.
-    /// @param initialGrid Objeto do tipo Raster<float> com a Superfície Inicial.
-    /// @param diffusivity Valor do tipo double com o parametro de difusividade.
-    /// @param deltaT Valor do tipo size_t com o passo de tempo de anos.
+    /// Método responsável pelo algoritmo de defusão
+    /// \param initialGrid Objeto do tipo Raster<float> com a Superfície Inicial.
+    /// \param getDiffusivity Valor do tipo double com o parametro de difusividade.
+    /// \param deltaT Valor do tipo size_t com o passo de tempo de anos.
     DifusionAlgorithmService(std::shared_ptr<continental::datamanagement::Raster<double>> initialGrid, double getDiffusivity, size_t deltaT);
 	
     /// Função que executa o algoritmo de alocação da topográfia.
@@ -40,22 +40,30 @@ public:
     void execute();
 
     /// Função que executa o algoritmo de difusividade.
+    /// \param eastBoundaryFactor Valor do fator da banda Leste
+    /// \param westBoundaryFactor Valor do fator da banda Oeste
+    /// \param southBoundaryFactor Valor do fator da banda Sul
+    /// \param northBoundaryFactor Valor do fator da banda Norte
     void executeWithVariableBoundary(size_t eastBoundaryFactor, size_t westBoundaryFactor, size_t southBoundaryFactor, size_t northBoundaryFactor);
 
+    /// Função Getter referente a difusidade
+    /// \return Retorna o valor da difusidade
     double getDiffusivity() const;
 
 private:
     /// Membros.
+    /// Observações: m_deltaT em ano, deltaX e Y em metros, difusidade em m²/ano
+    /// e m_T referente a matriz de topografia
     std::shared_ptr<continental::datamanagement::Raster<double>> m_initialGrid;
     size_t m_numberOfCols = 0;
     size_t m_numberOfRows = 0;
-    size_t m_deltaT = 0; // ano
+    size_t m_deltaT = 0;
     size_t m_numberOfIterations = 0;
-    double m_deltaX = 0.0; // m
-    double m_deltaY = 0.0; // m
-    double m_diffusivity = 0.0; // m*m/ano
+    double m_deltaX = 0.0;
+    double m_deltaY = 0.0;
+    double m_diffusivity = 0.0;
     double m_upLift = 0.0;
-    std::vector<std::vector<std::vector<std::vector<double>>>> m_T;  // matriz de topografia
+    std::vector<std::vector<std::vector<std::vector<double>>>> m_T;
 
 
 };

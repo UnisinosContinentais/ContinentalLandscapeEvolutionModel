@@ -64,22 +64,47 @@ public:
     size_t getSimulateUntilTime() const;
 
     /// Função de definição do tempo de simulação em anos
-    /// @param Tempo de simulação em anos
+    /// @param simulateUntilTime Tempo de simulação em anos
     void setSimulateUntilTime(const size_t simulateUntilTime);
 
+    /// Função de retorno da configuração dos parâmetros de dispersão do grão
+    /// \return Retorna a configuração dos parâmetros de dispersão do grão
     std::shared_ptr<domain::GrainDispersionConfig> getGrainDispersionConfig() const;
+
+    /// Função de definição da configuração dos parâmetros de dispersão do grão
+    /// \param grainDispersionConfig Valor dos parâmetros de dispersão do grão
     void setGrainDispersionConfig(const std::shared_ptr<domain::GrainDispersionConfig> &grainDispersionConfig);
 
+    /// Função de retorno da opção de habilitar/desabilitar a gravação de logs
+    /// \return Retorna o valor que habilita [true] e desabilita [false]
     bool getEnableSurfaceLog() const;
+
+    /// Função que habilita a criação de logs da superficie
+    /// \param enableSurfaceLog Valor que habilita [true] e desabilita [false]
     void setEnableSurfaceLog(bool enableSurfaceLog);
 
+    /// Função de retorno do caminho do log da superfície
+    /// \return Retorna o caminho do log da superfície
     QString getPathSurfaceLog() const;
+
+    /// Função de definição do caminho do Log da superfície
+    /// \param pathSurfaceLog Valor do caminho da superficie
     void setPathSurfaceLog(const QString &pathSurfaceLog);
 
+    /// Função de retorno com o valor da Idade
+    /// \return Retorna o valor da Idade
     double getAge() const;
+
+    /// Função de definição da Idade
+    /// \param age Valor da Idade
     void setAge(double age);
 
+    /// Função de retorno da taxa de soerguimento
+    /// \return Retorna o valor da taxa de soerguimento
     std::shared_ptr<datamanagement::Raster<double> > getUpliftRate() const;
+
+    /// Função de definição da taxa de soerguimento
+    /// \param upliftRate Valor referente a taxa de soerguimento
     void setUpliftRate(const std::shared_ptr<datamanagement::Raster<double> > &upliftRate);
 
 private:

@@ -22,7 +22,11 @@ template<class T>
 class RasterFileUtil
 {
 private:
-    //Lê um raster e retorna dados em inteiro
+
+    /// Método responsável pela leitura de um dado raster e retorna dados em inteiro
+    /// \param fileName Valor do nome do arquivo
+    /// \param onlyHeader Valor apenas do cabeçalho
+    /// \return Retorna o valor do dado em ASC
     static domain::Raster<T> getASCData(const QString &fileName, const bool onlyHeader)
     {
         const QRegularExpression regex("-?[0-9.,]+");
@@ -32,22 +36,22 @@ private:
             throw std::invalid_argument("Error openning file!");
         }
 
-        //Lê a linha do número de colunas
+        /// Lê a linha do número de colunas
         const size_t cols = regex.match(fs.readLine()).captured(0).toULongLong();
-        //Lê a linha do número de linhas
+        ///Lê a linha do número de linhas
         const size_t rows = regex.match(fs.readLine()).captured(0).toULongLong();
-        //Lê a linha da coordenada inferior em X
+        ///Lê a linha da coordenada inferior em X
         const double xOrigin = regex.match(fs.readLine()).captured(0).replace(",", ".").toDouble();
-        //Lê a linha da coordenada inferior em Y
+        ///Lê a linha da coordenada inferior em Y
         const double yOrigin = regex.match(fs.readLine()).captured(0).replace(",", ".").toDouble();
-        //Lê a linha do cellsize
+        ///Lê a linha do cellsize
         const double cellSize = regex.match(fs.readLine()).captured(0).replace(",", ".").toDouble();
-        //Lê a linha do NODATA
+        ///Lê a linha do NODATA
         const int noData = regex.match(fs.readLine()).captured(0).toInt();
 
         domain::Raster<T> raster(rows, cols, xOrigin, yOrigin, cellSize, noData);
 
-        //Lê apenas as informações do cabeçalho, caso ativado
+        ///Lê apenas as informações do cabeçalho, caso ativado
         if (!onlyHeader)
         {
             QRegularExpression regexLine("\\s$");
@@ -133,7 +137,7 @@ public:
     {
         const QRegularExpression regexAsc("\\.asc$", QRegularExpression::CaseInsensitiveOption);
 
-        //Extensão .ASC
+        ///Extensão .ASC
         if (regexAsc.match(fileName).hasMatch())
             return RasterFileUtil<T>::getASCData(fileName, onlyHeader);
         else

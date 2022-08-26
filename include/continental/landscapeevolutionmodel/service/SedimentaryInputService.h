@@ -39,17 +39,24 @@ public:
     /// Função que executa o algoritimo do aporte sedimentar.
     void execute();
 
-    //Atribui o Grid que possui as erosões e deposições
+    /// Função que atribui o Grid que possui apenas as erosões e deposições
+    /// \param onlyErosionDepositionGrid Valor do Grid que possui apenas as erosões e deposições
     void setOnlyErosionDepositionGrid(const std::shared_ptr<datamanagement::Raster<double>> & onlyErosionDepositionGrid);
 
     /// Função de definição das bacias.
     /// @param waterShed Objeto do tipo Raster<short>.
     void setWaterShed(const std::shared_ptr<datamanagement::Raster<short>> & waterShed);
 
+    /// Função de definição dos exutórios
+    /// \param cellExhilarating Valor dos exutórios
     void setCellExhilarating(const std::shared_ptr<std::vector<std::shared_ptr<hydrotools::service::CellWatershed>>> & cellExhilarating);
 
+    /// Função responsável pelos dados de entrada da sedimentação
+    /// \return Retorna o valor da entrada da sedimentação
     const std::shared_ptr<std::vector<std::shared_ptr<domain::SedimentaryInputContent>>> & sedimentaryInputs() const;
 
+    /// Função de definção do tempo de simulação
+    /// \param simulateUntilTime Valor do tempo de simulação
     void setSimulateUntilTime(const double simulateUntilTime);
 
 

@@ -14,12 +14,19 @@ namespace landscapeevolutionmodel {
 namespace domain {
 namespace definition {
 
-
+///
+/// \brief The SlopeUnits enum Classe com o enum referente aos tipos de unidade
+/// de declive
+///
 enum class SlopeUnits
 {
+    /// valor tangencial
     tangent = 1,
+    /// valor percentil %
     percent = 2,
+    /// valor do grau
     degree = 3,
+    /// valor em radiano
     radians = 4
 };
 

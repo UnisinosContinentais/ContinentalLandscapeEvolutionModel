@@ -219,6 +219,10 @@ public:
         m_version = version;
     }
 
+    /// Função referente se o dados é NoData
+    /// \param row Valor da linha
+    /// \param col Valor da Coluna
+    /// \return Retorna os dados
     inline bool isNoDataValue(size_t row, size_t col)
     {
         return static_cast<int>(getData(row, col)) == static_cast<int>(m_noDataValue);

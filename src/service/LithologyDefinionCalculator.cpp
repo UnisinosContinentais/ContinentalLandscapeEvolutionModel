@@ -12,21 +12,17 @@ namespace service {
 
 double LithologyDefinionCalculator::calculateFlowAccumulationSquareMeters(const double pixelsFlowAccumulation) const
 {
-    // Calcula o valor da acumulação em metros quadrados, caso a acumulação tenha sido calcula em número de pixels.
     const Raster<int> &rasterInput = *getFlowAccumulationRaster();
 
-    // Informações do Raster do DEM
     double inputCellSize = rasterInput.getCellSize();
     double areaPixel = std::pow(inputCellSize, 2);
-
-    // Adicionar 1 no FlowAccumulation, pois o ContinentalHydroTools atribui o valor 0 as nascentes.
 
     return (pixelsFlowAccumulation + 1) * areaPixel;
 }
 
 double LithologyDefinionCalculator::calculateDischarge(const double flowAccumulationSquareMeters) const
 {
-    // Calcula o valor da vazão
+
     return getDischargeKParameter() * std::pow(flowAccumulationSquareMeters, getDischargeEParameter());
 }
 
@@ -48,32 +44,32 @@ double LithologyDefinionCalculator::calculateGrainSizeD50(const double channelDe
 short LithologyDefinionCalculator::calculateGrainDiscretizationValue(const double grainSizeD50) const
 {
     GrainNames grainName;
-    // Maior que Areia Grossa
+
     if (grainSizeD50 > LandscapeEvolutionModelConstant::MaxCoarseSandSize)
     {
         grainName = GrainNames::Gravel;
     }
-    // Areia Grossa
+
     else if (grainSizeD50 > LandscapeEvolutionModelConstant::MaxMediumSandSize)
     {
         grainName = GrainNames::CoarseSand;
     }
-    // Areia Média
+
     else if (grainSizeD50 > LandscapeEvolutionModelConstant::MaxFineSandSize)
     {
         grainName = GrainNames::MediumSand;
     }
-    // Areia Fina
+
     else if (grainSizeD50 > LandscapeEvolutionModelConstant::MaxSiltSize)
     {
         grainName = GrainNames::FineSand;
     }
-    // Silte
+
     else if (grainSizeD50 > LandscapeEvolutionModelConstant::MaxClaySize)
     {
         grainName = GrainNames::Silt;
     }
-    // Argila
+
     else
     {
         grainName = GrainNames::Clay;
@@ -87,7 +83,6 @@ void LithologyDefinionCalculator::calculateGrainDiscretizationRaster()
     const Raster<int> &flowAccumulation = *getFlowAccumulationRaster();
     const Raster<double> &dem = *getDemRaster();
 
-    // Informações do Raster do DEM
     size_t inputRows = dem.getRows();
     size_t inputCols = dem.getCols();
     double inputXOrigin = dem.getXOrigin();
@@ -95,7 +90,6 @@ void LithologyDefinionCalculator::calculateGrainDiscretizationRaster()
     double inputCellSize = dem.getCellSize();
     int inputNoData = dem.getNoDataValue();
 
-    // Calcular a declividade
     SlopeCalculator slope;
     slope.setSlopeUnit(SlopeUnits::tangent);
     slope.setSlopeType(SlopeType::slopeHorn1981);
@@ -104,7 +98,7 @@ void LithologyDefinionCalculator::calculateGrainDiscretizationRaster()
     //std::shared_ptr<Raster<float>> resultSlope = slope.getOutputRaster();
     setSlope(slope.getOutputRaster());
 
-    // Cria o Raster do D50.
+
     setD50(std::make_shared<Raster<double>>(inputRows,
                                            inputCols,
                                            inputXOrigin,
@@ -113,7 +107,6 @@ void LithologyDefinionCalculator::calculateGrainDiscretizationRaster()
                                            inputNoData));
     Raster<double> &rasterD50 = *getD50();
 
-    // Cria o Raster com os resultados.
     setLithologyDefinitionRaster(std::make_shared<Raster<short>>(inputRows,
                                                                  inputCols,
                                                                  inputXOrigin,
@@ -142,7 +135,6 @@ void LithologyDefinionCalculator::calculateGrainDiscretizationRaster()
 
 double LithologyDefinionCalculator::convertDegreesAdimensional(const double degreeValue) const
 {
-    // Converte ângulo de graus para m '\' m, que é uma medida adimensional.
     double adimensional = std::tan(degreeValue * (M_PI / 180));
 
     return adimensional;
@@ -150,7 +142,6 @@ double LithologyDefinionCalculator::convertDegreesAdimensional(const double degr
 
 double LithologyDefinionCalculator::convertAdimensionalDegrees(const double adimensionalValue) const
 {
-    // Converte declividade de m '\' m (adimensional), para graus.
     double degree = std::atan(adimensionalValue) * (180.0 / M_PI);
 
     return degree;

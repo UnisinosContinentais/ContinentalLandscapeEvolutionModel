@@ -12,11 +12,23 @@ namespace continental {
 namespace landscapeevolutionmodel {
 namespace domain {
 
+///
+/// \brief The StreamDefinitionThresholdType enum Classe emun referente ao limiar
+/// dos tipos do definição dos riachos
+///
 enum class StreamDefinitionThresholdType
 {
+
+    ///Número de celulas
     NumberOfCells = 0,
+
+    ///Percentual maximo de celulas
     PercentualOfMaximumCells = 1,
-    Area = 2 //km²
+
+    /// Area em Km²
+    Area = 2
+
+
 };
 
 } // namespace domain

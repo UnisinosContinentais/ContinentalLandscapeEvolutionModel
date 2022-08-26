@@ -14,10 +14,14 @@ namespace landscapeevolutionmodel {
 namespace domain {
 namespace definition {
 
-
+///
+/// \brief The SlopeType enum Classe com o tipo de declive - Slope
+///
 enum class SlopeType
 {
+    /// Declive Horn1981
     slopeHorn1981 = 1,
+    /// Declive máximo
     maxSlope = 2
 };
 

@@ -20,21 +20,37 @@ class SedimentaryInputContent
 {
 
 public:
-    //construtor
+
+    /// Construtor
     SedimentaryInputContent();
 
+    /// Função Getter referente a posição I
+    /// \return Retorna o valor da posição I
     const unsigned long long & getPositionI() const;
+
+    /// Função Setter referente a posição I
+    /// \param positionI Valor da posição I
     void setPositionI(const unsigned long long &positionI);
 
+    /// Função Getter referente a posição J
+    /// \return Retorna o valor da posição J
     const unsigned long long & getPositionJ() const;
+
+    /// Função Setter referente a posição J
+    /// \param positionJ Valor da posição J
     void setPositionJ(const unsigned long long &positionJ);
 
+    /// Função Getter referente aos conteúdos de entrada da Sedimentação
+    /// \return Retorna o objeto com os conteúdos de entrada da Sedimentação
     const double & getSedimentaryInputContent() const;
+
+    /// Função Setter referente aos conteúdos de entrada da Sedimentação
+    /// \param sedimentaryInputContent
     void setSedimentaryInputContent(const double &sedimentaryInputContent);
 
 private:
 
-    //membros da classe
+    ///Membros
     unsigned long long m_positionI = 0;
     unsigned long long m_positionJ = 0;
     double m_sedimentaryInputContent = 0.0;

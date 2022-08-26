@@ -14,6 +14,10 @@ namespace landscapeevolutionmodel {
 namespace domain {
 namespace definition {
 
+
+///
+/// \brief The GrainNames enum Classe com os nomes do grão
+///
 enum class GrainNames
 {
     CoarseSand,

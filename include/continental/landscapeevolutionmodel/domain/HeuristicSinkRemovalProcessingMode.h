@@ -11,14 +11,21 @@
 namespace continental {
 namespace landscapeevolutionmodel {
 namespace domain {
-	
+
+///
+/// \brief The HeuristicSinkRemovalProcessingMode enum Classe enum referente aos 3
+/// tipos de heurísicas a serem utilizadas pelo algoritmo de remoção
+///
 enum class HeuristicSinkRemovalProcessingMode
 {
-    // Utiliza o modo Modified Heuristic Search
+
+    /// Utiliza o modo Modified Heuristic Search
     MHS = 0,
-    // Utiliza o modo Heuristic Search
+
+    /// Utiliza o modo Heuristic Search
     HS = 1,
-    // Utiliza o modo PFS
+
+    /// Utiliza o modo PFS
     PFS = 2
 };
 

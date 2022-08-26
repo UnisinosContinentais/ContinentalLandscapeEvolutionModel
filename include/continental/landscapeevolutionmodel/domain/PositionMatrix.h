@@ -7,6 +7,9 @@ namespace continental {
 namespace landscapeevolutionmodel {
 namespace domain {
 
+///
+/// \brief The PositionMatrix class Classe Matriz de posição
+///
 class CONTINENTALLANDSCAPEEVOLUTIONMODELPLUGIN_EXPORT_DECL PositionMatrix
 {
 public:

@@ -37,7 +37,7 @@ void ProcessLandscapeEvolutionModel::prepare(
         std::shared_ptr<datamanagement::Raster<int>> initialFlowAccumulation
     )
 {
-    //Prparando parâmetros para Exucução
+
     std::shared_ptr<SimulationLandscapeEvolutionModelConfig> config = inputParameters->getSimulationLandscapeEvolutionModelConfig();
 
     m_simulateUntilTime = inputParameters->getSimulateUntilTime();
@@ -46,25 +46,17 @@ void ProcessLandscapeEvolutionModel::prepare(
     m_enableSurfaceLog = inputParameters->getEnableSurfaceLog();
     m_logSurfacePath = inputParameters->getPathSurfaceLog();
 
-
-    //m_surface recebe a superfície inicial e os processo do LEM serão processados em sobre dela
     m_surface = surface;
     m_inputParameters = inputParameters;
     m_underwaterSeparatedGrid = underwaterSeparatedGrid;
     m_initialFlowDirection = initialFlowDirection;
     m_initialFlowAccumulation = initialFlowAccumulation;
 
-    //este grid é inicializado como uma cópia do grid que vai processar o LEM
-    //assim se subtrair esta copia e o uplift do resultado do LEM, tem-se o grid de erosão e deposição
     m_onlyErosionDepositionGrid = std::make_shared<datamanagement::Raster<double>>(*m_surface);
 
-    //é a cópia da superfície de entrada
     m_initialSurface = std::make_shared<datamanagement::Raster<double>>(*m_surface);
 
-
-    //é o dado necessário para plotar a superfície transiente no stratBR
     m_transientSurfaceWithUnderwaterFilter = std::make_shared<datamanagement::Raster<double>>(*m_surface);
-
 
     if (m_enableSurfaceLog)
     {
@@ -72,23 +64,21 @@ void ProcessLandscapeEvolutionModel::prepare(
         ProcessLandscapeEvolutionModelLogUtil::writeSurfaceLog( "DEBUG-m_initialSurface.asc", basePath, m_initialSurface);
     }
 
-
-    prepareFlowAccumulationLimit(); // método desta classe que calcula o flowAccLimit
+    prepareFlowAccumulationLimit();
 
     m_hydroToolsAlgorithm = HydroToolsAlgorithmService(m_surface, m_inputParameters, m_underwaterSeparatedGrid, m_initialFlowDirection, m_initialFlowAccumulation);
     m_difusionAlgorithm = DifusionAlgorithmService(m_surface, config->getDiffusivity(), m_difusionDeltaT);
 
-    m_difusionAlgorithm.allocateTopography(); //aloca o espaço de m_surface em m_T da classe difusionAlgorithm
+    m_difusionAlgorithm.allocateTopography();
 
-    m_hydroToolsAlgorithm.prepareDem(); //Executa o Hydrotools -> executa o syncAndDestroy
+    m_hydroToolsAlgorithm.prepareDem();
 
     m_upliftAlgorithm.setInitialGrid(surface);
     m_upliftAlgorithm.setNumberOfTimeSteps(m_simulateUntilTime/m_difusionDeltaT);
     m_upliftAlgorithm.setTimeStep(m_difusionDeltaT);
     m_upliftAlgorithm.setUpliftRate(inputParameters->getUpliftRate());
 
-
-    m_eroderAlgorithm.setRaster(m_surface); //o raster do eroder pegou as modificações do syncAndDestroy
+    m_eroderAlgorithm.setRaster(m_surface);
     m_eroderAlgorithm.setErodibility(config->getErodibility());
     m_eroderAlgorithm.setDeltaTime(m_erosionDeltaT);
     m_eroderAlgorithm.setConcavityIndex(config->getConcavityIndex());
@@ -125,7 +115,6 @@ void ProcessLandscapeEvolutionModel::prepare(
 
     if (m_enableSurfaceLog)
     {
-
         QString basePath = m_logSurfacePath + "/" + "ContinentalLEM_" + QString::number(m_logAge) + "_" + QString::number(m_logNode);
         QString pathParameters = basePath + "-prepare-01_Parameters.txt";
 
@@ -177,10 +166,9 @@ bool ProcessLandscapeEvolutionModel::iterate()
     m_eroderAlgorithm.setStreamDefinition(m_hydroToolsAlgorithm.getStreamDefinition());
     m_eroderAlgorithm.setFlowDirection(m_hydroToolsAlgorithm.getFlowDirection());
 
-    //executa os métodos de erosão apenas se a erodibilidade for diferente de 0
+
     if (!qFuzzyCompare(m_eroderAlgorithm.getErodibility(), 0.0))
     {
-        // esse for permite que a erosão possa ser executada mais vezes dentro do passso de tempo de difusão
         for (size_t erosionTimeStepCount = 0; erosionTimeStepCount < (m_difusionDeltaT / m_erosionDeltaT); ++erosionTimeStepCount)
         {
             if (qFuzzyCompare(m_eroderAlgorithm.getDimensionLessDepositionCoeficient(), 0.0))
@@ -194,7 +182,6 @@ bool ProcessLandscapeEvolutionModel::iterate()
         }
     }
 
-    // não é dentro do for ?
     if (!qFuzzyCompare(m_difusionAlgorithm.getDiffusivity(), 0.0))
     {
         m_difusionAlgorithm.executeWithVariableBoundary(
@@ -232,8 +219,6 @@ bool ProcessLandscapeEvolutionModel::iterate()
             ProcessLandscapeEvolutionModelLogUtil::writeOnlyErosionDepositionLog( QString::number(m_timeStepCount) + "-06-DEBUG_Grid_surface_ULTIMOPASSO_COM_hydroToolsAlgorith_DE_NOVO", basePath, m_surface);
         }
 
-
-        //Dispersão de Grãos
         m_grainDispersionService.setFlowAccumulationRaster(m_hydroToolsAlgorithm.getFlowAccumulation());
         m_grainDispersionService.setDemRaster(m_surface);
         m_grainDispersionService.calculateGrainDiscretizationRaster();

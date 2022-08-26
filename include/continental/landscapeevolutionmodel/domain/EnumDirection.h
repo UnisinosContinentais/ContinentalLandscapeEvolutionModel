@@ -5,6 +5,10 @@ namespace continental {
 namespace landscapeevolutionmodel {
 namespace domain {
 
+///
+/// \brief The EnumDirection enum Classe com a composição da codificação D8
+/// do método utilizado pelo Hydrotools
+///
 enum EnumDirection
 {
     Right = 1,

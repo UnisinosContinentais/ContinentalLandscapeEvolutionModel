@@ -34,6 +34,9 @@ public:
     /// Construtor.
     /// @param initialGrid Objeto do tipo Raster<float> com a Superfície Inicial.
     /// @param inputParameters Objeto do tipo LandscapeEvolutionModelInput com os parametros de entrada para realização do processamento.
+    /// @param underwaterSeparatedGrid Valor do grid que separa os valores do nivel aquoso
+    /// @param initialFlowDirection Valor inicial da direção do fluxo
+    /// @param initialFlowAccumulation Valor inicial do fluxo acumulado
     HydroToolsAlgorithmService(std::shared_ptr<continental::datamanagement::Raster<double>> initialGrid,
                                std::shared_ptr<continental::landscapeevolutionmodel::dto::LandscapeEvolutionModelInput> inputParameters,
                                std::shared_ptr<continental::datamanagement::Raster<short>> underwaterSeparatedGrid,
@@ -69,25 +72,25 @@ public:
     /// @return Objeto do tipo Raster<short>.
     const std::shared_ptr<continental::datamanagement::Raster<short>> & getWaterShed() const;
 
+    /// Função de retorno dos exutórios
+    /// \return Retorna o valor dos exutórios
     const std::shared_ptr<std::vector<std::shared_ptr<hydrotools::service::CellWatershed>>> & getCellsExhilarating() const;
 
+    /// Função de retorno do grid separador do meio aquoso
+    /// \return Retorna o valor do grid separado do meio aquoso
     std::shared_ptr<continental::datamanagement::Raster<short> > getUnderwaterSeparatedGrid() const;
 
 private:
     /// Membros.
     std::shared_ptr<continental::datamanagement::Raster<double>> m_initialGrid;
-
-
     std::shared_ptr<continental::datamanagement::Raster<short>> m_flowDirection;
     std::shared_ptr<continental::datamanagement::Raster<int>> m_flowAccumulation;
 	std::shared_ptr<continental::datamanagement::Raster<short>> m_streamDefinition;
 	std::shared_ptr<continental::datamanagement::Raster<short>> m_streamSegmentation;
     std::shared_ptr<continental::datamanagement::Raster<short>> m_waterShed;
     std::shared_ptr<std::vector<std::shared_ptr<hydrotools::service::CellWatershed>>> m_cellExhilarating;
-
     std::shared_ptr<continental::landscapeevolutionmodel::dto::LandscapeEvolutionModelInput> m_inputParameters;
     std::shared_ptr<continental::datamanagement::Raster<short>> m_underwaterSeparatedGrid;
-
     std::shared_ptr<continental::datamanagement::Raster<short>> m_initialFlowDirection = nullptr;
     std::shared_ptr<continental::datamanagement::Raster<int>> m_initialFlowAccumulation = nullptr;
 };

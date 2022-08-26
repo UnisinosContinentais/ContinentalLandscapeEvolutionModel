@@ -5,6 +5,10 @@ namespace continental {
 namespace landscapeevolutionmodel {
 namespace domain {
 
+///
+/// \brief The EnumDrainageNetworkLimit enum Enum responsável pela definição do
+/// limite da rede de drenagem. Não definida (1), Apenas a rede principal (1),
+/// porcentagem (2) e quantidade (3)
 enum EnumDrainageNetworkLimit
 {
     Undefined = 0,
